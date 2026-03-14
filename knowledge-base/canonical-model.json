@@ -1,0 +1,65 @@
+{
+  "project": "schetchiki-yug-telegram-storefront",
+  "timezone": "Europe/Moscow",
+  "canonical_key": "xml_id",
+  "systems": {
+    "site": {
+      "role": "catalog_master",
+      "domain": "https://xn----7sbhjpnneqb.xn--p1ai/",
+      "local_catalog_sources": [
+        "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_real.json",
+        "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_priced.json"
+      ],
+      "required_fields": [
+        "xml_id",
+        "name",
+        "price",
+        "old_price",
+        "promo_price",
+        "stock",
+        "url",
+        "image",
+        "sku",
+        "category",
+        "active"
+      ]
+    },
+    "bitrix24": {
+      "role": "storefront_control_layer",
+      "portal": "b24-w26t68.bitrix24.ru",
+      "owner_user_id": 1,
+      "entities": {
+        "popular_products": {
+          "entity_type_id": 1042,
+          "category_id": 23,
+          "active_stage_id": "DT1042_23:PREPARATION"
+        },
+        "promotions": {
+          "entity_type_id": 1044,
+          "category_id": 27,
+          "active_stage_id": "DT1044_27:CLIENT"
+        }
+      }
+    },
+    "telegram": {
+      "role": "consumer",
+      "entrypoint": "https://xn----7sbhjpnneqb.xn--p1ai/api/telegram/storefront.json",
+      "required_blocks": [
+        "popular_products",
+        "promotions"
+      ]
+    }
+  },
+  "join_rules": {
+    "bitrix_xmlId_equals_site_xml_id": true,
+    "skip_if_site_not_found": true,
+    "skip_if_site_inactive": true,
+    "skip_if_required_fields_missing": true
+  },
+  "rebuild_policy": {
+    "mode": "full_rebuild",
+    "publish_strategy": "temp_file_then_atomic_replace",
+    "sync_frequency_recommended_minutes": 15,
+    "sync_frequency_minimum_minutes": 60
+  }
+}

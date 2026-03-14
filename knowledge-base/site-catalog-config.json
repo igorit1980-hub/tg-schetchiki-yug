@@ -1,0 +1,40 @@
+{
+  "domain_human": "https://счетчики-юг.рф/",
+  "domain_technical": "https://xn----7sbhjpnneqb.xn--p1ai/",
+  "preferred_lookup_endpoint": "/api/catalog/by-xml-id?xml_id={xmlId}",
+  "fallback_local_sources": [
+    "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_real.json",
+    "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_priced.json"
+  ],
+  "required_lookup_response": {
+    "found": true,
+    "item": {
+      "xml_id": "string",
+      "name": "string",
+      "price": "number",
+      "old_price": "number|null",
+      "promo_price": "number|null",
+      "stock": "number|null",
+      "url": "string",
+      "image": "string|null",
+      "sku": "string|null",
+      "category": "string|null",
+      "active": "boolean"
+    }
+  },
+  "validation_rules": {
+    "active_must_be_true": true,
+    "required_for_popular_products": [
+      "name",
+      "price",
+      "url"
+    ],
+    "required_for_promotions": [
+      "name",
+      "price",
+      "promo_price",
+      "old_price",
+      "url"
+    ]
+  }
+}

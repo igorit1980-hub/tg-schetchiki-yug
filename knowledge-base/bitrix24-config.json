@@ -1,0 +1,73 @@
+{
+  "portal": "b24-w26t68.bitrix24.ru",
+  "owner": {
+    "name": "Толстиков Игорь Владимирович",
+    "user_id": 1
+  },
+  "entities": {
+    "popular_products": {
+      "type_id": 11,
+      "entity_type_id": 1042,
+      "code": "popular_products_tg",
+      "category_id": 23,
+      "category_name": "Telegram витрина",
+      "active_stage_id": "DT1042_23:PREPARATION",
+      "active_stage_name": "Активно",
+      "stages": {
+        "DT1042_23:NEW": "Черновик",
+        "DT1042_23:PREPARATION": "Активно",
+        "DT1042_23:CLIENT": "Остановлено",
+        "DT1042_23:SUCCESS": "Архив",
+        "DT1042_23:FAIL": "Отклонено"
+      },
+      "field_mapping": {
+        "id": "id",
+        "title": "title",
+        "xmlId": "xml_id",
+        "begindate": "date_from",
+        "closedate": "date_to",
+        "sourceDescription": "short_text",
+        "assignedById": "manager_id",
+        "updatedTime": "updated_at"
+      }
+    },
+    "promotions": {
+      "type_id": 13,
+      "entity_type_id": 1044,
+      "code": "telegram_promotions",
+      "category_id": 27,
+      "category_name": "Telegram акции",
+      "active_stage_id": "DT1044_27:CLIENT",
+      "active_stage_name": "Активна",
+      "stages": {
+        "DT1044_27:NEW": "Черновик",
+        "DT1044_27:PREPARATION": "Согласование",
+        "DT1044_27:CLIENT": "Активна",
+        "DT1044_27:SUCCESS": "Завершена",
+        "DT1044_27:FAIL": "Отключена"
+      },
+      "field_mapping": {
+        "id": "id",
+        "title": "promo_title",
+        "xmlId": "xml_id",
+        "begindate": "date_from",
+        "closedate": "date_to",
+        "sourceDescription": "promo_text",
+        "assignedById": "manager_id",
+        "updatedTime": "updated_at"
+      }
+    }
+  },
+  "allowed_fields_v1": [
+    "id",
+    "title",
+    "xmlId",
+    "begindate",
+    "closedate",
+    "sourceDescription",
+    "assignedById",
+    "stageId",
+    "categoryId",
+    "updatedTime"
+  ]
+}

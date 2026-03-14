@@ -1,0 +1,63 @@
+{
+  "endpoint": "https://xn----7sbhjpnneqb.xn--p1ai/api/telegram/storefront.json",
+  "timezone": "Europe/Moscow",
+  "format": {
+    "generated_at": "ISO8601",
+    "timezone": "Europe/Moscow",
+    "popular_products": [
+      {
+        "id": "number",
+        "xml_id": "string",
+        "title": "string",
+        "short_text": "string",
+        "date_from": "ISO8601",
+        "date_to": "ISO8601",
+        "manager_id": "number",
+        "updated_at": "ISO8601",
+        "product_name": "string",
+        "price": "number",
+        "old_price": "number|null",
+        "stock": "number|null",
+        "url": "string",
+        "image": "string|null",
+        "sku": "string|null",
+        "category": "string|null"
+      }
+    ],
+    "promotions": [
+      {
+        "id": "number",
+        "xml_id": "string",
+        "promo_title": "string",
+        "promo_text": "string",
+        "date_from": "ISO8601",
+        "date_to": "ISO8601",
+        "manager_id": "number",
+        "updated_at": "ISO8601",
+        "product_name": "string",
+        "price": "number",
+        "old_price": "number",
+        "stock": "number|null",
+        "url": "string",
+        "image": "string|null",
+        "sku": "string|null",
+        "category": "string|null"
+      }
+    ]
+  },
+  "sort_rules": {
+    "popular_products": [
+      "updated_at DESC",
+      "id DESC"
+    ],
+    "promotions": [
+      "updated_at DESC",
+      "id DESC"
+    ]
+  },
+  "publish_rules": {
+    "full_rebuild_only": true,
+    "temp_then_atomic_replace": true,
+    "keep_last_valid_version_on_failure": true
+  }
+}

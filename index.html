@@ -1,0 +1,2592 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Счетчики Юг | Telegram Channel</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #000;
+        --bg-soft: #0a0a0a;
+        --card: rgba(18, 18, 18, 0.98);
+        --card-2: rgba(24, 24, 24, 0.98);
+        --line: rgba(255, 255, 255, 0.06);
+        --text: #f7f7f7;
+        --muted: rgba(255, 255, 255, 0.58);
+        --muted-2: rgba(255, 255, 255, 0.38);
+        --accent: #49c989;
+        --accent-soft: rgba(73, 201, 137, 0.16);
+        --blue: #34b0da;
+        --red: #b84738;
+        --green: #2da630;
+        --link: #35a8ff;
+        --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --shadow: 0 38px 90px rgba(0, 0, 0, 0.52);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%), #111;
+        color: var(--text);
+        font-family: var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      button {
+        font: inherit;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        padding: 0;
+      }
+
+      .phone {
+        width: min(100%, 430px);
+        border-radius: 46px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #020202;
+        box-shadow: var(--shadow);
+      }
+
+      .screen {
+        position: relative;
+        height: 932px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(31, 108, 175, 0.18), transparent 11%),
+          radial-gradient(circle at 80% 34%, rgba(255, 255, 255, 0.08), transparent 12%),
+          linear-gradient(180deg, #050505 0%, #000 100%);
+      }
+
+      .blur-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 12% 8%, rgba(0, 162, 255, 0.24), transparent 9%),
+          radial-gradient(circle at 30% 12%, rgba(255, 30, 120, 0.18), transparent 8%),
+          radial-gradient(circle at 78% 74%, rgba(255, 255, 255, 0.1), transparent 14%);
+        filter: blur(28px);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .island {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 142px;
+        height: 30px;
+        border-radius: 999px;
+        background: #000;
+        z-index: 10;
+      }
+
+      .statusbar {
+        position: relative;
+        z-index: 8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 22px 10px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .status-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .sig,
+      .wifi {
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.82);
+      }
+
+      .sig {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .wifi {
+        width: 14px;
+        height: 10px;
+        border-radius: 3px;
+      }
+
+      .battery {
+        min-width: 28px;
+        height: 22px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #111;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .content {
+        position: relative;
+        z-index: 5;
+        height: 100%;
+        overflow-y: auto;
+        padding: 10px 8px 158px;
+      }
+
+      .content::-webkit-scrollbar {
+        display: none;
+      }
+
+      .hero {
+        position: sticky;
+        top: 0;
+        z-index: 15;
+        padding-bottom: 8px;
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-chip,
+      .share-chip,
+      .float-btn {
+        border-radius: 999px;
+        background: rgba(43, 43, 43, 0.76);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .back-chip {
+        width: 58px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+      }
+
+      .back-chip b {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.95);
+        color: #111;
+        font-size: 15px;
+      }
+
+      .pill {
+        min-width: 0;
+        flex: 1;
+        height: 52px;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        background: rgba(52, 52, 52, 0.72);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 12px 24px rgba(0, 0, 0, 0.22);
+        backdrop-filter: blur(16px);
+      }
+
+      .logo {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        background: var(--accent);
+        color: #07120c;
+        font-size: 12px;
+        font-weight: 800;
+        flex: 0 0 auto;
+      }
+
+      .pill-copy {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .pill-title {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.08;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .pill-sub {
+        margin-top: 2px;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 10px;
+      }
+
+      .pill-right {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 15px;
+      }
+
+      .share-chip {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+      }
+
+      .share-chip::before {
+        content: "СЮ";
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #050505;
+        color: #f2f2f2;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .views-line {
+        margin-top: 4px;
+        margin-right: 6px;
+        text-align: right;
+        color: var(--muted-2);
+        font-size: 11px;
+      }
+
+      .info-card,
+      .post,
+      .mini-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+      }
+
+      .info-card {
+        margin-top: 8px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 13px;
+        line-height: 1.38;
+      }
+
+      .section-label {
+        margin: 12px 4px 6px;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .status-switch {
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .status-pill {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(18, 18, 18, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .status-pill.active {
+        background: rgba(73, 201, 137, 0.18);
+        color: #def8e9;
+        border-color: rgba(73, 201, 137, 0.32);
+      }
+
+      .service-stack,
+      .info-links,
+      .catalog-stack {
+        display: grid;
+        gap: 4px;
+      }
+
+      .service-btn,
+      .info-link,
+      .catalog-btn,
+      .product-btn,
+      .brand-btn,
+      .cta,
+      .inline-btn {
+        position: relative;
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.18s ease, filter 0.18s ease, background 0.18s ease;
+      }
+
+      .service-btn:active,
+      .info-link:active,
+      .catalog-btn:active,
+      .product-btn:active,
+      .brand-btn:active,
+      .cta:active,
+      .inline-btn:active,
+      .back-chip:active,
+      .dock-btn:active,
+      .float-btn:active {
+        transform: scale(0.985);
+        filter: brightness(1.06);
+      }
+
+      .service-btn,
+      .info-link,
+      .catalog-btn,
+      .product-btn,
+      .brand-btn {
+        padding: 12px 40px 12px 14px;
+        text-align: left;
+        background:
+          linear-gradient(180deg, rgba(14, 14, 14, 0.98), rgba(0, 0, 0, 0.98)),
+          #000;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .service-btn::after,
+      .info-link::after,
+      .catalog-btn::after,
+      .product-btn::after,
+      .brand-btn::after,
+      .cta::after {
+        content: "↗";
+        position: absolute;
+        right: 12px;
+        top: 10px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 17px;
+      }
+
+      .service-btn {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .service-btn.blue {
+        background: linear-gradient(180deg, #349ec5, #2a8eb1);
+      }
+
+      .service-btn.green {
+        background: linear-gradient(180deg, #2cb933, #229828);
+      }
+
+      .catalog-grid,
+      .brand-grid,
+      .inline-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .catalog-btn {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 15px;
+        line-height: 1.16;
+        font-weight: 500;
+      }
+
+      .brand-btn {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .cta {
+        margin-top: 6px;
+        padding: 15px 46px 15px 18px;
+        text-align: center;
+        background: linear-gradient(180deg, #28b42d, #249826);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .crumbs {
+        margin: 10px 4px 8px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+      }
+
+      .post {
+        margin-top: 8px;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .post-body {
+        padding: 10px 12px 14px;
+      }
+
+      .post-name {
+        color: var(--link);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .post-date {
+        margin-top: 2px;
+        color: #36b9ff;
+        font-size: 17px;
+        font-weight: 500;
+      }
+
+      .post-copy,
+      .list-text {
+        margin-top: 12px;
+        white-space: pre-line;
+        font-size: 13.5px;
+        line-height: 1.34;
+      }
+
+      .post-copy strong {
+        color: #36b9ff;
+      }
+
+      .mini-card {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 16px;
+      }
+
+      .pin-stack,
+      .feed-stack {
+        display: grid;
+        gap: 8px;
+      }
+
+      .pin-card {
+        position: relative;
+        padding: 12px 40px 12px 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+        cursor: pointer;
+      }
+
+      .pin-card::after {
+        content: "↗";
+        position: absolute;
+        right: 12px;
+        top: 10px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 17px;
+      }
+
+      .pin-kicker {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .pin-title {
+        margin-top: 5px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .pin-copy {
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .quick-search {
+        margin-top: 8px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .quick-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .quick-copy {
+        margin-top: 3px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        line-height: 1.28;
+      }
+
+      .quick-grid {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .quick-chip {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 12.5px;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .feed-card {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(16, 16, 16, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+        cursor: pointer;
+      }
+
+      .feed-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .feed-tag {
+        color: #36b9ff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .feed-time {
+        color: rgba(255, 255, 255, 0.42);
+        font-size: 11px;
+      }
+
+      .feed-title {
+        margin-top: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .feed-copy {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12.5px;
+        line-height: 1.3;
+      }
+
+      .feed-meta {
+        margin-top: 8px;
+        color: rgba(255, 255, 255, 0.46);
+        font-size: 11px;
+      }
+
+      .feed-note {
+        margin-top: 8px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+        line-height: 1.32;
+      }
+
+      .mini-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .mini-list {
+        margin-top: 8px;
+        display: grid;
+        gap: 6px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 13px;
+        line-height: 1.34;
+      }
+
+      .product-stack {
+        display: grid;
+        gap: 4px;
+        margin-top: 10px;
+      }
+
+      .filter-bar {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .filter-copy {
+        min-width: 0;
+      }
+
+      .filter-title {
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+
+      .filter-sub {
+        margin-top: 2px;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 11.5px;
+        line-height: 1.28;
+      }
+
+      .filter-toggle {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+      }
+
+      .filter-toggle.active {
+        background: rgba(73, 201, 137, 0.14);
+        border-color: rgba(73, 201, 137, 0.22);
+      }
+
+      .check-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        color: transparent;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .filter-toggle.active .check-box {
+        background: rgba(73, 201, 137, 0.92);
+        color: #07120c;
+      }
+
+      .check-copy {
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .product-btn {
+        min-height: 50px;
+        display: block;
+        font-size: 12.5px;
+        line-height: 1.22;
+      }
+
+      .product-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .product-title {
+        flex: 1;
+        text-align: left;
+        color: rgba(255, 255, 255, 0.94);
+        padding-right: 2px;
+        overflow-wrap: anywhere;
+      }
+
+      .product-prices {
+        text-align: right;
+        white-space: nowrap;
+        min-width: 86px;
+      }
+
+      .price-retail {
+        color: #fff;
+        font-weight: 700;
+        font-size: 12.5px;
+      }
+
+      .price-stock {
+        margin-top: 3px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .stock-yes {
+        color: #7fe2aa;
+      }
+
+      .stock-no {
+        color: #ff7b7b;
+      }
+
+      .inline-grid {
+        margin-top: 12px;
+      }
+
+      .inline-btn {
+        padding: 10px 8px;
+        border-radius: 12px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .inline-btn.primary {
+        background: rgba(73, 201, 137, 0.18);
+        border-color: rgba(73, 201, 137, 0.28);
+        color: #def8e9;
+      }
+
+      .route-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .route-btn {
+        padding: 12px 12px 11px;
+        border-radius: 14px;
+        text-align: left;
+        background:
+          linear-gradient(180deg, rgba(15, 15, 15, 0.98), rgba(5, 5, 5, 0.98)),
+          #000;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+      }
+
+      .route-kicker {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .route-title {
+        margin-top: 6px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .route-copy {
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .address-box {
+        margin-top: 12px;
+        padding: 13px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .address-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .address-copy {
+        margin-top: 7px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 13px;
+        line-height: 1.4;
+        white-space: pre-line;
+      }
+
+      .card-stage {
+        margin-top: 12px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .card-stage.retail {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .card-stage.pending {
+        background: rgba(255, 187, 86, 0.11);
+        border-color: rgba(255, 187, 86, 0.2);
+      }
+
+      .card-stage.approved {
+        background: rgba(73, 201, 137, 0.12);
+        border-color: rgba(73, 201, 137, 0.22);
+      }
+
+      .card-stage-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .card-stage-badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+      }
+
+      .card-stage-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .card-stage-copy {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 13px;
+        line-height: 1.32;
+      }
+
+      .journey-grid {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .journey-step {
+        display: grid;
+        grid-template-columns: 26px 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .journey-step:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .journey-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 13px;
+      }
+
+      .journey-title {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .journey-copy {
+        margin-top: 2px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12.5px;
+        line-height: 1.32;
+      }
+
+      .loyalty-card {
+        margin-top: 12px;
+        padding: 15px 14px 14px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at top right, rgba(73, 201, 137, 0.22), transparent 28%),
+          linear-gradient(180deg, rgba(24, 35, 28, 0.98), rgba(11, 15, 12, 0.98));
+        border: 1px solid rgba(73, 201, 137, 0.22);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.26);
+      }
+
+      .loyalty-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .loyalty-kicker {
+        color: rgba(217, 255, 233, 0.78);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .loyalty-name {
+        margin-top: 6px;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.08;
+      }
+
+      .loyalty-meta {
+        margin-top: 4px;
+        color: rgba(223, 255, 236, 0.78);
+        font-size: 12px;
+      }
+
+      .discount-chip {
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(217, 255, 233, 0.12);
+        color: #ebfff2;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .customer-grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .customer-cell {
+        padding: 9px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .customer-label {
+        color: rgba(223, 255, 236, 0.62);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .customer-value {
+        margin-top: 5px;
+        color: #f4fff7;
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      .card-note {
+        margin-top: 10px;
+        color: rgba(223, 255, 236, 0.72);
+        font-size: 12px;
+        line-height: 1.32;
+      }
+
+      .qr {
+        position: relative;
+        width: 148px;
+        height: 148px;
+        margin: 14px auto 0;
+        border-radius: 18px;
+        background:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.96) 11px, transparent 11px),
+          linear-gradient(rgba(255, 255, 255, 0.96) 11px, transparent 11px);
+        background-size: 22px 22px;
+        background-color: #fff;
+      }
+
+      .qr::before,
+      .qr::after,
+      .qr-corner {
+        content: "";
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        border: 9px solid #fff;
+        background: #0a0a0a;
+      }
+
+      .qr::before {
+        top: 12px;
+        left: 12px;
+      }
+
+      .qr::after {
+        top: 12px;
+        right: 12px;
+      }
+
+      .qr-corner {
+        left: 12px;
+        bottom: 12px;
+      }
+
+      .float-ui {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 82px;
+        z-index: 18;
+        pointer-events: none;
+      }
+
+      .float-left,
+      .float-right {
+        position: absolute;
+        bottom: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .float-left {
+        left: 0;
+      }
+
+      .float-right {
+        right: 0;
+      }
+
+      .float-btn {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        color: rgba(255, 255, 255, 0.95);
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      .sound-pill {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        min-width: 200px;
+        height: 48px;
+        padding: 0 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: rgba(39, 39, 39, 0.86);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 12px 24px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(14px);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .dock {
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        padding: 8px;
+        border-radius: 22px;
+        background: rgba(20, 20, 20, 0.84);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 12px 28px rgba(0, 0, 0, 0.34);
+        backdrop-filter: blur(18px);
+      }
+
+      .dock-btn {
+        min-height: 54px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        gap: 2px;
+        padding: 8px 4px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+      }
+
+      .dock-btn strong {
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .dock-btn.active {
+        background: var(--accent-soft);
+        color: #def8e9;
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 0;
+          background: #000;
+        }
+
+        .phone {
+          width: 100%;
+          border-radius: 0;
+          border: 0;
+        }
+
+        .screen {
+          height: 100vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <section class="screen">
+        <div class="blur-bg"></div>
+        <div class="island"></div>
+
+        <div class="statusbar">
+          <div>10:36</div>
+          <div class="status-right">
+            <span class="sig"></span>
+            <span class="wifi"></span>
+            <span class="battery">22</span>
+          </div>
+        </div>
+
+        <div class="content" id="contentRoot">
+          <div class="hero">
+            <div class="hero-row">
+              <button class="back-chip" id="backButton"><span>❮</span><b>1</b></button>
+              <div class="pill">
+                <div class="logo">СЮ</div>
+                <div class="pill-copy">
+                  <div class="pill-title" id="pillTitle">Счетчики Юг | Каталог приборов учета</div>
+                  <div class="pill-sub" id="pillSub">Оптовый поставщик приборов учета и комплектующих</div>
+                </div>
+                <div class="pill-right" id="pillRight">🔇</div>
+              </div>
+              <div class="share-chip"></div>
+            </div>
+            <div class="views-line" id="viewsLine">👁 137K изменено 09:42</div>
+          </div>
+
+          <div id="screenRoot"></div>
+        </div>
+
+        <div class="float-ui">
+          <div class="float-left">
+            <button class="float-btn" id="giftButton">🎁</button>
+          </div>
+          <div class="sound-pill">Вкл. звук</div>
+          <div class="float-right">
+            <button class="float-btn" id="upButton">⌄</button>
+            <button class="float-btn" id="searchButton">⌕</button>
+          </div>
+        </div>
+
+        <nav class="dock">
+          <button class="dock-btn active" data-tab="home"><strong>⌂</strong><span>Меню</span></button>
+          <button class="dock-btn" data-tab="catalog"><strong>▦</strong><span>Каталог</span></button>
+          <button class="dock-btn" data-tab="post"><strong>☰</strong><span>Пост</span></button>
+          <button class="dock-btn" data-tab="card"><strong>◫</strong><span>Карта</span></button>
+        </nav>
+      </section>
+    </main>
+
+    <script src="./catalog_real.js"></script>
+    <script>
+      const CATALOG = Array.isArray(window.CATALOG_DATA) ? window.CATALOG_DATA : [];
+
+      const state = {
+        tab: "home",
+        history: [{ screen: "home" }],
+        categoryPath: [],
+        selectedNode: null,
+        selectedBrand: "",
+        cardStatus: "retail",
+        showDeliveryItems: false,
+      };
+
+      const screenRoot = document.getElementById("screenRoot");
+      const contentRoot = document.getElementById("contentRoot");
+      const pillTitle = document.getElementById("pillTitle");
+      const pillSub = document.getElementById("pillSub");
+      const pillRight = document.getElementById("pillRight");
+      const viewsLine = document.getElementById("viewsLine");
+      const backButton = document.getElementById("backButton");
+      const dockButtons = Array.from(document.querySelectorAll(".dock-btn"));
+
+      const HOME_BRANDS = [
+        "Бетар",
+        "Вектор",
+        "Таугас",
+        "Эстер",
+        "Экомера",
+        "Эконом",
+        "Беломо",
+        "Гарант",
+        "Гранд",
+        "Грандфар",
+      ];
+
+      const LOCATION_INFO = {
+        city: "Ростов-на-Дону",
+        address: "Октябрьский р-н, пер. Радиаторный, 3а",
+        phones: ["+7 863 308-88-70", "+7 908 187 80 08"],
+        fullAddress: "Ростов-на-Дону, Октябрьский р-н, переулок Радиаторный, 3а",
+        hours: "Пн - Пт с 9:00 до 17:00, Сб и Вс - выходной",
+        yandex: "https://yandex.ru/maps/?text=%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2-%D0%BD%D0%B0-%D0%94%D0%BE%D0%BD%D1%83,%20%D0%BF%D0%B5%D1%80.%20%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D0%B9,%203%D0%B0",
+        google: "https://www.google.com/maps/search/?api=1&query=%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2-%D0%BD%D0%B0-%D0%94%D0%BE%D0%BD%D1%83,%20%D0%BF%D0%B5%D1%80.%20%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D0%B9,%203%D0%B0",
+        dgis: "https://2gis.ru/search/%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2-%D0%BD%D0%B0-%D0%94%D0%BE%D0%BD%D1%83,%20%D0%BF%D0%B5%D1%80.%20%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D0%B9,%203%D0%B0",
+        whatsapp: "https://wa.me/79081878008",
+        max: "https://max.ru/id615013493531_bot",
+        contactsPage: "https://xn----7sbhjpnneqb.xn--p1ai/contacts/",
+      };
+
+      function rootCategories() {
+        return CATALOG;
+      }
+
+      function getChildren(node) {
+        if (!node) return CATALOG;
+        return Array.isArray(node.subs) ? node.subs : [];
+      }
+
+      function getNodeAtPath(path) {
+        let list = CATALOG;
+        let node = null;
+        for (const index of path) {
+          node = list[index];
+          if (!node) return null;
+          list = getChildren(node);
+        }
+        return node;
+      }
+
+      function firstNodeWithProducts() {
+        function walk(nodes) {
+          for (const node of nodes) {
+            if (Array.isArray(node.products) && node.products.length) return node;
+            if (Array.isArray(node.subs)) {
+              const found = walk(node.subs);
+              if (found) return found;
+            }
+          }
+          return null;
+        }
+        return walk(CATALOG);
+      }
+
+      function setHeader(title, sub, right = "🔇", views = "👁 137K изменено 09:42") {
+        pillTitle.textContent = title;
+        pillSub.textContent = sub;
+        pillRight.textContent = right;
+        viewsLine.textContent = views;
+      }
+
+      function hasWholesaleAccess() {
+        return state.cardStatus === "approved";
+      }
+
+      function cardStatusMeta() {
+        if (state.cardStatus === "approved") {
+          return {
+            label: "Карта подтверждена",
+            shortLabel: "Опт активен",
+            title: "Оптовый доступ открыт",
+            copy: "Менеджер подтвердил профиль клиента. В каталоге и публикациях показываются только оптовые цены.",
+            headerSub: "Личный кабинет подтвержденного клиента",
+          };
+        }
+        if (state.cardStatus === "pending") {
+          return {
+            label: "Заявка на проверке",
+            shortLabel: "Проверка",
+            title: "Карта ожидает подтверждения",
+            copy: "Заявка отправлена менеджеру. До подтверждения в канале и каталоге остаются только розничные цены.",
+            headerSub: "Заявка отправлена менеджеру на проверку",
+          };
+        }
+        return {
+          label: "Карта не оформлена",
+          shortLabel: "Розница",
+          title: "Получите доступ к оптовым ценам",
+          copy: "После регистрации карты менеджер подтверждает тип клиента: застройщик, монтажник или оптовый покупатель.",
+          headerSub: "Регистрация и доступ к оптовым ценам",
+        };
+      }
+
+      function updateDock() {
+        dockButtons.forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === state.tab);
+        });
+      }
+
+      function sectionLabel(text) {
+        return '<div class="section-label">' + text + "</div>";
+      }
+
+      function infoCardHtml() {
+        return (
+          '<div class="info-card">' +
+          "Ростов-на-Дону<br>" +
+          "Октябрьский р-н, пер. Радиаторный, 3а<br>" +
+          "+7 863 308-88-70<br>" +
+          "+7 908 187 80 08<br>" +
+          "WhatsApp / Telegram · Доставка по России" +
+          "</div>"
+        );
+      }
+
+      function statusSwitchHtml() {
+        return (
+          sectionLabel("Статус клиента") +
+          '<div class="status-switch">' +
+          '<button class="status-pill ' + (state.cardStatus === "retail" ? "active" : "") + '" data-card-status="retail">Гость</button>' +
+          '<button class="status-pill ' + (state.cardStatus === "pending" ? "active" : "") + '" data-card-status="pending">На проверке</button>' +
+          '<button class="status-pill ' + (state.cardStatus === "approved" ? "active" : "") + '" data-card-status="approved">Карта активна</button>' +
+          "</div>"
+        );
+      }
+
+      function renderHome() {
+        const categories = rootCategories();
+        const quickItems = categories.slice(0, 6);
+        screenRoot.innerHTML =
+          infoCardHtml() +
+          statusSwitchHtml() +
+          sectionLabel("Закрепленные сообщения") +
+          '<div class="pin-stack">' +
+          '<button class="pin-card" data-action="open-root-catalog"><div class="pin-kicker">Закреп</div><div class="pin-title">Каталог и быстрый вход в разделы</div><div class="pin-copy">Главная навигация по категориям, подкаталогам и спискам товаров.</div></button>' +
+          '<button class="pin-card" data-action="show-card"><div class="pin-kicker">Закреп</div><div class="pin-title">Карта клиента и оптовый доступ</div><div class="pin-copy">Регистрация, подтверждение менеджером, QR и номер карты для ручного ввода.</div></button>' +
+          '<button class="pin-card" data-action="show-content-channel"><div class="pin-kicker">Закреп</div><div class="pin-title">Информационный канал</div><div class="pin-copy">Подписка на отдельный канал с обучающими роликами, инструкциями и полезными публикациями каждый день.</div></button>' +
+          '<button class="pin-card" data-action="show-manager"><div class="pin-kicker">Закреп</div><div class="pin-title">Связь с менеджером</div><div class="pin-copy">Подбор товара, оптовый запрос, доставка, сервис и гарантия.</div></button>' +
+          '</div>' +
+          '<div class="quick-search">' +
+          '<div class="quick-title">Быстрый поиск по каталогу</div>' +
+          '<div class="quick-copy">Короткий вход в основные разделы прямо из шапки канала, без длинного скролла по ленте.</div>' +
+          '<div class="quick-grid">' +
+          quickItems
+            .map((item) => '<button class="quick-chip" data-root-code="' + item.code + '">' + item.title + "</button>")
+            .join("") +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть весь каталог</button>' +
+          '<button class="inline-btn" data-action="show-wholesale">💰 Оптовый режим</button>' +
+          '<button class="inline-btn" data-action="show-find">📍 Наш адрес</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+          '</div>' +
+          '</div>' +
+          sectionLabel("Сегодня в канале") +
+          '<div class="feed-stack">' +
+          '<button class="feed-card" data-action="show-promotions">' +
+          '<div class="feed-top"><div class="feed-tag">Акция дня</div><div class="feed-time">сегодня</div></div>' +
+          '<div class="feed-title">Снижение цены на популярные счетчики воды</div>' +
+          '<div class="feed-copy">Небольшой ежедневный пост, который занимает компактный кусок экрана и быстро переводит клиента в акционный блок.</div>' +
+          '<div class="feed-meta">Переход: Акции → менеджер / каталог</div>' +
+          '</button>' +
+          '<button class="feed-card" data-action="show-popular">' +
+          '<div class="feed-top"><div class="feed-tag">Популярное</div><div class="feed-time">сегодня</div></div>' +
+          '<div class="feed-title">ТОП ходовых позиций по воде и газу</div>' +
+          '<div class="feed-copy">Компактная подборка товаров, которую клиент быстро просматривает прямо в ленте без перегруза интерфейса.</div>' +
+          '<div class="feed-meta">Переход: Популярные товары → каталог</div>' +
+          '</button>' +
+          '<button class="feed-card" data-action="show-content">' +
+          '<div class="feed-top"><div class="feed-tag">Полезное</div><div class="feed-time">сегодня</div></div>' +
+          '<div class="feed-title">Как выбрать счетчик под квартиру, дом или объект</div>' +
+          '<div class="feed-copy">Контентный пост небольшого размера, который прогревает клиента и ведет в нужный раздел каталога или к менеджеру.</div>' +
+          '<div class="feed-meta">Переход: Полезный контент → каталог / менеджер</div>' +
+          '</button>' +
+          '</div>' +
+          '<div class="feed-note">Информационный канал вынесен в закрепленные сообщения. Основная лента этого канала остается короткой: витрина, акции, полезное и переход в каталог.</div>' +
+          sectionLabel("Быстрые разделы") +
+          '<div class="info-links">' +
+          '<button class="info-link" data-action="show-popular">📦 Популярные товары</button>' +
+          '<button class="info-link" data-action="show-promotions">🔥 Акции</button>' +
+          '<button class="info-link" data-action="show-content">📰 Полезный контент</button>' +
+          '<button class="info-link" data-action="show-history">🕰 История</button>' +
+          '<button class="info-link" data-action="show-project">🧩 Проект</button>' +
+          '<button class="info-link" data-action="show-service">⚙️ Сервис и гарантия</button>' +
+          '<button class="info-link" data-action="show-delivery">🚚 Доставка по России</button>' +
+          '<button class="info-link" data-action="show-site">🌐 Перейти на сайт</button>' +
+          "</div>";
+
+        setHeader(
+          "Счетчики Юг | Каталог приборов учета",
+          "Оптовый поставщик приборов учета и комплектующих",
+          "🔇",
+          "👁 137K изменено 09:42"
+        );
+      }
+
+      function renderCatalog() {
+        const node = getNodeAtPath(state.categoryPath);
+        const items = getChildren(node);
+        const title = node ? node.title : "Каталог сайта";
+        const crumbs = ["Каталог"].concat(
+          state.categoryPath.map((_, idx) => {
+            const item = getNodeAtPath(state.categoryPath.slice(0, idx + 1));
+            return item ? item.title : "";
+          }).filter(Boolean)
+        );
+
+        screenRoot.innerHTML =
+          '<div class="crumbs">' + crumbs.join(" / ") + "</div>" +
+          sectionLabel(node ? "Подкатегории" : "Разделы сайта") +
+          '<div class="catalog-stack">' +
+          items
+            .map((item, index) => {
+              const count = Array.isArray(item.subs) ? item.subs.length : Array.isArray(item.products) ? item.products.length : 0;
+              return (
+                '<button class="catalog-btn" data-catalog-index="' +
+                index +
+                '">' +
+                item.title +
+                (count ? " (" + count + ")" : "") +
+                "</button>"
+              );
+            })
+            .join("") +
+          "</div>" +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Навигация по каталогу сайта</div>' +
+          '<div class="mini-list">' +
+          "<div>В этом экране показываются реальные папки и подпапки боевого каталога сайта.</div>" +
+          "<div>Когда раздел содержит товары, открывается список позиций без карточек и описаний.</div>" +
+          "</div>" +
+          "</div>";
+
+        setHeader(title, node ? "Подкаталоги и товарные списки" : "Структура каталога сайта", "↗", "👁 каталог сайта");
+      }
+
+      function renderProducts() {
+        const node = state.selectedNode || firstNodeWithProducts();
+        state.selectedNode = node;
+        const products = node && Array.isArray(node.products) ? node.products : [];
+        const crumbs = buildNodePath(node);
+        const filteredProducts = products.filter((item) => {
+          if (state.showDeliveryItems) return true;
+          const qtyNum = Number(item.quantity);
+          return Number.isFinite(qtyNum) ? qtyNum > 0 : true;
+        });
+        const productRows = filteredProducts.map((item) => {
+          const retail = item.retail ? formatPrice(item.retail, item.currency) : "—";
+          const wholesale = item.wholesale ? formatPrice(item.wholesale, item.currency) : retail;
+          const activePrice = hasWholesaleAccess() ? wholesale : retail;
+          const qtyNum = Number(item.quantity);
+          const stock = Number.isFinite(qtyNum)
+            ? (qtyNum > 0
+              ? '<span class="price-stock stock-yes">✓</span>'
+              : '<span class="price-stock stock-no">🚚</span>')
+            : '';
+          return (
+            '<button class="product-btn" data-action="' + (hasWholesaleAccess() ? 'show-price' : 'show-wholesale') + '">' +
+            '<span class="product-row">' +
+            '<span class="product-title">' + escapeHtml(item.name) + '</span>' +
+            '<span class="product-prices">' +
+            '<span class="price-retail">' + activePrice + '</span>' +
+            stock +
+            '</span>' +
+            '</span>' +
+            '</button>'
+          );
+        }).join("");
+
+        screenRoot.innerHTML =
+          '<div class="crumbs">' + crumbs.join(" / ") + "</div>" +
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">' + (node ? node.title : "Список товаров") + "</div>" +
+          '<div class="post-copy">' +
+          (hasWholesaleAccess()
+            ? "Карта подтверждена. В списке показываются только оптовые цены."
+            : state.cardStatus === "pending"
+              ? "Карта отправлена на проверку. Пока менеджер не подтвердил клиента, в списке остаются розничные цены."
+              : "Вы просматриваете канал как обычный клиент. В списке показываются только розничные цены. Оптовые цены открываются после регистрации карты и подтверждения менеджером.") +
+          "</div>" +
+          '<div class="filter-bar">' +
+          '<div class="filter-copy">' +
+          '<div class="filter-title">' + (state.showDeliveryItems ? "Показаны все товары раздела" : "Показаны только товары в наличии") + '</div>' +
+          '<div class="filter-sub">' + (state.showDeliveryItems ? "В список включены позиции со склада и товары, доступные под доставку." : "Товары под доставку скрыты. Включите галочку, чтобы посмотреть все позиции раздела.") + '</div>' +
+          '</div>' +
+          '<button class="filter-toggle ' + (state.showDeliveryItems ? 'active' : '') + '" data-action="toggle-delivery">' +
+          '<span class="check-box">✓</span>' +
+          '<span class="check-copy">Все товары</span>' +
+          '</button>' +
+          '</div>' +
+          '<div class="product-stack">' +
+          (productRows || '<div class="mini-card"><div class="mini-title">Нет товаров в наличии</div><div class="mini-list"><div>В этом разделе сейчас нет позиций на складе.</div><div>Включите галочку "Все товары", чтобы показать позиции под доставку.</div></div></div>') +
+          "</div>" +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn' + (hasWholesaleAccess() ? '' : ' primary') + '" data-action="' + (hasWholesaleAccess() ? 'show-price' : 'show-wholesale') + '">' + (hasWholesaleAccess() ? '💰 Оптовый прайс' : '🔐 Получить оптовый доступ') + '</button>' +
+          '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+          '<button class="inline-btn" data-action="sync">🌐 Сайт / CRM</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+          "</div>" +
+          "</div>" +
+          "</article>";
+
+        setHeader(
+          node ? node.title : "Список товаров",
+          "Товары показаны списком, без карточек",
+          "↗",
+          "👁 список товаров"
+        );
+      }
+
+      function renderPost() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">Оптовый прайс / публикация каталога</div>' +
+          '<div class="post-copy"><strong>Сайт + Telegram + Битрикс24</strong><br>' +
+          (hasWholesaleAccess()
+            ? "Карта подтверждена, поэтому публикации показывают только оптовые цены."
+            : state.cardStatus === "pending"
+              ? "Заявка на карту отправлена, но до подтверждения менеджером публикации показывают только розничные цены."
+              : "Карта клиента еще не подтверждена, поэтому публикации показывают только розничные цены.") +
+          "</div>" +
+          '<div class="list-text">' +
+          'С Ч Ё Т Ч И К И В О Д Ы\n' +
+          (hasWholesaleAccess()
+            ? 'ЭКО-М Ду15 — 890 ₽\\nITELMA Ду20 — 1 050 ₽\\nБЕТАР СГВ-15 — 980 ₽\\n\\n'
+            : 'ЭКО-М Ду15 — 950 ₽\\nITELMA Ду20 — 1 250 ₽\\nБЕТАР СГВ-15 — 1 100 ₽\\n\\n') +
+          'С Ч Ё Т Ч И К И Г А З А\n' +
+          (hasWholesaleAccess()
+            ? 'G4 — 2 700 ₽\\nG6 — 4 250 ₽\\n\\n'
+            : 'G4 — 2 900 ₽\\nG6 — 4 600 ₽\\n\\n') +
+          'М А Н О М Е Т Р Ы\n' +
+          (hasWholesaleAccess()
+            ? 'МП50 0–6 бар — 320 ₽\\nМП100 0–16 бар — 590 ₽\\n\\n'
+            : 'МП50 0–6 бар — 350 ₽\\nМП100 0–16 бар — 650 ₽\\n\\n') +
+          'Н А С О С Ы\n' +
+          (hasWholesaleAccess()
+            ? 'Wilo — 8 300 ₽\\nGrundfos — 9 900 ₽'
+            : 'Wilo — 8 900 ₽\\nGrundfos — 10 500 ₽') +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Синхронизация</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Пост каталога", "Формат длинной публикации в канале", "☰", "👁 104,2K изменено 09:43");
+      }
+
+      function renderPopular() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📦 Популярные товары</div>' +
+          '<div class="post-copy">Этот блок нужен для самых ходовых позиций канала. На следующем этапе он будет собираться из `Битрикс24`, а сейчас показывает будущую механику публикации и переходов.</div>' +
+          '<div class="list-text">' +
+          'ТОП ПО СПРОСУ\\n' +
+          'ЭКО НОМ СВ 15-110 — ' + (hasWholesaleAccess() ? '1 690 ₽' : '1 850 ₽') + '\\n' +
+          'БЕТАР СГВ-15 — ' + (hasWholesaleAccess() ? '1 540 ₽' : '1 690 ₽') + '\\n' +
+          'Газовый счетчик Вектор G4 — ' + (hasWholesaleAccess() ? '2 700 ₽' : '2 950 ₽') + '\\n' +
+          'Манометр МП50 0–6 бар — ' + (hasWholesaleAccess() ? '320 ₽' : '350 ₽') +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Логика блока</div>' +
+          '<div class="mini-list">' +
+          '<div>• товары попадают сюда из Битрикс24 как отдельная витрина</div>' +
+          '<div>• клиент переходит из популярных товаров сразу в каталог или к менеджеру</div>' +
+          '<div>• блок должен обновляться без ручной правки Telegram-поста</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Битрикс24</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Популярные товары", "Блок автоподборки ходовых позиций", "📦", "👁 популярные");
+      }
+
+      function renderPromotions() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🔥 Акции</div>' +
+          '<div class="post-copy">Акции должны жить отдельно от общего прайса. Здесь собираются временные предложения, которые менеджеры включают в Битрикс24 и выводят в канал на срок акции.</div>' +
+          '<div class="list-text">' +
+          'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' +
+          'ЭКО НОМ СВ 15-110 — старая цена 1 850 ₽ / акция 1 690 ₽\\n' +
+          'БЕТАР СГВ-15 — старая цена 1 690 ₽ / акция 1 540 ₽\\n' +
+          'Vector G4 — старая цена 2 950 ₽ / акция 2 790 ₽' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Логика акций</div>' +
+          '<div class="mini-list">' +
+          '<div>• акции задаются менеджером или руководителем отдела продаж</div>' +
+          '<div>• каждая акция имеет срок действия и отдельный заголовок для канала</div>' +
+          '<div>• после завершения акция автоматически уходит из витрины</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-manager">📞 Уточнить акцию</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-popular">📦 Популярные товары</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Битрикс24</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Акции", "Промо-блок канала с ограниченным сроком", "🔥", "👁 акции");
+      }
+
+      function renderContent() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📰 Полезный контент</div>' +
+          '<div class="post-copy">В канале нужен не только каталог, но и полезные посты: инструкции, разборы моделей, правила выбора, кейсы по монтажу и объяснение отличий бытовых и промышленных приборов.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Инструкции</div><div class="route-copy">Поверка, монтаж, передача показаний, выбор модели.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Сравнение моделей</div><div class="route-copy">Чем отличаются Бетар, Экомера, Вектор, ЭКО НОМ и другие бренды.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Кейсы объектов</div><div class="route-copy">Примеры поставки на монтаж, объект и оптовую закупку.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Новости и изменения</div><div class="route-copy">Новые позиции, сроки поставки, изменения по наличию и акциям.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Как встроить в канал</div>' +
+          '<div class="mini-list">' +
+          '<div>• полезные посты должны жить отдельной лентой между витринными постами</div>' +
+          '<div>• каждый контентный пост должен уводить или в каталог, или к менеджеру</div>' +
+          '<div>• часть контента может быть закрепленной навигацией для новых клиентов</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-manager">📞 Задать вопрос менеджеру</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Перейти в каталог</button>' +
+          '<button class="inline-btn" data-action="show-find">📍 Наш адрес</button>' +
+          '<button class="inline-btn" data-action="show-post">📄 Прайс</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Контент канала", "Инструкции, объяснения и полезные посты", "📰", "👁 полезный контент");
+      }
+
+      function renderContentChannel() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🔗 Информационный канал</div>' +
+          '<div class="post-copy">Это отдельный Telegram-канал без продажной нагрузки. В нем публикуются только полезные материалы для клиентов: обучающие ролики, инструкции, тематические посты, разборы моделей и практическая информация по нашей продукции.</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что будет в этом канале</div>' +
+          '<div class="mini-list">' +
+          '<div>• обучающие видео и короткие объяснения</div>' +
+          '<div>• посты по выбору и эксплуатации приборов</div>' +
+          '<div>• полезные материалы по монтажу и применению</div>' +
+          '<div>• регулярная информационная публикация без продажной нагрузки</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="address-box">' +
+          '<div class="address-title">Формат подписки</div>' +
+          '<div class="address-copy">Подпишитесь на наш информационный канал по ссылке и получайте полезную информацию каждый день.\nНа этом канале не будет лишних движений — только публикации и обучающий контент для клиентов.</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="content-channel-link">🔗 Подписаться на канал</button>' +
+          '<button class="inline-btn" data-action="show-content">📰 Смотреть рубрику</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Информационный канал", "Отдельный контентный Telegram-канал", "🔗", "👁 полезные публикации");
+      }
+
+      function renderHistory() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🕰 История проекта</div>' +
+          '<div class="post-copy">Это краткая история того, как собиралась Telegram-витрина: от согласования концепции до рабочей схемы, где сайт, Telegram и Битрикс24 работают как одна система.</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Старт проекта</div>' +
+          '<div class="mini-list">' +
+          '<div>• зафиксировали бренд `Счетчики Юг` и формат канала-каталога</div>' +
+          '<div>• определили связку: Telegram-канал + Telegram-бот + сайт + Битрикс24</div>' +
+          '<div>• задали цель: витрина, заявки, цены, остатки и карта клиента</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Этап 1</div>' +
+          '<div class="mini-list">' +
+          '<div>• согласовали тёмный мобильный визуал Telegram-витрины</div>' +
+          '<div>• собрали переходы между меню, каталогом, прайсом, остатками и картой клиента</div>' +
+          '<div>• закрепили сценарии для обычного и оптового клиента</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Этап 2</div>' +
+          '<div class="mini-list">' +
+          '<div>• разложили проект на сущности, связи и потоки данных</div>' +
+          '<div>• сайт оставили мастер-источником каталога и карточек</div>' +
+          '<div>• Битрикс24 закрепили как источник цен, остатков, статусов и заявок</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-project">🧩 Открыть проект</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Синхронизация</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("История проекта", "Как развивалась витрина Счетчики Юг", "🕰", "👁 история проекта");
+      }
+
+      function renderProject() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🧩 Проект</div>' +
+          '<div class="post-copy">Проект собирает витрину продаж и обслуживания в одной логике: сайт отдает каталог, Telegram показывает путь клиента, а Битрикс24 управляет коммерческой частью и статусами.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Источник</div><div class="route-title">Сайт</div><div class="route-copy">Категории, бренды, карточки товаров, описания и изображения.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Витрина</div><div class="route-title">Telegram-канал</div><div class="route-copy">Навигация, публикации, акции, полезный контент и вход в каталог.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарии</div><div class="route-title">Telegram-бот</div><div class="route-copy">Регистрация клиента, карта, оптовый доступ и отправка заявок.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Коммерция</div><div class="route-title">Битрикс24</div><div class="route-copy">Цены, остатки, клиенты, статусы, сделки и менеджерская логика.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Главные правила</div>' +
+          '<div class="mini-list">' +
+          '<div>• сайт — мастер-источник каталога и товарных карточек</div>' +
+          '<div>• Битрикс24 — мастер-источник цен, остатков и клиентского статуса</div>' +
+          '<div>• Telegram показывает уже собранную витринную модель без ручной путаницы</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что должен уметь MVP</div>' +
+          '<div class="mini-list">' +
+          '<div>• подтягивать категории и товарные списки с сайта</div>' +
+          '<div>• показывать цены и сценарии по статусу клиента</div>' +
+          '<div>• передавать заявки и обращения в Битрикс24</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-history">🕰 История</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+          '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+          '<button class="inline-btn" data-action="show-content-channel">🔗 Инфоканал</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Проект", "Сайт, Telegram и Битрикс24 в одной схеме", "🧩", "👁 схема проекта");
+      }
+
+      function renderBrand() {
+        const brand = state.selectedBrand || "Бренд";
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🏷 ' + escapeHtml(brand) + '</div>' +
+          '<div class="post-copy">Это брендовый вход в каталог. Здесь клиент должен видеть короткую подборку по бренду и переход в нужные разделы, а не случайный список товаров.</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Как будет работать брендовый блок</div>' +
+          '<div class="mini-list">' +
+          '<div>• бренд открывает подборку товаров этого производителя</div>' +
+          '<div>• клиент может перейти в общий каталог или сразу к менеджеру</div>' +
+          '<div>• позже сюда можно добавить популярные модели бренда и акции по нему</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер по бренду</button>' +
+          '<button class="inline-btn" data-action="show-popular">📦 Популярные товары</button>' +
+          '<button class="inline-btn" data-action="show-post">📄 Прайс</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader(brand, "Брендовая точка входа в каталог", "🏷", "👁 бренд");
+      }
+
+      function renderWholesale() {
+        let topBlock = "";
+        let actionBlock = "";
+
+        if (hasWholesaleAccess()) {
+          topBlock =
+            '<div class="card-stage approved">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">Оптовый режим активен</div><div class="card-stage-copy">Карта подтверждена, поэтому клиенту открывается отдельный оптовый сценарий внутри канала и показ только оптовых цен.</div></div>' +
+            '<div class="card-stage-badge">Опт активен</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="route-grid">' +
+            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает публикации и списки товаров уже в оптовом режиме.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Оформить заявку</div><div class="route-copy">Клиент сможет отправить запрос на отгрузку после связки с CRM.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Запросить остатки</div><div class="route-copy">Отдельный путь для оперативной проверки доступности товара.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Связаться с менеджером</div><div class="route-copy">Быстрый маршрут к оптовому менеджеру без выхода из логики канала.</div></button>' +
+            '</div>';
+
+          actionBlock =
+            '<button class="inline-btn primary" data-action="show-price">💰 Открыть оптовый прайс</button>' +
+            '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+            '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>';
+        } else if (state.cardStatus === "pending") {
+          topBlock =
+            '<div class="card-stage pending">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">Оптовый доступ на проверке</div><div class="card-stage-copy">Заявка уже отправлена. Пока менеджер не подтвердил клиента, канал продолжает показывать только розничные цены.</div></div>' +
+            '<div class="card-stage-badge">Проверка</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="mini-card">' +
+            '<div class="mini-title">Что происходит сейчас</div>' +
+            '<div class="mini-list">' +
+            '<div>• заявка на карту уже создана</div>' +
+            '<div>• менеджер проверяет тип клиента и право на оптовый доступ</div>' +
+            '<div>• после подтверждения включается отдельный оптовый сценарий</div>' +
+            '</div>' +
+            '</div>';
+
+          actionBlock =
+            '<button class="inline-btn primary" data-action="show-card">💳 Открыть карту клиента</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Напомнить менеджеру</button>' +
+            '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+            '<button class="inline-btn" data-action="show-post">📄 Розничный прайс</button>';
+        } else {
+          topBlock =
+            '<div class="card-stage retail">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации</div><div class="card-stage-copy">Без подтвержденной карты канал показывает только розничные цены. Чтобы открыть оптовый режим, клиент проходит регистрацию и подтверждение менеджером.</div></div>' +
+            '<div class="card-stage-badge">Розница</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="route-grid">' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Подать заявку</div><div class="route-copy">Клиент оставляет данные для карты и оптового доступа.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Проверка менеджером</div><div class="route-copy">Менеджер определяет, застройщик это, монтажник или оптовый покупатель.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Активация карты</div><div class="route-copy">После подтверждения открываются только оптовые цены и отдельные кнопки сценария.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Работа в канале</div><div class="route-copy">Клиент пользуется каталогом, остатками и прайсом уже как оптовик.</div></button>' +
+            '</div>';
+
+          actionBlock =
+            '<button class="inline-btn primary" data-card-status="pending">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+            '<button class="inline-btn" data-action="show-post">📄 Смотреть розничный прайс</button>';
+        }
+
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">💰 Оптовый заказ</div>' +
+          '<div class="post-copy">Это отдельный сценарий внутри канала: не просто прайс, а путь клиента к оптовому режиму, карте и дальнейшим действиям внутри витрины.</div>' +
+          topBlock +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Логика экрана</div>' +
+          '<div class="mini-list">' +
+          '<div>• обычный клиент видит путь к регистрации</div>' +
+          '<div>• клиент на проверке видит ожидание подтверждения</div>' +
+          '<div>• подтвержденный клиент попадает в отдельный оптовый режим</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          actionBlock +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Оптовый заказ", "Отдельный сценарий доступа к оптовому режиму", "💰", "👁 оптовый путь");
+      }
+
+      function renderCard() {
+        const meta = cardStatusMeta();
+        const stageClass = state.cardStatus;
+        let cardBody = "";
+        let actionButtons = "";
+
+        if (state.cardStatus === "approved") {
+          cardBody =
+            '<div class="card-stage approved">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
+            '<div class="card-stage-badge">' + meta.shortLabel + '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="loyalty-card">' +
+            '<div class="loyalty-top">' +
+            '<div>' +
+            '<div class="loyalty-kicker">Постоянный покупатель</div>' +
+            '<div class="loyalty-name">Иван Иванов</div>' +
+            '<div class="loyalty-meta">+7 900 123-45-67 · ID 104582</div>' +
+            '</div>' +
+            '<div class="discount-chip">Скидка 10%</div>' +
+            '</div>' +
+            '<div class="customer-grid">' +
+            '<div class="customer-cell"><div class="customer-label">Статус</div><div class="customer-value">Подтвержденный оптовик</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Тип клиента</div><div class="customer-value">Монтажник / опт</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Номер карты</div><div class="customer-value">SY-104582</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Ручной ввод</div><div class="customer-value">SY-104582</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Цены в канале</div><div class="customer-value">Только оптовые</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Синхронизация</div><div class="customer-value">Битрикс24 + Telegram</div></div>' +
+            '</div>' +
+            '<div class="qr"><span class="qr-corner"></span></div>' +
+            '<div class="card-note">Покажите QR-код в магазине. Если сканер не работает, используйте номер карты SY-104582 для ручного ввода.</div>' +
+            '</div>';
+
+          actionButtons =
+            '<button class="inline-btn primary" data-action="open-root-catalog">📦 Перейти в каталог</button>' +
+            '<button class="inline-btn" data-action="show-wholesale">💰 Открыть оптовый режим</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+            '<button class="inline-btn" data-card-status="pending">↺ Вернуть на проверку</button>';
+        } else if (state.cardStatus === "pending") {
+          cardBody =
+            '<div class="card-stage pending">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
+            '<div class="card-stage-badge">' + meta.shortLabel + '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="mini-card">' +
+            '<div class="mini-title">Заявка клиента</div>' +
+            '<div class="mini-list">' +
+            '<div>Имя: Иван</div>' +
+            '<div>Телефон: +7 900 123-45-67</div>' +
+            '<div>Город: Ростов-на-Дону</div>' +
+            '<div>Тип клиента: монтажник / застройщик / оптовик</div>' +
+            '<div>Источник: Telegram-бот и канал</div>' +
+            '</div>' +
+            '<div class="journey-grid">' +
+            '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Заявка создана</div><div class="journey-copy">Контакт и карточка клиента уже отправлены менеджеру для проверки.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">2</div><div><div class="journey-title">Проверка профиля</div><div class="journey-copy">Менеджер определяет тип клиента и подтверждает доступ к оптовому прайсу.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">3</div><div><div class="journey-title">Активация карты</div><div class="journey-copy">После подтверждения в Telegram автоматически открываются только оптовые цены.</div></div></div>' +
+            '</div>' +
+            '</div>';
+
+          actionButtons =
+            '<button class="inline-btn" data-action="show-manager">📞 Напомнить менеджеру</button>' +
+            '<button class="inline-btn" data-card-status="approved">✅ Подтвердить карту</button>' +
+            '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+            '<button class="inline-btn" data-card-status="retail">✏️ Редактировать заявку</button>';
+        } else {
+          cardBody =
+            '<div class="card-stage retail">' +
+            '<div class="card-stage-top">' +
+            '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
+            '<div class="card-stage-badge">' + meta.shortLabel + '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="mini-card">' +
+            '<div class="mini-title">Как работает карта</div>' +
+            '<div class="journey-grid">' +
+            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация в боте</div><div class="journey-copy">Клиент оставляет имя, телефон, город и тип деятельности.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">👤</div><div><div class="journey-title">Проверка менеджером</div><div class="journey-copy">Менеджер проверяет, кто это: монтажник, застройщик или оптовый клиент.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Выпуск карты</div><div class="journey-copy">После подтверждения клиент получает QR-карту и доступ к оптовым ценам.</div></div></div>' +
+            '</div>' +
+            '</div>';
+
+          actionButtons =
+            '<button class="inline-btn primary" data-card-status="pending">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+            '<button class="inline-btn" data-action="open-root-catalog">📦 Смотреть каталог</button>' +
+            '<button class="inline-btn" data-action="show-post">💰 Посмотреть розничный прайс</button>';
+        }
+
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">💳 Карта постоянного покупателя</div>' +
+          '<div class="post-copy">' + meta.copy + '</div>' +
+          cardBody +
+          sectionLabel("Тестовый сценарий статуса") +
+          statusSwitchHtml() +
+          '<div class="inline-grid">' +
+          actionButtons +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Карта клиента", meta.headerSub, "★", "👁 62,8K просмотров");
+      }
+
+      function renderSync() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">Синхронизация с сайтом и Битрикс24</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Текущая схема</div>' +
+          '<div class="mini-list">' +
+          '<div>• категории, подкатегории и товарные списки берутся с сайта</div>' +
+          '<div>• цены и остатки планируются из Битрикс24</div>' +
+          '<div>• заявки будут отправляться в Битрикс24</div>' +
+          '<div>• карта клиента и оптовый кабинет работают через бота</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+          '<button class="inline-btn" data-action="show-price">📄 Прайс</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">🏠 Каталог</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Синхронизация", "Сайт / Telegram / Битрикс24", "⚙", "👁 интеграции");
+      }
+
+      function renderManager() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📞 Связаться с менеджером</div>' +
+          '<div class="post-copy">Этот экран собирает логику обращения клиента внутри канала. Сейчас он не привязан к Telegram, боту и реальным менеджерам, но уже показывает, как будут выглядеть сценарии связи после подключения интеграций.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент нажимает кнопку, указывает вопрос и получает маршрут обращения в менеджерский поток.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карточке клиента пойдет отдельным путем после подключения CRM.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер поможет подобрать прибор по задаче, объекту и типу монтажа.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что увидит клиент позже</div>' +
+          '<div class="mini-list">' +
+          '<div>• кнопки связи через Telegram, WhatsApp и MAX</div>' +
+          '<div>• быстрый выбор темы обращения</div>' +
+          '<div>• автоматическую передачу заявки в CRM</div>' +
+          '<div>• возврат менеджера в нужный раздел каталога или карты клиента</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-messengers">💬 Каналы связи</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 По карте клиента</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Открыть каталог</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Менеджер", "Внутренняя логика обращения без боевой привязки", "📞", "👁 сценарии связи");
+      }
+
+      function renderService() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">⚙️ Гарантийный сервис</div>' +
+          '<div class="post-copy">Экран сервиса собирает путь клиента после покупки: гарантийный вопрос, сверка по заказу, обращение по прибору и возврат к менеджеру. Сейчас это внутренняя логика канала без боевой привязки.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Клиент сможет сообщить о проблеме по прибору и приложить номер заказа или фото.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Отдельный путь для сверки по отгрузке, комплектности и документам.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Сценарий для уточнения модели, даты покупки и типа неисправности.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Маршрут в менеджера</div><div class="route-copy">После сборки бота это обращение будет уходить в нужную очередь CRM.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что подключим позже</div>' +
+          '<div class="mini-list">' +
+          '<div>• форму сервисного обращения</div>' +
+          '<div>• прикрепление фото и номера заказа</div>' +
+          '<div>• маршрутизацию к сервисному менеджеру</div>' +
+          '<div>• статус обработки обращения в Telegram</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-manager">📞 Связаться с менеджером</button>' +
+          '<button class="inline-btn" data-action="show-messengers">💬 Каналы связи</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Гарантийный сервис", "Сервисная логика канала без боевой привязки", "⚙️", "👁 сервис и гарантия");
+      }
+
+      function renderDelivery() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🚚 Доставка по России</div>' +
+          '<div class="post-copy">Экран доставки нужен, чтобы клиент сразу понимал, как будет происходить отгрузка: со склада в Ростове-на-Дону, по каким сценариям и куда дальше его вести внутри канала.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Со склада в Ростове</div><div class="route-copy">Основные позиции отгружаются со склада в Ростове-на-Дону.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">По России</div><div class="route-copy">Для канала предусмотрим сценарий отправки в любой регион России.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Сроки и наличие</div><div class="route-copy">Клиент будет понимать, что в наличии, а что идет под доставку.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Связь по отгрузке</div><div class="route-copy">Отдельная точка связи для согласования отправки и логистики.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что будет на следующем этапе</div>' +
+          '<div class="mini-list">' +
+          '<div>• реальные сценарии расчета доставки</div>' +
+          '<div>• связь с остатками и сроками отгрузки</div>' +
+          '<div>• передача запросов на доставку в CRM</div>' +
+          '<div>• выбор способа получения: склад, отправка, самовывоз</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-find">📍 Адрес и маршрут</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Уточнить доставку</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Доставка", "Логика отгрузки и маршрута клиента", "🚚", "👁 доставка по России");
+      }
+
+      function renderSite() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">🌐 Переход на сайт</div>' +
+          '<div class="post-copy">Этот экран показывает, как внутри канала будет устроен переход на сайт без резкого выпадения пользователя из Telegram-витрины. Сейчас это визуальный сценарий, а не боевой редирект.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Открыть карточку на сайте</div><div class="route-copy">Для сложных товаров сайт будет использоваться как расширенная карточка и источник технических данных.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Остаться в канале</div><div class="route-copy">Основная витрина и быстрый выбор должны оставаться внутри Telegram-структуры.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Возврат в каталог</div><div class="route-copy">После просмотра сайта клиент должен легко возвращаться в нужный раздел канала.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Связка с CRM</div><div class="route-copy">На следующем этапе переходы с сайта и канала будут связываться в единую логику заявок.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что фиксируем сейчас</div>' +
+          '<div class="mini-list">' +
+          '<div>• сайт остается источником каталога и контента</div>' +
+          '<div>• Telegram-канал остается витриной и навигацией</div>' +
+          '<div>• прямой переход на сайт подключим после финальной сборки структуры</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="sync">🔄 Сайт / CRM</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Вернуться в каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+          '<button class="inline-btn" data-action="show-find">📍 Наш адрес</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Сайт", "Сценарий перехода с витрины канала", "🌐", "👁 сайт и структура");
+      }
+
+      function renderFindUs() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📍 Нас найти</div>' +
+          '<div class="post-copy">Этот экран нужен, чтобы клиенту было удобно сразу выбрать привычный способ построить маршрут: Яндекс.Карты, Google Maps, 2GIS или быстрый звонок менеджеру.</div>' +
+          '<div class="address-box">' +
+          '<div class="address-title">Адрес склада и офиса</div>' +
+          '<div class="address-copy">' + LOCATION_INFO.city + '\n' + LOCATION_INFO.address + '\n' + LOCATION_INFO.phones.join('\n') + '\nРежим работы: ' + LOCATION_INFO.hours + '</div>' +
+          '</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn" data-map="yandex"><div class="route-kicker">Маршрут</div><div class="route-title">Яндекс.Карты</div><div class="route-copy">Открыть маршрут в привычной навигации по России</div></button>' +
+          '<button class="route-btn" data-map="google"><div class="route-kicker">Маршрут</div><div class="route-title">Google Maps</div><div class="route-copy">Построить маршрут через Google Карты</div></button>' +
+          '<button class="route-btn" data-map="dgis"><div class="route-kicker">Маршрут</div><div class="route-title">2GIS</div><div class="route-copy">Открыть адрес и подъездные пути в 2GIS</div></button>' +
+          '<button class="route-btn" data-action="copy-address"><div class="route-kicker">Адрес</div><div class="route-title">Скопировать адрес</div><div class="route-copy">Скопировать адрес для отправки водителю или логисту</div></button>' +
+          '</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">WhatsApp</div><div class="route-copy">Визуальная точка входа для будущей связи с менеджером</div></button>' +
+          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">Telegram</div><div class="route-copy">Подготовленный слот под менеджера или Telegram-бота</div></button>' +
+          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">MAX</div><div class="route-copy">Заготовка под подключение канала связи на следующем этапе</div></button>' +
+          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Контакт</div><div class="route-title">Отдел продаж</div><div class="route-copy">Экран будущих способов связи без боевой привязки</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Как это работает для клиента</div>' +
+          '<div class="mini-list">' +
+          '<div>• клиент нажимает "Нас найти" в канале</div>' +
+          '<div>• выбирает привычный картографический сервис</div>' +
+          '<div>• сразу строит маршрут до склада или офиса</div>' +
+          '<div>• видит часы работы до выезда</div>' +
+          '<div>• при необходимости пишет в MAX, WhatsApp или Telegram</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-map="yandex">🧭 Построить маршрут</button>' +
+          '<button class="inline-btn" data-action="show-messengers">✈️ Написать в Telegram</button>' +
+          '<button class="inline-btn" data-action="show-messengers">💬 WhatsApp</button>' +
+          '<button class="inline-btn" data-action="show-messengers">⚡ MAX</button>' +
+          '<button class="inline-btn" data-action="copy-address">📋 Скопировать адрес</button>' +
+          '<button class="inline-btn" data-action="show-messengers">📞 Связь с отделом</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Вернуться в каталог</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Нас найти", "Адрес, навигация и быстрый маршрут", "📍", "👁 маршрут и контакты");
+      }
+
+      function renderMessengers() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">💬 Каналы связи</div>' +
+          '<div class="post-copy">Этот экран пока собирается как часть визуала и внутренней логики канала. Реальные привязки к Telegram, MAX, WhatsApp, ботам и менеджерам будут подключаться на следующем этапе.</div>' +
+          '<div class="route-grid">' +
+          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">Telegram</div><div class="route-copy">Подготовим связку с каналом, ботом и менеджером после финального согласования визуала.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">WhatsApp</div><div class="route-copy">Кнопка и сценарий предусмотрены, боевую ссылку подключим позже.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">MAX</div><div class="route-copy">Есть место в интерфейсе под MAX, но без реальной интеграции на текущем этапе.</div></button>' +
+          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">Менеджер</div><div class="route-copy">Отдельный маршрут обращения и передача в CRM будут подключаться после сборки канала.</div></button>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Что фиксируем сейчас</div>' +
+          '<div class="mini-list">' +
+          '<div>• место мессенджеров в канале уже определено</div>' +
+          '<div>• кнопки и сценарии связи предусмотрены в визуале</div>' +
+          '<div>• боевые ссылки и боты подключим после сборки структуры канала</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="show-find">📍 Назад к адресу</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Каналы связи", "Визуальная заготовка без боевых привязок", "💬", "👁 точки контакта");
+      }
+
+      function renderStock() {
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">Остатки склада</div>' +
+          '<div class="list-text">' +
+          'ЭКО-М Ду15 — 125 шт\n' +
+          'ЭКО-М Ду20 — 61 шт\n' +
+          'ITELMA Ду15 — 48 шт\n' +
+          'G4 — 73 шт\n' +
+          'G6 — 26 шт\n' +
+          'МП50 0-6 бар — 212 шт\n' +
+          'Wilo Star-RS 25/4 — 18 шт\n\n' +
+          'На этом этапе экран тестовый. Реальная автосинхронизация остатков будет подключаться из Битрикс24.' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn" data-action="show-price">📄 Прайс</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Синхронизация</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Остатки", "Склад Ростов-на-Дону", "↻", "👁 76,1K изменено 09:44");
+      }
+
+      function buildNodePath(node) {
+        if (!node) return ["Каталог"];
+        const path = [];
+        function walk(nodes, currentPath) {
+          for (const item of nodes) {
+            const nextPath = currentPath.concat(item.title);
+            if (item === node) return nextPath;
+            if (Array.isArray(item.subs)) {
+              const found = walk(item.subs, nextPath);
+              if (found) return found;
+            }
+          }
+          return null;
+        }
+        return walk(CATALOG, ["Каталог"]) || ["Каталог", node.title];
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      function formatPrice(value, currency) {
+        const num = Number(String(value).replace(",", "."));
+        if (!Number.isFinite(num)) return value + (currency === "RUB" ? " ₽" : "");
+        const formatted = new Intl.NumberFormat("ru-RU", {
+          maximumFractionDigits: 0,
+        }).format(num);
+        return formatted + (currency === "RUB" ? " ₽" : " " + currency);
+      }
+
+      function openMap(kind) {
+        const url = LOCATION_INFO[kind];
+        if (!url) return;
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      function copyAddress() {
+        const text = LOCATION_INFO.fullAddress;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+          return;
+        }
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "absolute";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+      }
+
+      function pushHistory(screen) {
+        const last = state.history[state.history.length - 1];
+        if (!last || last.screen !== screen || JSON.stringify(last.path || []) !== JSON.stringify(state.categoryPath)) {
+          state.history.push({ screen, path: [...state.categoryPath], nodeTitle: state.selectedNode ? state.selectedNode.title : null });
+        }
+      }
+
+      function openScreen(screen, push = true) {
+        if (screen === "home") state.tab = "home";
+        if (screen === "catalog") state.tab = "catalog";
+        if (screen === "post") state.tab = "post";
+        if (screen === "card") state.tab = "card";
+
+        if (push) pushHistory(screen);
+        updateDock();
+
+        if (screen === "home") renderHome();
+        if (screen === "catalog") renderCatalog();
+        if (screen === "products") renderProducts();
+        if (screen === "post") renderPost();
+        if (screen === "wholesale") renderWholesale();
+        if (screen === "card") renderCard();
+        if (screen === "popular") renderPopular();
+        if (screen === "promotions") renderPromotions();
+        if (screen === "content") renderContent();
+        if (screen === "content-channel") renderContentChannel();
+        if (screen === "history") renderHistory();
+        if (screen === "project") renderProject();
+        if (screen === "brand") renderBrand();
+        if (screen === "manager") renderManager();
+        if (screen === "service") renderService();
+        if (screen === "delivery") renderDelivery();
+        if (screen === "site") renderSite();
+        if (screen === "sync") renderSync();
+        if (screen === "find") renderFindUs();
+        if (screen === "messengers") renderMessengers();
+        if (screen === "stock") renderStock();
+
+        contentRoot.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function goBack() {
+        if (state.tab === "catalog" && state.categoryPath.length > 0) {
+          state.categoryPath.pop();
+          openScreen("catalog", false);
+          return;
+        }
+
+        if (state.history.length > 1) {
+          state.history.pop();
+          const prev = state.history[state.history.length - 1];
+          state.categoryPath = [...(prev.path || [])];
+          if (prev.screen === "products" && prev.nodeTitle) {
+            state.selectedNode = findNodeByTitle(prev.nodeTitle);
+          }
+          openScreen(prev.screen, false);
+          return;
+        }
+
+        state.categoryPath = [];
+        openScreen("home", false);
+      }
+
+      function findNodeByTitle(title) {
+        function walk(nodes) {
+          for (const item of nodes) {
+            if (item.title === title) return item;
+            if (Array.isArray(item.subs)) {
+              const found = walk(item.subs);
+              if (found) return found;
+            }
+          }
+          return null;
+        }
+        return walk(CATALOG);
+      }
+
+      document.addEventListener("click", (event) => {
+        const tabBtn = event.target.closest("[data-tab]");
+        if (tabBtn) {
+          const tab = tabBtn.getAttribute("data-tab");
+          if (tab === "home") {
+            state.categoryPath = [];
+            openScreen("home");
+          }
+          if (tab === "catalog") {
+            state.categoryPath = [];
+            state.showDeliveryItems = false;
+            openScreen("catalog");
+          }
+          if (tab === "post") openScreen("post");
+          if (tab === "card") openScreen("card");
+          return;
+        }
+
+        const rootCodeBtn = event.target.closest("[data-root-code]");
+        if (rootCodeBtn) {
+          const code = rootCodeBtn.getAttribute("data-root-code");
+          const index = CATALOG.findIndex((item) => item.code === code);
+          if (index >= 0) {
+            state.categoryPath = [index];
+            state.tab = "catalog";
+            state.showDeliveryItems = false;
+            openScreen("catalog");
+          }
+          return;
+        }
+
+        const catBtn = event.target.closest("[data-catalog-index]");
+        if (catBtn) {
+          const currentNode = getNodeAtPath(state.categoryPath);
+          const items = getChildren(currentNode);
+          const index = Number(catBtn.getAttribute("data-catalog-index"));
+          const nextNode = items[index];
+          if (!nextNode) return;
+
+          if (Array.isArray(nextNode.subs) && nextNode.subs.length) {
+            state.categoryPath.push(index);
+            state.showDeliveryItems = false;
+            openScreen("catalog");
+          } else {
+            state.selectedNode = nextNode;
+            state.showDeliveryItems = false;
+            openScreen("products");
+          }
+          return;
+        }
+
+        const actionBtn = event.target.closest("[data-action]");
+        if (!actionBtn) return;
+
+        const action = actionBtn.getAttribute("data-action");
+        if (action === "open-root-catalog") {
+          state.categoryPath = [];
+          state.showDeliveryItems = false;
+          openScreen("catalog");
+        }
+        if (action === "show-price" || action === "show-post") openScreen("post");
+        if (action === "show-popular") openScreen("popular");
+        if (action === "show-promotions") openScreen("promotions");
+        if (action === "show-content") openScreen("content");
+        if (action === "show-content-channel") openScreen("content-channel");
+        if (action === "show-history") openScreen("history");
+        if (action === "show-project") openScreen("project");
+        if (action === "show-wholesale") openScreen("wholesale");
+        if (action === "show-card") openScreen("card");
+        if (action === "show-find") openScreen("find");
+        if (action === "show-manager") openScreen("manager");
+        if (action === "show-service") openScreen("service");
+        if (action === "show-delivery") openScreen("delivery");
+        if (action === "show-site") openScreen("site");
+        if (action === "show-messengers") openScreen("messengers");
+        if (action === "sync") openScreen("sync");
+        if (action === "show-stock") openScreen("stock");
+        if (action === "open-brand") {
+          state.selectedBrand = actionBtn.textContent.trim();
+          openScreen("brand");
+        }
+        if (action === "copy-address") copyAddress();
+        if (action === "content-channel-link") openScreen("content-channel", false);
+        if (action === "toggle-delivery") {
+          state.showDeliveryItems = !state.showDeliveryItems;
+          openScreen("products", false);
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        const mapBtn = event.target.closest("[data-map]");
+        if (!mapBtn) return;
+        openMap(mapBtn.getAttribute("data-map"));
+      });
+
+      document.addEventListener("click", (event) => {
+        const statusBtn = event.target.closest("[data-card-status]");
+        if (!statusBtn) return;
+        state.cardStatus = statusBtn.getAttribute("data-card-status");
+        const last = state.history[state.history.length - 1];
+        openScreen(last ? last.screen : "home", false);
+      });
+
+      backButton.addEventListener("click", goBack);
+      document.getElementById("giftButton").addEventListener("click", () => openScreen("home"));
+      document.getElementById("upButton").addEventListener("click", () => contentRoot.scrollTo({ top: 0, behavior: "smooth" }));
+      document.getElementById("searchButton").addEventListener("click", () => openScreen("sync"));
+
+      renderHome();
+      updateDock();
+    </script>
+  </body>
+</html>
