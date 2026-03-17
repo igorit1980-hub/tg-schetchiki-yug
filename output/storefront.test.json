@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-03-14T11:37:45.026061+03:00",
+  "timezone": "Europe/Moscow",
+  "popular_products": [
+    {
+      "id": 2,
+      "xml_id": "15246",
+      "title": "Промышленный счетчик",
+      "short_text": "Проверка остатков и категории",
+      "date_from": "2026-03-01T00:00:00+03:00",
+      "date_to": "2026-12-31T23:59:59+03:00",
+      "manager_id": 1,
+      "updated_at": "2026-03-14T10:05:00+03:00",
+      "product_name": "СТВУ-100 ДГ1 (100 л/имп)",
+      "price": 25176.0,
+      "old_price": 25176.0,
+      "stock": 0.0,
+      "url": "https://xn----7sbhjpnneqb.xn--p1ai/search/?q=%D0%A1%D0%A2%D0%92%D0%A3-100%20%D0%94%D0%931%20%28100%20%D0%BB/%D0%B8%D0%BC%D0%BF%29&product_id=15246",
+      "image": null,
+      "sku": "15246",
+      "category": "СЧЕТЧИКИ ВОДЫ / Счётчики воды промышленные"
+    },
+    {
+      "id": 1,
+      "xml_id": "12763",
+      "title": "Ходовой товар",
+      "short_text": "Проверка fallback по id",
+      "date_from": "2026-03-01T00:00:00+03:00",
+      "date_to": "2026-12-31T23:59:59+03:00",
+      "manager_id": 1,
+      "updated_at": "2026-03-14T10:00:00+03:00",
+      "product_name": "Блок питания БПЭК-02\\\\ЦК -02",
+      "price": 164600.0,
+      "old_price": 164600.0,
+      "stock": 1.0,
+      "url": "https://xn----7sbhjpnneqb.xn--p1ai/search/?q=%D0%91%D0%BB%D0%BE%D0%BA%20%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%91%D0%9F%D0%AD%D0%9A-02%5C%5C%D0%A6%D0%9A%20-02&product_id=12763",
+      "image": null,
+      "sku": "12763",
+      "category": "СЧЕТЧИКИ ГАЗА / Коммуникационные модули телеметрии"
+    }
+  ],
+  "promotions": [
+    {
+      "id": 11,
+      "xml_id": "577",
+      "promo_title": "Акция на БПЭК-04",
+      "promo_text": "Проверка promo_price из wholesale",
+      "date_from": "2026-03-01T00:00:00+03:00",
+      "date_to": "2026-12-31T23:59:59+03:00",
+      "manager_id": 1,
+      "updated_at": "2026-03-14T10:15:00+03:00",
+      "product_name": "Блок питания БПЭК-04\\\\ТС",
+      "price": 33900.0,
+      "old_price": 46400.0,
+      "stock": 0.0,
+      "url": "https://xn----7sbhjpnneqb.xn--p1ai/search/?q=%D0%91%D0%BB%D0%BE%D0%BA%20%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%91%D0%9F%D0%AD%D0%9A-04%5C%5C%D0%A2%D0%A1&product_id=577",
+      "image": null,
+      "sku": "577",
+      "category": "СЧЕТЧИКИ ГАЗА / Коммуникационные модули телеметрии"
+    }
+  ]
+}

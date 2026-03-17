@@ -13,17 +13,26 @@ class Bitrix24Client:
         self.config = config
 
     def fetch_all_items(self, entity: EntityConfig) -> List[Dict[str, Any]]:
+        return self.fetch_items(entity, stage_id=entity.active_stage_id)
+
+    def fetch_items(
+        self,
+        entity: EntityConfig,
+        stage_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         items: List[Dict[str, Any]] = []
         start = 0
         while True:
+            params: Dict[str, Any] = {
+                "entityTypeId": entity.entity_type_id,
+                "filter[categoryId]": entity.category_id,
+                "start": start,
+            }
+            if stage_id:
+                params["filter[stageId]"] = stage_id
             data = self._call(
                 "crm.item.list",
-                {
-                    "entityTypeId": entity.entity_type_id,
-                    "filter[categoryId]": entity.category_id,
-                    "filter[stageId]": entity.active_stage_id,
-                    "start": start,
-                },
+                params,
             )
             chunk = data.get("result", {}).get("items", [])
             items.extend(chunk)
@@ -63,6 +72,14 @@ class Bitrix24Client:
         data = self._call("crm.company.update", {"id": company_id, **_flatten_fields(fields)})
         return bool(data["result"])
 
+    def create_lead(self, fields: Dict[str, Any]) -> int:
+        data = self._call("crm.lead.add", _flatten_fields(fields))
+        return int(data["result"])
+
+    def create_deal(self, fields: Dict[str, Any]) -> int:
+        data = self._call("crm.deal.add", _flatten_fields(fields))
+        return int(data["result"])
+
     def _fetch_paginated(
         self,
         method: str,
@@ -90,6 +107,8 @@ class Bitrix24Client:
         return items
 
     def _call(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        if not self.config.bitrix_enabled or not self.config.bitrix_webhook:
+            raise RuntimeError("BITRIX24_WEBHOOK is not configured")
         url = f"{self.config.bitrix_webhook}{method}.json"
         encoded = urlencode(params, doseq=True).encode("utf-8")
         request = Request(

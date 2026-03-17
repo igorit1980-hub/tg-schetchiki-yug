@@ -9,13 +9,17 @@ from urllib.request import Request, urlopen
 from ..config import AppConfig
 
 
-def _walk_catalog(nodes: Iterable[Dict[str, Any]]) -> Iterable[Dict[str, Any]]:
+def _walk_catalog(nodes: Iterable[Dict[str, Any]], category_path: Optional[List[str]] = None) -> Iterable[Dict[str, Any]]:
+    category_path = list(category_path or [])
     for node in nodes:
+        next_path = category_path + [node.get("title", "")]
         for product in node.get("products", []) or []:
-            yield product
+            enriched = dict(product)
+            enriched["_category_path"] = [part for part in next_path if part]
+            yield enriched
         subs = node.get("subs", []) or []
         if subs:
-            yield from _walk_catalog(subs)
+            yield from _walk_catalog(subs, next_path)
 
 
 class SiteCatalogClient:
@@ -30,23 +34,36 @@ class SiteCatalogClient:
             data = json.load(fh)
         index: Dict[str, Dict[str, Any]] = {}
         for product in _walk_catalog(data):
-            xml_id = product.get("xml_id") or product.get("xmlId") or product.get("code")
-            if not xml_id:
+            xml_id = product.get("xml_id") or product.get("xmlId") or product.get("code") or product.get("id")
+            product_id = product.get("id")
+            if not xml_id and not product_id:
                 continue
-            index[str(xml_id)] = {
-                "xml_id": str(xml_id),
+            retail_price = _to_number(product.get("retail") or product.get("price"))
+            wholesale_price = _to_number(product.get("wholesale"))
+            category = " / ".join(product.get("_category_path") or []) or None
+            fallback_id = str(xml_id or product_id)
+            item = {
+                "xml_id": str(xml_id or product_id),
                 "name": product.get("name"),
-                "price": _to_number(product.get("retail")),
-                "old_price": None,
-                "promo_price": None,
+                "price": retail_price,
+                "old_price": retail_price if wholesale_price is not None and retail_price is not None and wholesale_price < retail_price else None,
+                "promo_price": wholesale_price if wholesale_price is not None and retail_price is not None and wholesale_price < retail_price else None,
                 "stock": _to_number(product.get("quantity")),
-                "url": product.get("url"),
+                "url": product.get("url") or self._fallback_url(product_id or fallback_id, product.get("name")),
                 "image": product.get("image"),
-                "sku": product.get("sku"),
-                "category": product.get("category"),
-                "active": True,
+                "sku": product.get("sku") or str(product_id) if product_id else None,
+                "category": product.get("category") or category,
+                "active": (product.get("available") or "Y") == "Y",
             }
+            index[str(fallback_id)] = item
+            if product_id is not None:
+                index[str(product_id)] = item
         return index
+
+    def _fallback_url(self, product_id: str, product_name: Any) -> str:
+        base = self.config.site_lookup_url.split("/api/", 1)[0].rstrip("/")
+        slug = quote(str(product_name or product_id))
+        return f"{base}/search/?q={slug}&product_id={quote(str(product_id))}"
 
     def lookup(self, xml_id: str) -> Optional[Dict[str, Any]]:
         http_item = self._lookup_http(xml_id)

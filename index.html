@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Счетчики Юг | Telegram Channel</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
     <style>
       :root {
         color-scheme: dark;
@@ -23,6 +24,9 @@
         --link: #35a8ff;
         --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         --shadow: 0 38px 90px rgba(0, 0, 0, 0.52);
+        --tg-viewport-height: 100vh;
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
       }
 
       * {
@@ -42,7 +46,12 @@
       body {
         display: flex;
         justify-content: center;
-        padding: 20px;
+        padding: 18px;
+      }
+
+      body.tg-webapp {
+        padding: 0;
+        background: var(--bg);
       }
 
       button {
@@ -55,21 +64,38 @@
 
       .phone {
         width: min(100%, 430px);
-        border-radius: 46px;
+        max-width: 430px;
+        border-radius: 34px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: #020202;
         box-shadow: var(--shadow);
       }
 
+      body.tg-webapp .phone {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        background: var(--bg);
+      }
+
       .screen {
         position: relative;
-        height: 932px;
+        height: min(100dvh - 36px, 932px);
+        min-height: min(100dvh - 36px, 932px);
         overflow: hidden;
         background:
           radial-gradient(circle at 20% 10%, rgba(31, 108, 175, 0.18), transparent 11%),
           radial-gradient(circle at 80% 34%, rgba(255, 255, 255, 0.08), transparent 12%),
           linear-gradient(180deg, #050505 0%, #000 100%);
+      }
+
+      body.tg-webapp .screen {
+        height: var(--tg-viewport-height);
+        min-height: var(--tg-viewport-height);
+        background: var(--bg);
       }
 
       .blur-bg {
@@ -94,6 +120,11 @@
         border-radius: 999px;
         background: #000;
         z-index: 10;
+      }
+
+      body.tg-webapp .island,
+      body.tg-webapp .statusbar {
+        display: none;
       }
 
       .statusbar {
@@ -148,6 +179,11 @@
         height: 100%;
         overflow-y: auto;
         padding: 10px 8px 158px;
+      }
+
+      body.tg-webapp .content {
+        padding-top: calc(var(--safe-top) + 10px);
+        padding-bottom: calc(var(--safe-bottom) + 158px);
       }
 
       .content::-webkit-scrollbar {
@@ -258,6 +294,7 @@
         display: grid;
         place-items: center;
         flex: 0 0 auto;
+        cursor: pointer;
       }
 
       .share-chip::before {
@@ -281,6 +318,20 @@
         font-size: 11px;
       }
 
+      .tg-status {
+        margin-top: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(52, 176, 218, 0.12);
+        border: 1px solid rgba(52, 176, 218, 0.18);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+      }
+
+      .tg-status.hidden {
+        display: none;
+      }
+
       .info-card,
       .post,
       .mini-card {
@@ -298,8 +349,99 @@
         line-height: 1.38;
       }
 
+      .hero-panel {
+        position: relative;
+        overflow: hidden;
+        margin-top: 8px;
+        padding: 18px 16px 16px;
+        border-radius: 22px;
+        background:
+          radial-gradient(circle at top left, rgba(52, 176, 218, 0.22), transparent 34%),
+          radial-gradient(circle at 78% 22%, rgba(73, 201, 137, 0.18), transparent 28%),
+          linear-gradient(180deg, rgba(20, 21, 24, 0.98), rgba(7, 7, 8, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 22px 46px rgba(0, 0, 0, 0.28);
+      }
+
+      .hero-panel::after {
+        content: "";
+        position: absolute;
+        inset: auto -12% -42% auto;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 62%);
+        pointer-events: none;
+      }
+
+      .hero-kicker {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .hero-title {
+        position: relative;
+        z-index: 1;
+        margin-top: 12px;
+        max-width: 300px;
+        font-size: 26px;
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+        font-weight: 800;
+      }
+
+      .hero-copy {
+        position: relative;
+        z-index: 1;
+        margin-top: 10px;
+        max-width: 320px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 13px;
+        line-height: 1.42;
+      }
+
+      .hero-meta {
+        position: relative;
+        z-index: 1;
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .hero-stat {
+        padding: 12px 10px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .hero-stat-value {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-stat-label {
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.56);
+        font-size: 11px;
+        line-height: 1.25;
+      }
+
       .section-label {
-        margin: 12px 4px 6px;
+        margin: 16px 4px 8px;
         color: rgba(255, 255, 255, 0.48);
         font-size: 11px;
         text-transform: uppercase;
@@ -505,11 +647,14 @@
 
       .pin-card {
         position: relative;
-        padding: 12px 40px 12px 14px;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
-        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+        overflow: hidden;
+        padding: 14px 42px 14px 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 28%),
+          linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98));
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
         cursor: pointer;
       }
 
@@ -522,58 +667,74 @@
         font-size: 17px;
       }
 
+      .pin-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 14px;
+        bottom: 14px;
+        width: 3px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--blue), var(--accent));
+      }
+
       .pin-kicker {
-        color: rgba(255, 255, 255, 0.5);
+        color: rgba(255, 255, 255, 0.46);
         font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.1em;
       }
 
       .pin-title {
         margin-top: 5px;
         font-size: 15px;
         font-weight: 700;
+        line-height: 1.2;
       }
 
       .pin-copy {
-        margin-top: 4px;
-        color: rgba(255, 255, 255, 0.72);
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.68);
         font-size: 12px;
-        line-height: 1.3;
+        line-height: 1.35;
       }
 
       .quick-search {
         margin-top: 8px;
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 14px;
+        border-radius: 20px;
+        background:
+          linear-gradient(180deg, rgba(15, 21, 28, 0.98), rgba(8, 11, 15, 0.98)),
+          rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(103, 179, 220, 0.14);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.2);
       }
 
       .quick-title {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
       }
 
       .quick-copy {
-        margin-top: 3px;
-        color: rgba(255, 255, 255, 0.68);
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.66);
         font-size: 12px;
-        line-height: 1.28;
+        line-height: 1.34;
       }
 
       .quick-grid {
-        margin-top: 10px;
+        margin-top: 12px;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 6px;
+        gap: 8px;
       }
 
       .quick-chip {
-        padding: 10px 12px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 46px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         font-size: 12.5px;
         font-weight: 600;
         text-align: left;
@@ -581,12 +742,28 @@
       }
 
       .feed-card {
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: rgba(16, 16, 16, 0.96);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+        position: relative;
+        overflow: hidden;
+        padding: 14px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.06), transparent 24%),
+          rgba(16, 16, 16, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
         cursor: pointer;
+      }
+
+      .feed-card.promotions {
+        border-color: rgba(225, 111, 84, 0.22);
+      }
+
+      .feed-card.popular {
+        border-color: rgba(73, 201, 137, 0.2);
+      }
+
+      .feed-card.content {
+        border-color: rgba(52, 176, 218, 0.2);
       }
 
       .feed-top {
@@ -609,9 +786,9 @@
 
       .feed-title {
         margin-top: 6px;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
-        line-height: 1.25;
+        line-height: 1.24;
       }
 
       .feed-copy {
@@ -629,10 +806,10 @@
 
       .feed-note {
         margin-top: 8px;
-        padding: 11px 12px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 13px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         color: rgba(255, 255, 255, 0.72);
         font-size: 12px;
         line-height: 1.32;
@@ -1177,10 +1354,191 @@
           width: 100%;
           border-radius: 0;
           border: 0;
+          box-shadow: none;
         }
 
         .screen {
-          height: 100vh;
+          height: 100dvh;
+          min-height: 100dvh;
+        }
+
+        .content {
+          padding: 8px 6px 150px;
+        }
+
+        .hero {
+          padding-bottom: 6px;
+        }
+
+        .hero-row {
+          gap: 6px;
+        }
+
+        .back-chip {
+          width: 50px;
+          height: 42px;
+        }
+
+        .pill {
+          height: 48px;
+          padding: 0 10px;
+          gap: 6px;
+        }
+
+        .pill-title {
+          font-size: 12px;
+        }
+
+        .pill-sub {
+          font-size: 9px;
+        }
+
+        .share-chip {
+          width: 38px;
+          height: 38px;
+        }
+
+        .share-chip::before {
+          width: 34px;
+          height: 34px;
+          font-size: 12px;
+        }
+
+        .info-card,
+        .mini-card,
+        .quick-search,
+        .post-body,
+        .address-box,
+        .card-stage,
+        .loyalty-card,
+        .feed-card,
+        .pin-card {
+          border-radius: 14px;
+        }
+
+        .status-switch,
+        .quick-grid,
+        .inline-grid,
+        .route-grid,
+        .customer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .catalog-grid,
+        .brand-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 6px;
+        }
+
+        .product-row,
+        .card-stage-top,
+        .loyalty-top,
+        .filter-bar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .product-prices,
+        .discount-chip {
+          text-align: left;
+          min-width: 0;
+        }
+
+        .filter-toggle {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .qr {
+          width: 132px;
+          height: 132px;
+        }
+
+        .float-ui {
+          left: 8px;
+          right: 8px;
+          bottom: 86px;
+        }
+
+        .float-btn {
+          width: 44px;
+          height: 44px;
+          font-size: 22px;
+        }
+
+        .sound-pill {
+          min-width: 168px;
+          height: 44px;
+          padding: 0 18px;
+          font-size: 14px;
+        }
+
+        .dock {
+          left: 6px;
+          right: 6px;
+          bottom: 6px;
+          gap: 4px;
+          padding: 6px;
+          border-radius: 18px;
+        }
+
+        .dock-btn {
+          min-height: 50px;
+          font-size: 10px;
+          padding: 6px 2px;
+        }
+
+        .dock-btn strong {
+          font-size: 16px;
+        }
+      }
+
+      @media (max-width: 390px) {
+        .content {
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+
+        .pill {
+          height: 46px;
+          padding: 0 8px;
+        }
+
+        .logo {
+          width: 24px;
+          height: 24px;
+          font-size: 11px;
+        }
+
+        .pill-right {
+          font-size: 13px;
+        }
+
+        .catalog-grid,
+        .brand-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .service-btn,
+        .catalog-btn,
+        .brand-btn,
+        .inline-btn,
+        .route-btn,
+        .quick-chip {
+          font-size: 12px;
+        }
+
+        .post-copy,
+        .list-text,
+        .customer-value,
+        .journey-copy,
+        .route-copy {
+          font-size: 12px;
+        }
+
+        .sound-pill {
+          min-width: 150px;
+          font-size: 13px;
         }
       }
     </style>
@@ -1212,9 +1570,10 @@
                 </div>
                 <div class="pill-right" id="pillRight">🔇</div>
               </div>
-              <div class="share-chip"></div>
+              <button class="share-chip" id="shareButton" aria-label="Поделиться"></button>
             </div>
             <div class="views-line" id="viewsLine">👁 137K изменено 09:42</div>
+            <div class="tg-status hidden" id="tgStatus"></div>
           </div>
 
           <div id="screenRoot"></div>
@@ -1252,6 +1611,22 @@
         selectedBrand: "",
         cardStatus: "retail",
         showDeliveryItems: false,
+        storefront: { popular_products: [], promotions: [] },
+        backend: {
+          baseUrl: window.__TG_API_BASE__ || "http://127.0.0.1:8787",
+          connected: false,
+          mode: "offline",
+          health: null,
+          error: "",
+        },
+        customerContext: null,
+        customerCard: null,
+        profileDraft: {
+          phone: window.localStorage.getItem("tg_preview_phone") || "",
+          city: window.localStorage.getItem("tg_preview_city") || "Ростов-на-Дону",
+          customerType: window.localStorage.getItem("tg_preview_customer_type") || "installer",
+          companyName: window.localStorage.getItem("tg_preview_company_name") || "",
+        },
       };
 
       const screenRoot = document.getElementById("screenRoot");
@@ -1261,7 +1636,10 @@
       const pillRight = document.getElementById("pillRight");
       const viewsLine = document.getElementById("viewsLine");
       const backButton = document.getElementById("backButton");
+      const shareButton = document.getElementById("shareButton");
+      const tgStatus = document.getElementById("tgStatus");
       const dockButtons = Array.from(document.querySelectorAll(".dock-btn"));
+      const telegramWebApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
       const HOME_BRANDS = [
         "Бетар",
@@ -1289,6 +1667,296 @@
         max: "https://max.ru/id615013493531_bot",
         contactsPage: "https://xn----7sbhjpnneqb.xn--p1ai/contacts/",
       };
+
+      function telegramIdentity() {
+        const user = telegramWebApp && telegramWebApp.initDataUnsafe ? telegramWebApp.initDataUnsafe.user : null;
+        if (user) {
+          return {
+            firstName: user.first_name || "Клиент",
+            lastName: user.last_name || "",
+            userId: String(user.id || ""),
+            username: user.username || "",
+            chatId: String(user.id || ""),
+          };
+        }
+        return {
+          firstName: "Локальный",
+          lastName: "Клиент",
+          userId: "preview-user",
+          username: "preview",
+          chatId: "preview-chat",
+        };
+      }
+
+      function deriveCardStatus(context) {
+        if (!context || context.customer_state === "guest") return "retail";
+        if (context.can_view_wholesale_prices) return "approved";
+        if (context.approval_status === "pending_review" || context.customer_state === "pending_review") return "pending";
+        return "retail";
+      }
+
+      function backendLabel() {
+        if (!state.backend.connected) return "offline";
+        if (state.backend.mode === "local_preview") return "local preview";
+        if (state.backend.mode === "bitrix24") return "Bitrix24";
+        return state.backend.mode || "online";
+      }
+
+      async function apiJson(path, options = {}) {
+        const response = await fetch(state.backend.baseUrl + path, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const data = await response.json();
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.message || data.error_code || "API request failed");
+        }
+        return data;
+      }
+
+      async function refreshCustomerState() {
+        const identity = telegramIdentity();
+        const query = new URLSearchParams({ telegram_user_id: identity.userId });
+        const context = await apiJson("/api/telegram/customer/status?" + query.toString());
+        state.customerContext = context;
+        state.cardStatus = deriveCardStatus(context);
+        if (context.contact_id) {
+          state.customerCard = await apiJson("/api/telegram/customer/card?" + query.toString());
+        } else {
+          state.customerCard = null;
+        }
+      }
+
+      async function loadStorefrontState() {
+        const data = await apiJson("/api/telegram/storefront");
+        state.storefront = {
+          popular_products: Array.isArray(data.popular_products) ? data.popular_products : [],
+          promotions: Array.isArray(data.promotions) ? data.promotions : [],
+        };
+      }
+
+      async function bootstrapBackend() {
+        try {
+          const health = await apiJson("/api/health");
+          state.backend.connected = true;
+          state.backend.mode = health.mode || "online";
+          state.backend.health = health;
+          state.backend.error = "";
+
+          await loadStorefrontState();
+          await refreshCustomerState();
+
+          const modeLabel = state.backend.mode === "local_preview" ? "Локальный preview backend" : "Mini App backend";
+          setTelegramStatus(modeLabel + " подключен: " + backendLabel());
+        } catch (error) {
+          state.backend.connected = false;
+          state.backend.error = error.message || "backend unavailable";
+          setTelegramStatus("Локальный режим прототипа. Backend недоступен, поэтому включен статический fallback.");
+        }
+      }
+
+      function persistProfileDraft() {
+        window.localStorage.setItem("tg_preview_phone", state.profileDraft.phone || "");
+        window.localStorage.setItem("tg_preview_city", state.profileDraft.city || "");
+        window.localStorage.setItem("tg_preview_customer_type", state.profileDraft.customerType || "");
+        window.localStorage.setItem("tg_preview_company_name", state.profileDraft.companyName || "");
+      }
+
+      async function submitCardRegistration() {
+        const identity = telegramIdentity();
+        const phone = window.prompt("Телефон для заявки", state.profileDraft.phone || "+7 ");
+        if (phone === null) return;
+        const city = window.prompt("Город", state.profileDraft.city || LOCATION_INFO.city);
+        if (city === null) return;
+        const customerType = window.prompt("Тип клиента: installer / developer / wholesale", state.profileDraft.customerType || "installer");
+        if (customerType === null) return;
+        const companyName = window.prompt("Компания или ИП", state.profileDraft.companyName || "");
+        if (companyName === null) return;
+
+        state.profileDraft.phone = phone.trim();
+        state.profileDraft.city = city.trim();
+        state.profileDraft.customerType = customerType.trim() || "installer";
+        state.profileDraft.companyName = companyName.trim();
+        persistProfileDraft();
+
+        try {
+          const response = await apiJson("/api/telegram/customer/register", {
+            method: "POST",
+            body: JSON.stringify({
+              first_name: identity.firstName,
+              last_name: identity.lastName,
+              phone: state.profileDraft.phone,
+              city: state.profileDraft.city,
+              customer_type: state.profileDraft.customerType,
+              company_name: state.profileDraft.companyName,
+              comment: "Регистрация из Telegram Mini App preview",
+              telegram_user_id: identity.userId,
+              telegram_username: identity.username,
+              telegram_chat_id: identity.chatId,
+              source: "telegram-mini-app",
+            }),
+          });
+          await refreshCustomerState();
+          openScreen("card", false);
+          notifyTelegram(response.message || "Заявка отправлена");
+        } catch (error) {
+          notifyTelegram("Не удалось отправить заявку: " + error.message);
+        }
+      }
+
+      async function submitManagerRequest(requestType) {
+        const identity = telegramIdentity();
+        const productName = state.selectedNode ? state.selectedNode.title : "";
+        const defaultMessage =
+          requestType === "wholesale"
+            ? "Нужны оптовые условия и подтверждение карты клиента."
+            : requestType === "product"
+              ? "Нужна помощь с подбором товара."
+              : "Нужна связь с менеджером.";
+        const message = window.prompt("Сообщение менеджеру", defaultMessage);
+        if (message === null) return;
+
+        try {
+          const response = await apiJson("/api/telegram/request", {
+            method: "POST",
+            body: JSON.stringify({
+              request_type: requestType,
+              message: message.trim(),
+              product_name: productName,
+              first_name: identity.firstName,
+              last_name: identity.lastName,
+              phone: state.profileDraft.phone,
+              company_name: state.profileDraft.companyName,
+              city: state.profileDraft.city,
+              telegram_user_id: identity.userId,
+              telegram_username: identity.username,
+              telegram_chat_id: identity.chatId,
+              source: "telegram-mini-app",
+            }),
+          });
+          notifyTelegram(response.message || "Обращение отправлено");
+        } catch (error) {
+          notifyTelegram("Не удалось отправить обращение: " + error.message);
+        }
+      }
+
+      function applyTelegramTheme() {
+        if (!telegramWebApp || !telegramWebApp.themeParams) return;
+
+        const theme = telegramWebApp.themeParams;
+        const root = document.documentElement;
+
+        if (theme.bg_color) root.style.setProperty("--bg", theme.bg_color);
+        if (theme.secondary_bg_color) root.style.setProperty("--bg-soft", theme.secondary_bg_color);
+        if (theme.section_bg_color) root.style.setProperty("--card", theme.section_bg_color);
+        if (theme.bottom_bar_bg_color) root.style.setProperty("--card-2", theme.bottom_bar_bg_color);
+        if (theme.text_color) root.style.setProperty("--text", theme.text_color);
+        if (theme.hint_color) root.style.setProperty("--muted", theme.hint_color);
+        if (theme.link_color) root.style.setProperty("--link", theme.link_color);
+        if (theme.button_color) root.style.setProperty("--accent", theme.button_color);
+      }
+
+      function updateViewportHeight() {
+        const viewport = telegramWebApp && telegramWebApp.viewportHeight ? telegramWebApp.viewportHeight : window.innerHeight;
+        document.documentElement.style.setProperty("--tg-viewport-height", viewport + "px");
+      }
+
+      function setTelegramStatus(text) {
+        if (!text) {
+          tgStatus.classList.add("hidden");
+          tgStatus.textContent = "";
+          return;
+        }
+        tgStatus.classList.remove("hidden");
+        tgStatus.textContent = text;
+      }
+
+      function openExternal(url) {
+        if (!url) return;
+        if (telegramWebApp && typeof telegramWebApp.openLink === "function") {
+          telegramWebApp.openLink(url, { try_instant_view: false });
+          return;
+        }
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      function notifyTelegram(text) {
+        if (telegramWebApp && typeof telegramWebApp.showAlert === "function") {
+          telegramWebApp.showAlert(text);
+        }
+      }
+
+      function shareCurrentScreen() {
+        const shareUrl = LOCATION_INFO.contactsPage;
+        const shareText = encodeURIComponent("Счетчики Юг: витрина каталога и быстрый вход в разделы");
+        const url = "https://t.me/share/url?url=" + encodeURIComponent(shareUrl) + "&text=" + shareText;
+        if (telegramWebApp && typeof telegramWebApp.openTelegramLink === "function") {
+          telegramWebApp.openTelegramLink(url);
+          return;
+        }
+        openExternal(url);
+      }
+
+      function syncTelegramChrome() {
+        if (!telegramWebApp) return;
+
+        const canGoBack = state.categoryPath.length > 0 || state.history.length > 1;
+        if (telegramWebApp.BackButton) {
+          if (canGoBack) telegramWebApp.BackButton.show();
+          else telegramWebApp.BackButton.hide();
+        }
+
+        if (!telegramWebApp.MainButton) return;
+
+        const currentScreen = state.history[state.history.length - 1].screen;
+        if (currentScreen === "find") telegramWebApp.MainButton.setText("Открыть контакты");
+        else telegramWebApp.MainButton.setText("Связаться с менеджером");
+
+        telegramWebApp.MainButton.show();
+      }
+
+      function initTelegramMiniApp() {
+        if (!telegramWebApp) {
+          setTelegramStatus("Локальный режим прототипа. Для Mini App откройте этот экран внутри Telegram.");
+          updateViewportHeight();
+          return;
+        }
+
+        document.body.classList.add("tg-webapp");
+        applyTelegramTheme();
+        updateViewportHeight();
+        telegramWebApp.ready();
+        telegramWebApp.expand();
+
+        try {
+          if (typeof telegramWebApp.setHeaderColor === "function") telegramWebApp.setHeaderColor("bg_color");
+          if (typeof telegramWebApp.setBackgroundColor === "function" && telegramWebApp.themeParams.bg_color) {
+            telegramWebApp.setBackgroundColor(telegramWebApp.themeParams.bg_color);
+          }
+        } catch (error) {}
+
+        const user = telegramWebApp.initDataUnsafe && telegramWebApp.initDataUnsafe.user;
+        const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "гость";
+        const platform = telegramWebApp.platform || "telegram";
+        setTelegramStatus("Mini App подключен: " + userName + " • " + platform);
+
+        if (telegramWebApp.BackButton && typeof telegramWebApp.BackButton.onClick === "function") {
+          telegramWebApp.BackButton.onClick(goBack);
+        }
+
+        if (telegramWebApp.MainButton && typeof telegramWebApp.MainButton.onClick === "function") {
+          telegramWebApp.MainButton.onClick(() => {
+            const currentScreen = state.history[state.history.length - 1].screen;
+            if (currentScreen === "find") openExternal(LOCATION_INFO.contactsPage);
+            else openScreen("manager");
+          });
+        }
+
+        if (typeof telegramWebApp.onEvent === "function") {
+          telegramWebApp.onEvent("themeChanged", applyTelegramTheme);
+          telegramWebApp.onEvent("viewportChanged", updateViewportHeight);
+        }
+      }
 
       function rootCategories() {
         return CATALOG;
@@ -1367,6 +2035,7 @@
         dockButtons.forEach((btn) => {
           btn.classList.toggle("active", btn.getAttribute("data-tab") === state.tab);
         });
+        syncTelegramChrome();
       }
 
       function sectionLabel(text) {
@@ -1399,19 +2068,31 @@
       function renderHome() {
         const categories = rootCategories();
         const quickItems = categories.slice(0, 6);
+        const storefrontCounts = state.backend.health && state.backend.health.storefront_counts
+          ? state.backend.health.storefront_counts
+          : {
+              popular_products: state.storefront.popular_products.length,
+              promotions: state.storefront.promotions.length,
+            };
+        const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
+        const heroKicker = fallbackActive ? "Preview storefront" : "Telegram Mini App";
         screenRoot.innerHTML =
+          '<section class="hero-panel">' +
+          '<div class="hero-kicker">' + heroKicker + "</div>" +
+          '<div class="hero-title">Каталог, заявки и оптовый доступ в одном экране</div>' +
+          '<div class="hero-copy">Главный вход в Mini App: клиент видит витрину, быстрые маршруты по каталогу и живой статус синхронизации с backend.</div>' +
+          '<div class="hero-meta">' +
+          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="hero-stat-label">популярных позиций</div></div>' +
+          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(String(storefrontCounts.promotions || 0)) + '</div><div class="hero-stat-label">акций в витрине</div></div>' +
+          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(backendLabel()) + '</div><div class="hero-stat-label">режим backend</div></div>' +
+          '</div>' +
+          '</section>' +
           infoCardHtml() +
           statusSwitchHtml() +
-          sectionLabel("Закрепленные сообщения") +
-          '<div class="pin-stack">' +
-          '<button class="pin-card" data-action="open-root-catalog"><div class="pin-kicker">Закреп</div><div class="pin-title">Каталог и быстрый вход в разделы</div><div class="pin-copy">Главная навигация по категориям, подкаталогам и спискам товаров.</div></button>' +
-          '<button class="pin-card" data-action="show-card"><div class="pin-kicker">Закреп</div><div class="pin-title">Карта клиента и оптовый доступ</div><div class="pin-copy">Регистрация, подтверждение менеджером, QR и номер карты для ручного ввода.</div></button>' +
-          '<button class="pin-card" data-action="show-content-channel"><div class="pin-kicker">Закреп</div><div class="pin-title">Информационный канал</div><div class="pin-copy">Подписка на отдельный канал с обучающими роликами, инструкциями и полезными публикациями каждый день.</div></button>' +
-          '<button class="pin-card" data-action="show-manager"><div class="pin-kicker">Закреп</div><div class="pin-title">Связь с менеджером</div><div class="pin-copy">Подбор товара, оптовый запрос, доставка, сервис и гарантия.</div></button>' +
-          '</div>' +
+          sectionLabel("Каталог") +
           '<div class="quick-search">' +
-          '<div class="quick-title">Быстрый поиск по каталогу</div>' +
-          '<div class="quick-copy">Короткий вход в основные разделы прямо из шапки канала, без длинного скролла по ленте.</div>' +
+          '<div class="quick-title">Открыть каталог сразу</div>' +
+          '<div class="quick-copy">Это главный экран витрины. Сразу вход в основные разделы без ощущения закрепов и служебных постов наверху.</div>' +
           '<div class="quick-grid">' +
           quickItems
             .map((item) => '<button class="quick-chip" data-root-code="' + item.code + '">' + item.title + "</button>")
@@ -1424,29 +2105,36 @@
           '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
           '</div>' +
           '</div>' +
-          sectionLabel("Сегодня в канале") +
+          sectionLabel("Подборки и витрина") +
           '<div class="feed-stack">' +
-          '<button class="feed-card" data-action="show-promotions">' +
+          '<button class="feed-card promotions" data-action="show-promotions">' +
           '<div class="feed-top"><div class="feed-tag">Акция дня</div><div class="feed-time">сегодня</div></div>' +
           '<div class="feed-title">Снижение цены на популярные счетчики воды</div>' +
           '<div class="feed-copy">Небольшой ежедневный пост, который занимает компактный кусок экрана и быстро переводит клиента в акционный блок.</div>' +
           '<div class="feed-meta">Переход: Акции → менеджер / каталог</div>' +
           '</button>' +
-          '<button class="feed-card" data-action="show-popular">' +
+          '<button class="feed-card popular" data-action="show-popular">' +
           '<div class="feed-top"><div class="feed-tag">Популярное</div><div class="feed-time">сегодня</div></div>' +
           '<div class="feed-title">ТОП ходовых позиций по воде и газу</div>' +
           '<div class="feed-copy">Компактная подборка товаров, которую клиент быстро просматривает прямо в ленте без перегруза интерфейса.</div>' +
           '<div class="feed-meta">Переход: Популярные товары → каталог</div>' +
           '</button>' +
-          '<button class="feed-card" data-action="show-content">' +
+          '<button class="feed-card content" data-action="show-content">' +
           '<div class="feed-top"><div class="feed-tag">Полезное</div><div class="feed-time">сегодня</div></div>' +
           '<div class="feed-title">Как выбрать счетчик под квартиру, дом или объект</div>' +
           '<div class="feed-copy">Контентный пост небольшого размера, который прогревает клиента и ведет в нужный раздел каталога или к менеджеру.</div>' +
           '<div class="feed-meta">Переход: Полезный контент → каталог / менеджер</div>' +
           '</button>' +
           '</div>' +
-          '<div class="feed-note">Информационный канал вынесен в закрепленные сообщения. Основная лента этого канала остается короткой: витрина, акции, полезное и переход в каталог.</div>' +
-          sectionLabel("Быстрые разделы") +
+          '<div class="feed-note">Основной акцент сверху теперь на каталоге. Подборки и служебные переходы остаются ниже, чтобы экран ощущался как витрина, а не как Telegram-лента.</div>' +
+          sectionLabel("Служебные разделы") +
+          '<div class="pin-stack">' +
+          '<button class="pin-card" data-action="show-card"><div class="pin-kicker">Клиент</div><div class="pin-title">Карта клиента и оптовый доступ</div><div class="pin-copy">Регистрация, подтверждение менеджером, ручной ввод номера карты и переход в оптовый режим.</div></button>' +
+          '<button class="pin-card" data-action="show-manager"><div class="pin-kicker">Связь</div><div class="pin-title">Запрос менеджеру</div><div class="pin-copy">Быстрый вход в сценарии подбора товара, оптового запроса, доставки и сервиса.</div></button>' +
+          '<button class="pin-card" data-action="show-content-channel"><div class="pin-kicker">Контент</div><div class="pin-title">Информационный канал</div><div class="pin-copy">Отдельная лента с полезными материалами, инструкциями и регулярными постами для клиентов.</div></button>' +
+          '<button class="pin-card" data-action="sync"><div class="pin-kicker">Система</div><div class="pin-title">Синхронизация витрины</div><div class="pin-copy">Статус backend, storefront, fallback-режима и связки сайта с CRM.</div></button>' +
+          '</div>' +
+          sectionLabel("Ещё разделы") +
           '<div class="info-links">' +
           '<button class="info-link" data-action="show-popular">📦 Популярные товары</button>' +
           '<button class="info-link" data-action="show-promotions">🔥 Акции</button>' +
@@ -1626,18 +2314,32 @@
       }
 
       function renderPopular() {
+        const liveItems = state.storefront.popular_products.slice(0, 4);
+        const liveList = liveItems
+          .map((item) => {
+            const price = formatPrice(item.price, "RUB");
+            const suffix = item.stock > 0 ? " · в наличии" : " · под заказ";
+            return escapeHtml((item.product_name || item.title || "Товар") + " — " + price + suffix);
+          })
+          .join("\\n");
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📦 Популярные товары</div>' +
-          '<div class="post-copy">Этот блок нужен для самых ходовых позиций канала. На следующем этапе он будет собираться из `Битрикс24`, а сейчас показывает будущую механику публикации и переходов.</div>' +
+          '<div class="post-copy">' +
+          (liveItems.length
+            ? "Блок уже читает локальный storefront backend и показывает актуальные позиции из последней сборки."
+            : "Этот блок нужен для самых ходовых позиций канала. Пока backend не отдал свежую витрину, используется fallback-вариант экрана.") +
+          "</div>" +
           '<div class="list-text">' +
-          'ТОП ПО СПРОСУ\\n' +
-          'ЭКО НОМ СВ 15-110 — ' + (hasWholesaleAccess() ? '1 690 ₽' : '1 850 ₽') + '\\n' +
-          'БЕТАР СГВ-15 — ' + (hasWholesaleAccess() ? '1 540 ₽' : '1 690 ₽') + '\\n' +
-          'Газовый счетчик Вектор G4 — ' + (hasWholesaleAccess() ? '2 700 ₽' : '2 950 ₽') + '\\n' +
-          'Манометр МП50 0–6 бар — ' + (hasWholesaleAccess() ? '320 ₽' : '350 ₽') +
+          (liveItems.length
+            ? 'ТОП ПО СПРОСУ\\n' + liveList
+            : 'ТОП ПО СПРОСУ\\n' +
+              'ЭКО НОМ СВ 15-110 — ' + (hasWholesaleAccess() ? '1 690 ₽' : '1 850 ₽') + '\\n' +
+              'БЕТАР СГВ-15 — ' + (hasWholesaleAccess() ? '1 540 ₽' : '1 690 ₽') + '\\n' +
+              'Газовый счетчик Вектор G4 — ' + (hasWholesaleAccess() ? '2 700 ₽' : '2 950 ₽') + '\\n' +
+              'Манометр МП50 0–6 бар — ' + (hasWholesaleAccess() ? '320 ₽' : '350 ₽')) +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Логика блока</div>' +
@@ -1660,17 +2362,31 @@
       }
 
       function renderPromotions() {
+        const liveItems = state.storefront.promotions.slice(0, 4);
+        const liveList = liveItems
+          .map((item) => {
+            const retailPrice = item.old_price ? formatPrice(item.old_price, "RUB") : "—";
+            const promoPrice = formatPrice(item.price, "RUB");
+            return escapeHtml((item.promo_title || item.product_name || "Акция") + " — старая цена " + retailPrice + " / акция " + promoPrice);
+          })
+          .join("\\n");
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">🔥 Акции</div>' +
-          '<div class="post-copy">Акции должны жить отдельно от общего прайса. Здесь собираются временные предложения, которые менеджеры включают в Битрикс24 и выводят в канал на срок акции.</div>' +
+          '<div class="post-copy">' +
+          (liveItems.length
+            ? "Этот блок уже берет акции из локально опубликованного storefront payload."
+            : "Акции должны жить отдельно от общего прайса. Здесь собираются временные предложения, которые менеджеры включают в Битрикс24 и выводят в канал на срок акции.") +
+          "</div>" +
           '<div class="list-text">' +
-          'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' +
-          'ЭКО НОМ СВ 15-110 — старая цена 1 850 ₽ / акция 1 690 ₽\\n' +
-          'БЕТАР СГВ-15 — старая цена 1 690 ₽ / акция 1 540 ₽\\n' +
-          'Vector G4 — старая цена 2 950 ₽ / акция 2 790 ₽' +
+          (liveItems.length
+            ? 'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' + liveList
+            : 'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' +
+              'ЭКО НОМ СВ 15-110 — старая цена 1 850 ₽ / акция 1 690 ₽\\n' +
+              'БЕТАР СГВ-15 — старая цена 1 690 ₽ / акция 1 540 ₽\\n' +
+              'Vector G4 — старая цена 2 950 ₽ / акция 2 790 ₽') +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Логика акций</div>' +
@@ -1931,7 +2647,7 @@
             '</div>';
 
           actionBlock =
-            '<button class="inline-btn primary" data-card-status="pending">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn primary" data-action="register-card">📝 Подать заявку на карту</button>' +
             '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
             '<button class="inline-btn" data-action="show-post">📄 Смотреть розничный прайс</button>';
@@ -1964,10 +2680,11 @@
       function renderCard() {
         const meta = cardStatusMeta();
         const stageClass = state.cardStatus;
+        const liveCard = state.customerCard;
         let cardBody = "";
         let actionButtons = "";
 
-        if (state.cardStatus === "approved") {
+        if (state.cardStatus === "approved" && liveCard) {
           cardBody =
             '<div class="card-stage approved">' +
             '<div class="card-stage-top">' +
@@ -1979,21 +2696,21 @@
             '<div class="loyalty-top">' +
             '<div>' +
             '<div class="loyalty-kicker">Постоянный покупатель</div>' +
-            '<div class="loyalty-name">Иван Иванов</div>' +
-            '<div class="loyalty-meta">+7 900 123-45-67 · ID 104582</div>' +
+            '<div class="loyalty-name">' + escapeHtml(liveCard.full_name || "Клиент") + '</div>' +
+            '<div class="loyalty-meta">' + escapeHtml((liveCard.phone || "Телефон не указан") + " · " + (liveCard.contact_id ? "ID " + liveCard.contact_id : "preview")) + '</div>' +
             '</div>' +
-            '<div class="discount-chip">Скидка 10%</div>' +
+            '<div class="discount-chip">Скидка ' + escapeHtml(String(liveCard.discount_percent || 0)) + '%</div>' +
             '</div>' +
             '<div class="customer-grid">' +
             '<div class="customer-cell"><div class="customer-label">Статус</div><div class="customer-value">Подтвержденный оптовик</div></div>' +
-            '<div class="customer-cell"><div class="customer-label">Тип клиента</div><div class="customer-value">Монтажник / опт</div></div>' +
-            '<div class="customer-cell"><div class="customer-label">Номер карты</div><div class="customer-value">SY-104582</div></div>' +
-            '<div class="customer-cell"><div class="customer-label">Ручной ввод</div><div class="customer-value">SY-104582</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Тип клиента</div><div class="customer-value">' + escapeHtml(liveCard.customer_type || "Оптовик") + '</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Номер карты</div><div class="customer-value">' + escapeHtml(liveCard.client_card_id || "—") + '</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Ручной ввод</div><div class="customer-value">' + escapeHtml(liveCard.manual_entry_code || "—") + '</div></div>' +
             '<div class="customer-cell"><div class="customer-label">Цены в канале</div><div class="customer-value">Только оптовые</div></div>' +
-            '<div class="customer-cell"><div class="customer-label">Синхронизация</div><div class="customer-value">Битрикс24 + Telegram</div></div>' +
+            '<div class="customer-cell"><div class="customer-label">Синхронизация</div><div class="customer-value">' + escapeHtml(backendLabel()) + '</div></div>' +
             '</div>' +
             '<div class="qr"><span class="qr-corner"></span></div>' +
-            '<div class="card-note">Покажите QR-код в магазине. Если сканер не работает, используйте номер карты SY-104582 для ручного ввода.</div>' +
+            '<div class="card-note">Покажите QR-код в магазине. Если сканер не работает, используйте номер карты ' + escapeHtml(liveCard.manual_entry_code || "—") + ' для ручного ввода.</div>' +
             '</div>';
 
           actionButtons =
@@ -2002,6 +2719,10 @@
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
             '<button class="inline-btn" data-card-status="pending">↺ Вернуть на проверку</button>';
         } else if (state.cardStatus === "pending") {
+          const pendingName = liveCard && liveCard.full_name ? liveCard.full_name : "Иван";
+          const pendingPhone = liveCard && liveCard.phone ? liveCard.phone : "+7 900 123-45-67";
+          const pendingCompany = liveCard && liveCard.company_name ? liveCard.company_name : "—";
+          const pendingCustomerType = liveCard && liveCard.customer_type ? liveCard.customer_type : "монтажник / застройщик / оптовик";
           cardBody =
             '<div class="card-stage pending">' +
             '<div class="card-stage-top">' +
@@ -2012,11 +2733,11 @@
             '<div class="mini-card">' +
             '<div class="mini-title">Заявка клиента</div>' +
             '<div class="mini-list">' +
-            '<div>Имя: Иван</div>' +
-            '<div>Телефон: +7 900 123-45-67</div>' +
-            '<div>Город: Ростов-на-Дону</div>' +
-            '<div>Тип клиента: монтажник / застройщик / оптовик</div>' +
-            '<div>Источник: Telegram-бот и канал</div>' +
+            '<div>Имя: ' + escapeHtml(pendingName) + '</div>' +
+            '<div>Телефон: ' + escapeHtml(pendingPhone) + '</div>' +
+            '<div>Город: ' + escapeHtml(state.profileDraft.city || LOCATION_INFO.city) + '</div>' +
+            '<div>Тип клиента: ' + escapeHtml(pendingCustomerType) + '</div>' +
+            '<div>Компания: ' + escapeHtml(pendingCompany) + '</div>' +
             '</div>' +
             '<div class="journey-grid">' +
             '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Заявка создана</div><div class="journey-copy">Контакт и карточка клиента уже отправлены менеджеру для проверки.</div></div></div>' +
@@ -2048,7 +2769,7 @@
             '</div>';
 
           actionButtons =
-            '<button class="inline-btn primary" data-card-status="pending">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn primary" data-action="register-card">📝 Подать заявку на карту</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
             '<button class="inline-btn" data-action="open-root-catalog">📦 Смотреть каталог</button>' +
             '<button class="inline-btn" data-action="show-post">💰 Посмотреть розничный прайс</button>';
@@ -2073,6 +2794,7 @@
       }
 
       function renderSync() {
+        const health = state.backend.health;
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
@@ -2081,10 +2803,23 @@
           '<div class="mini-card">' +
           '<div class="mini-title">Текущая схема</div>' +
           '<div class="mini-list">' +
-          '<div>• категории, подкатегории и товарные списки берутся с сайта</div>' +
-          '<div>• цены и остатки планируются из Битрикс24</div>' +
-          '<div>• заявки будут отправляться в Битрикс24</div>' +
-          '<div>• карта клиента и оптовый кабинет работают через бота</div>' +
+          '<div>• backend режим: ' + escapeHtml(backendLabel()) + '</div>' +
+          '<div>• popular_products: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.popular_products : state.storefront.popular_products.length)) + '</div>' +
+          '<div>• promotions: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.promotions : state.storefront.promotions.length)) + '</div>' +
+          '<div>• storefront path: ' + escapeHtml(health && health.storefront_path ? health.storefront_path : "не подключен") + '</div>' +
+          '<div>• diagnostics path: ' + escapeHtml(health && health.diagnostics_path ? health.diagnostics_path : "—") + '</div>' +
+          '<div>• fallback: ' + escapeHtml(health && health.fallback_mode && health.fallback_mode.active ? "активен" : "выключен") + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Smart-process статус</div>' +
+          '<div class="mini-list">' +
+          '<div>• webhook настроен: ' + (health && health.bitrix_webhook_configured ? "да" : "нет") + '</div>' +
+          '<div>• popular_products_tg: ET ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.entity_type_id : 1042)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.category_id : 23)) + '</div>' +
+          '<div>• telegram_promotions: ET ' + escapeHtml(String(health && health.entities ? health.entities.promotions.entity_type_id : 1044)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.promotions.category_id : 27)) + '</div>' +
+          '<div>• lookup URL: ' + escapeHtml(health && health.site_lookup_url ? health.site_lookup_url : "—") + '</div>' +
+          '<div>• fallback path: ' + escapeHtml(health && health.empty_fallback_path ? health.empty_fallback_path : "—") + '</div>' +
+          '<div>• клиентский статус: ' + escapeHtml(state.customerContext && state.customerContext.customer_state ? state.customerContext.customer_state : "guest") + '</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -2105,24 +2840,25 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📞 Связаться с менеджером</div>' +
-          '<div class="post-copy">Этот экран собирает логику обращения клиента внутри канала. Сейчас он не привязан к Telegram, боту и реальным менеджерам, но уже показывает, как будут выглядеть сценарии связи после подключения интеграций.</div>' +
+          '<div class="post-copy">Этот экран уже умеет отправлять обращение в локальный backend. Если рядом поднят `customer_api.py`, запрос уйдет в `Telegram -> backend -> CRM/preview` поток.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент нажимает кнопку, указывает вопрос и получает маршрут обращения в менеджерский поток.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карточке клиента пойдет отдельным путем после подключения CRM.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер поможет подобрать прибор по задаче, объекту и типу монтажа.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а backend сохраняет обращение для менеджера.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карте клиента сразу уходит как отдельный тип заявки.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="product"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер получит сообщение с текущим разделом каталога или товарной логикой.</div></button>' +
           '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что увидит клиент позже</div>' +
+          '<div class="mini-title">Что уже подключено</div>' +
           '<div class="mini-list">' +
-          '<div>• кнопки связи через Telegram, WhatsApp и MAX</div>' +
+          '<div>• base URL: ' + escapeHtml(state.backend.baseUrl) + '</div>' +
+          '<div>• backend режим: ' + escapeHtml(backendLabel()) + '</div>' +
           '<div>• быстрый выбор темы обращения</div>' +
-          '<div>• автоматическую передачу заявки в CRM</div>' +
-          '<div>• возврат менеджера в нужный раздел каталога или карты клиента</div>' +
+          '<div>• отправка заявки через `/api/telegram/request`</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="show-messengers">💬 Каналы связи</button>' +
+          '<button class="inline-btn primary" data-action="submit-request" data-request-type="quick">📝 Отправить запрос</button>' +
+          '<button class="inline-btn" data-action="submit-request" data-request-type="wholesale">💰 Оптовый запрос</button>' +
           '<button class="inline-btn" data-action="show-card">💳 По карте клиента</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Открыть каталог</button>' +
           '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
@@ -2380,13 +3116,14 @@
       function openMap(kind) {
         const url = LOCATION_INFO[kind];
         if (!url) return;
-        window.open(url, "_blank", "noopener,noreferrer");
+        openExternal(url);
       }
 
       function copyAddress() {
         const text = LOCATION_INFO.fullAddress;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text);
+          notifyTelegram("Адрес скопирован");
           return;
         }
         const area = document.createElement("textarea");
@@ -2398,6 +3135,7 @@
         area.select();
         document.execCommand("copy");
         document.body.removeChild(area);
+        notifyTelegram("Адрес скопирован");
       }
 
       function pushHistory(screen) {
@@ -2554,6 +3292,14 @@
         if (action === "show-messengers") openScreen("messengers");
         if (action === "sync") openScreen("sync");
         if (action === "show-stock") openScreen("stock");
+        if (action === "register-card") {
+          submitCardRegistration();
+          return;
+        }
+        if (action === "submit-request") {
+          submitManagerRequest(actionBtn.getAttribute("data-request-type") || "quick");
+          return;
+        }
         if (action === "open-brand") {
           state.selectedBrand = actionBtn.textContent.trim();
           openScreen("brand");
@@ -2581,12 +3327,19 @@
       });
 
       backButton.addEventListener("click", goBack);
+      shareButton.addEventListener("click", shareCurrentScreen);
       document.getElementById("giftButton").addEventListener("click", () => openScreen("home"));
       document.getElementById("upButton").addEventListener("click", () => contentRoot.scrollTo({ top: 0, behavior: "smooth" }));
       document.getElementById("searchButton").addEventListener("click", () => openScreen("sync"));
+      window.addEventListener("resize", updateViewportHeight);
 
+      initTelegramMiniApp();
       renderHome();
       updateDock();
+      bootstrapBackend().then(() => {
+        const current = state.history[state.history.length - 1];
+        openScreen(current ? current.screen : "home", false);
+      });
     </script>
   </body>
 </html>

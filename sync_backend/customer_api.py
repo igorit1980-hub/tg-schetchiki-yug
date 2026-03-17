@@ -12,14 +12,25 @@ if __package__ is None or __package__ == "":
 from sync_backend.clients.bitrix24 import Bitrix24Client
 from sync_backend.config import load_config
 from sync_backend.logging_utils import configure_logging
-from sync_backend.models import CustomerRegistrationPayload
+from sync_backend.models import CustomerRegistrationPayload, TelegramRequestPayload
 from sync_backend.services.customer_service import CustomerService
+from sync_backend.services.preview_service import PreviewService
+from sync_backend.services.request_service import RequestService
 
 
 def run() -> int:
     logger = configure_logging()
     config = load_config()
-    service = CustomerService(config, Bitrix24Client(config))
+    if config.bitrix_enabled:
+        bitrix_client = Bitrix24Client(config)
+        service = CustomerService(config, bitrix_client)
+        request_service = RequestService(config, bitrix_client)
+        backend_mode = "bitrix24"
+    else:
+        preview_service = PreviewService(config)
+        service = preview_service
+        request_service = preview_service
+        backend_mode = "local_preview"
 
     def app(environ, start_response):
         method = environ["REQUEST_METHOD"].upper()
@@ -31,6 +42,13 @@ def run() -> int:
                 raw = environ["wsgi.input"].read(body_size) if body_size > 0 else b"{}"
                 payload = json.loads(raw.decode("utf-8"))
                 response = service.register_customer(_registration_payload_from_json(payload))
+                return _respond(start_response, 200 if response.get("ok") else 400, response)
+
+            if method == "POST" and path == "/api/telegram/request":
+                body_size = int(environ.get("CONTENT_LENGTH") or 0)
+                raw = environ["wsgi.input"].read(body_size) if body_size > 0 else b"{}"
+                payload = json.loads(raw.decode("utf-8"))
+                response = request_service.submit_request(_request_payload_from_json(payload))
                 return _respond(start_response, 200 if response.get("ok") else 400, response)
 
             if method == "GET" and path == "/api/telegram/customer/status":
@@ -59,6 +77,59 @@ def run() -> int:
                 )
                 return _respond(start_response, 200 if response.get("ok") else 404, response)
 
+            if method == "GET" and path == "/api/telegram/storefront":
+                if not config.output_path.exists():
+                    return _respond(
+                        start_response,
+                        404,
+                        {"ok": False, "error_code": "STOREFRONT_NOT_FOUND", "path": str(config.output_path)},
+                    )
+                response = json.loads(config.output_path.read_text(encoding="utf-8"))
+                response["ok"] = True
+                return _respond(start_response, 200, response)
+
+            if method == "GET" and path == "/api/health":
+                storefront_counts = {"popular_products": 0, "promotions": 0}
+                fallback_mode = {"active": False, "source": "", "reason": ""}
+                if config.output_path.exists():
+                    try:
+                        storefront_payload = json.loads(config.output_path.read_text(encoding="utf-8"))
+                        storefront_counts = {
+                            "popular_products": len(storefront_payload.get("popular_products") or []),
+                            "promotions": len(storefront_payload.get("promotions") or []),
+                        }
+                        fallback_mode = storefront_payload.get("fallback_mode") or fallback_mode
+                    except Exception:
+                        storefront_counts = {"popular_products": 0, "promotions": 0}
+                return _respond(
+                    start_response,
+                    200,
+                    {
+                        "ok": True,
+                        "mode": backend_mode,
+                        "bitrix_webhook_configured": bool(config.bitrix_webhook),
+                        "site_lookup_url": config.site_lookup_url,
+                        "storefront_path": str(config.output_path),
+                        "diagnostics_path": str(config.diagnostics_path),
+                        "empty_fallback_path": str(config.empty_storefront_fallback_path),
+                        "storefront_counts": storefront_counts,
+                        "fallback_mode": fallback_mode,
+                        "crm_request_mode": config.crm_request_mode,
+                        "entities": {
+                            "popular_products": {
+                                "entity_type_id": config.popular_products.entity_type_id,
+                                "category_id": config.popular_products.category_id,
+                                "active_stage_id": config.popular_products.active_stage_id,
+                            },
+                            "promotions": {
+                                "entity_type_id": config.promotions.entity_type_id,
+                                "category_id": config.promotions.category_id,
+                                "active_stage_id": config.promotions.active_stage_id,
+                            },
+                        },
+                    },
+                )
+
             return _respond(start_response, 404, {"ok": False, "error_code": "NOT_FOUND"})
         except Exception as exc:
             logger.exception("customer_api_error path=%s error=%s", path, exc)
@@ -80,6 +151,25 @@ def _registration_payload_from_json(data: dict) -> CustomerRegistrationPayload:
         company_name=str(data.get("company_name", "")).strip(),
         inn=str(data.get("inn", "")).strip(),
         comment=str(data.get("comment", "")).strip(),
+        telegram_user_id=str(data.get("telegram_user_id", "")).strip(),
+        telegram_username=str(data.get("telegram_username", "")).strip(),
+        telegram_chat_id=str(data.get("telegram_chat_id", "")).strip(),
+        source=str(data.get("source", "telegram")).strip() or "telegram",
+    )
+
+
+def _request_payload_from_json(data: dict) -> TelegramRequestPayload:
+    return TelegramRequestPayload(
+        request_type=str(data.get("request_type", "")).strip(),
+        message=str(data.get("message", "")).strip(),
+        product_xml_id=str(data.get("product_xml_id", "")).strip(),
+        product_name=str(data.get("product_name", "")).strip(),
+        quantity=str(data.get("quantity", "")).strip(),
+        first_name=str(data.get("first_name", "")).strip(),
+        last_name=str(data.get("last_name", "")).strip(),
+        phone=str(data.get("phone", "")).strip(),
+        company_name=str(data.get("company_name", "")).strip(),
+        city=str(data.get("city", "")).strip(),
         telegram_user_id=str(data.get("telegram_user_id", "")).strip(),
         telegram_username=str(data.get("telegram_username", "")).strip(),
         telegram_chat_id=str(data.get("telegram_chat_id", "")).strip(),

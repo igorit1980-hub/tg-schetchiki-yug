@@ -3,8 +3,8 @@
   "domain_technical": "https://xn----7sbhjpnneqb.xn--p1ai/",
   "preferred_lookup_endpoint": "/api/catalog/by-xml-id?xml_id={xmlId}",
   "fallback_local_sources": [
-    "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_real.json",
-    "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_priced.json"
+    "/Users/igor_itmail.ru/Documents/ТГ счетчики юг/catalog_real.json",
+    "/Users/igor_itmail.ru/Documents/ТГ счетчики юг/catalog_priced.json"
   ],
   "required_lookup_response": {
     "found": true,

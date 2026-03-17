@@ -65,3 +65,21 @@ class CustomerContext:
     company_name: Optional[str]
     last_sync_at: Optional[str]
     raw: Dict[str, Any]
+
+
+@dataclass(frozen=True)
+class TelegramRequestPayload:
+    request_type: str
+    message: str
+    product_xml_id: str
+    product_name: str
+    quantity: str
+    first_name: str
+    last_name: str
+    phone: str
+    company_name: str
+    city: str
+    telegram_user_id: str
+    telegram_username: str
+    telegram_chat_id: str
+    source: str

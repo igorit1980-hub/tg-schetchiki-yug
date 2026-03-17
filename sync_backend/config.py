@@ -4,7 +4,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,6 +14,21 @@ KNOWLEDGE_BASE_DIR = BASE_DIR / "knowledge-base"
 def _load_json(path: Path) -> Dict[str, Any]:
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def _load_local_env() -> None:
+    env_path = BASE_DIR / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        raw = line.strip()
+        if not raw or raw.startswith("#") or "=" not in raw:
+            continue
+        key, value = raw.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip("'").strip('"')
+        if key and key not in os.environ:
+            os.environ[key] = value
 
 
 @dataclass(frozen=True)
@@ -28,10 +43,15 @@ class EntityConfig:
 class AppConfig:
     timezone: str
     bitrix_webhook: str
+    bitrix_enabled: bool
     site_lookup_url: str
     output_path: Path
+    diagnostics_path: Path
+    empty_storefront_fallback_path: Path
     customer_api_host: str
     customer_api_port: int
+    crm_request_mode: str
+    crm_request_title_prefix: str
     popular_products: EntityConfig
     promotions: EntityConfig
     local_catalog_path: Path
@@ -63,16 +83,13 @@ def _default_customer_fields() -> Dict[str, str]:
 
 
 def load_config() -> AppConfig:
+    _load_local_env()
     canonical = _load_json(KNOWLEDGE_BASE_DIR / "canonical-model.json")
     bitrix = _load_json(KNOWLEDGE_BASE_DIR / "bitrix24-config.json")
     site = _load_json(KNOWLEDGE_BASE_DIR / "site-catalog-config.json")
 
     systems = canonical["systems"]
     webhook = os.environ.get("BITRIX24_WEBHOOK", "").strip()
-    if not webhook:
-        raise RuntimeError(
-            "BITRIX24_WEBHOOK is required. Set it in the environment before running sync_backend."
-        )
 
     site_lookup_url = os.environ.get("SITE_CATALOG_LOOKUP_URL", "").strip()
     if not site_lookup_url:
@@ -87,11 +104,26 @@ def load_config() -> AppConfig:
 
     return AppConfig(
         timezone=canonical["timezone"],
-        bitrix_webhook=webhook.rstrip("/") + "/",
+        bitrix_webhook=webhook.rstrip("/") + "/" if webhook else "",
+        bitrix_enabled=bool(webhook),
         site_lookup_url=site_lookup_url,
         output_path=output_path,
+        diagnostics_path=Path(
+            os.environ.get(
+                "STORE_DIAGNOSTICS_PATH",
+                str(BASE_DIR / "output" / "storefront.diagnostics.json"),
+            )
+        ),
+        empty_storefront_fallback_path=Path(
+            os.environ.get(
+                "STORE_EMPTY_FALLBACK_PATH",
+                str(BASE_DIR / "output" / "storefront.test.json"),
+            )
+        ),
         customer_api_host=os.environ.get("CUSTOMER_API_HOST", "127.0.0.1"),
         customer_api_port=int(os.environ.get("CUSTOMER_API_PORT", "8787")),
+        crm_request_mode=os.environ.get("CRM_REQUEST_MODE", "lead").strip() or "lead",
+        crm_request_title_prefix=os.environ.get("CRM_REQUEST_TITLE_PREFIX", "Telegram").strip() or "Telegram",
         popular_products=EntityConfig(
             name="popular_products",
             entity_type_id=bitrix["entities"]["popular_products"]["entity_type_id"],
