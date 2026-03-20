@@ -2648,9 +2648,53 @@
         );
       }
 
+      function homeQuickItems() {
+        const preferred = [
+          { code: "schetchiki_vody", title: "Счетчики воды" },
+          { code: "schetchiki_gaza", title: "Счетчики газа" },
+          { code: "signalizatory_zagazovannosti", title: "Сигнализатор" },
+          { code: "podvodka_gazovaya", title: "Подвод" },
+          { code: "nasosy", title: "Насос" },
+        ];
+        const roots = rootCategories();
+        return preferred
+          .map((item) => {
+            const found = roots.find((root) => root.code === item.code);
+            return found ? { code: found.code, title: item.title } : null;
+          })
+          .filter(Boolean);
+      }
+
+      function fallbackPopularItems() {
+        return [
+          { product_name: "Счетчик воды ЭКО НОМ 15", price: 1400, stock: 24 },
+          { product_name: "Счетчик воды ЭКО НОМ 20", price: 1500, stock: 18 },
+          { product_name: "Счетчик газа ВК G4 левый", price: 2250, stock: 9 },
+          { product_name: "Счетчик газа ВК G4 правый", price: 2250, stock: 8 },
+          { product_name: "Сигнализатор загазованности СЗ-1", price: 1850, stock: 11 },
+          { product_name: "Подводка газовая ELKA 1/2", price: 550, stock: 16 },
+          { product_name: "Насос циркуляционный 25/6", price: 4900, stock: 6 },
+          { product_name: "Счетчик воды Бетар СГВ-15", price: 1650, stock: 12 },
+          { product_name: "Сигнализатор САКЗ", price: 2800, stock: 5 },
+          { product_name: "Насос дренажный 550 Вт", price: 5400, stock: 4 },
+        ];
+      }
+
+      function fallbackPromotionItems() {
+        return [
+          { promo_title: "Подводка газовая ELKA 1/2", old_price: 690, price: 550 },
+          { promo_title: "ВК G4 левый", old_price: 2450, price: 2250 },
+          { promo_title: "ВК G4 правый", old_price: 2450, price: 2250 },
+          { promo_title: "ЭКО НОМ 15", old_price: 1650, price: 1400 },
+          { promo_title: "ЭКО НОМ 20", old_price: 1750, price: 1500 },
+        ];
+      }
+
       function renderHome() {
         const categories = rootCategories();
-        const menuItems = categories.slice(0, 14);
+        const quickItems = homeQuickItems();
+        const preferredCodes = new Set(quickItems.map((item) => item.code));
+        const menuItems = quickItems.concat(categories.filter((item) => !preferredCodes.has(item.code)).slice(0, 9));
         const storefrontCounts = state.backend.health && state.backend.health.storefront_counts
           ? state.backend.health.storefront_counts
           : {
@@ -2658,14 +2702,17 @@
               promotions: state.storefront.promotions.length,
             };
         const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
+        const useDemoStorefront = fallbackActive || !state.backend.connected;
+        const visiblePopularItems = useDemoStorefront ? fallbackPopularItems() : state.storefront.popular_products;
+        const visiblePromotionItems = useDemoStorefront ? fallbackPromotionItems() : state.storefront.promotions;
         screenRoot.innerHTML =
           '<div class="channel-menu">' +
           '<section class="channel-menu-head">' +
           '<div class="channel-menu-title">Каталог и акции в одном окне</div>' +
           '<div class="channel-menu-meta">' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></div>' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">статус витрины</div></div>' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(visiblePopularItems.length || storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(visiblePromotionItems.length || storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></div>' +
+          '<button class="channel-meta-tile" data-action="open-root-catalog"><div class="channel-meta-value">Каталог</div><div class="channel-meta-label">открыть разделы</div></button>' +
           '</div>' +
           '</section>' +
           '<div class="channel-grid">' +
@@ -2678,7 +2725,6 @@
           '<button class="channel-service-btn warn" data-action="show-wholesale">💸 Оптовый заказ</button>' +
           '<button class="channel-service-btn accent" data-action="show-manager">💬 Менеджер</button>' +
           '</div>' +
-          statusSwitchHtml() +
           infoCardHtml() +
           '<button class="channel-bottom-cta" data-action="show-manager">⚙️ Заказать у менеджера</button>' +
           "</div>";
@@ -2837,7 +2883,9 @@
       }
 
       function renderPopular() {
-        const liveItems = state.storefront.popular_products.slice(0, 4);
+        const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
+        const useDemoStorefront = fallbackActive || !state.backend.connected;
+        const liveItems = (useDemoStorefront ? fallbackPopularItems() : state.storefront.popular_products).slice(0, 10);
         const liveList = liveItems
           .map((item) => {
             const price = formatPrice(item.price, "RUB");
@@ -2885,7 +2933,9 @@
       }
 
       function renderPromotions() {
-        const liveItems = state.storefront.promotions.slice(0, 4);
+        const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
+        const useDemoStorefront = fallbackActive || !state.backend.connected;
+        const liveItems = (useDemoStorefront ? fallbackPromotionItems() : state.storefront.promotions).slice(0, 10);
         const liveList = liveItems
           .map((item) => {
             const retailPrice = item.old_price ? formatPrice(item.old_price, "RUB") : "—";
