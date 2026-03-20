@@ -3428,32 +3428,32 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">⚙️ Гарантийный сервис</div>' +
-          '<div class="post-copy">Экран сервиса собирает путь клиента после покупки: гарантийный вопрос, сверка по заказу, обращение по прибору и возврат к менеджеру. Сейчас это внутренняя логика канала без боевой привязки.</div>' +
+          '<div class="post-copy">Здесь можно быстро выбрать тип сервисного обращения: гарантия, сверка по заказу или вопрос по уже купленному оборудованию. Заявка сразу уходит менеджеру.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Клиент сможет сообщить о проблеме по прибору и приложить номер заказа или фото.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="order"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Отдельный путь для сверки по отгрузке, комплектности и документам.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Сценарий для уточнения модели, даты покупки и типа неисправности.</div></button>' +
-          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Сервис</div><div class="route-title">Маршрут в менеджера</div><div class="route-copy">После сборки бота это обращение будет уходить в нужную очередь CRM.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Сообщите о проблеме по прибору, чтобы менеджер помог с гарантией и дальнейшими шагами.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="order"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Уточните отгрузку, комплектность, документы или текущий статус заказа.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Опишите модель и вопрос, чтобы менеджер подсказал решение.</div></button>' +
+          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Связь</div><div class="route-title">Менеджер</div><div class="route-copy">Открыть все каналы связи и отправить обращение напрямую.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что подключим позже</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• форму сервисного обращения</div>' +
-          '<div>• прикрепление фото и номера заказа</div>' +
-          '<div>• маршрутизацию к сервисному менеджеру</div>' +
-          '<div>• статус обработки обращения в Telegram</div>' +
+          '<div>• выбрать тип сервисного вопроса</div>' +
+          '<div>• быстро отправить обращение менеджеру</div>' +
+          '<div>• перейти к заказу, каталогу или карте клиента</div>' +
+          '<div>• получить обратную связь по заявке</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
           '<button class="inline-btn primary" data-action="show-manager">📞 Связаться с менеджером</button>' +
           '<button class="inline-btn" data-action="show-messengers">💬 Каналы связи</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
-          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
           '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Гарантийный сервис", "Сервисная логика канала без боевой привязки", "⚙️", "👁 сервис и гарантия");
+        setHeader("Гарантийный сервис", "Заявки по гарантии и сопровождению заказа", "⚙️", "👁 сервис и гарантия");
       }
 
       function renderDelivery() {
@@ -3462,20 +3462,20 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">🚚 Доставка по России</div>' +
-          '<div class="post-copy">Экран доставки нужен, чтобы клиент сразу понимал, как будет происходить отгрузка: со склада в Ростове-на-Дону, по каким сценариям и куда дальше его вести внутри канала.</div>' +
+          '<div class="post-copy">Здесь собрана вся базовая информация по получению заказа: отгрузка со склада в Ростове-на-Дону, доставка по России и связь с менеджером по срокам.</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="show-find"><div class="route-kicker">Доставка</div><div class="route-title">Со склада в Ростове</div><div class="route-copy">Основные позиции отгружаются со склада в Ростове-на-Дону.</div></button>' +
-          '<button class="route-btn" data-action="show-find"><div class="route-kicker">Доставка</div><div class="route-title">По России</div><div class="route-copy">Для канала предусмотрим сценарий отправки в любой регион России.</div></button>' +
-          '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Доставка</div><div class="route-title">Сроки и наличие</div><div class="route-copy">Клиент будет понимать, что в наличии, а что идет под доставку.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="delivery"><div class="route-kicker">Доставка</div><div class="route-title">Связь по отгрузке</div><div class="route-copy">Отдельная точка связи для согласования отправки и логистики.</div></button>' +
+          '<button class="route-btn" data-action="show-find"><div class="route-kicker">Доставка</div><div class="route-title">По России</div><div class="route-copy">Откройте адрес и контакты, если нужен маршрут или согласование получения.</div></button>' +
+          '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Доставка</div><div class="route-title">Сроки и наличие</div><div class="route-copy">Проверьте наличие товаров и подготовьте запрос по отгрузке.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="delivery"><div class="route-kicker">Доставка</div><div class="route-title">Связь по отгрузке</div><div class="route-copy">Отправьте запрос менеджеру по доставке, отгрузке или самовывозу.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что будет на следующем этапе</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• реальные сценарии расчета доставки</div>' +
-          '<div>• связь с остатками и сроками отгрузки</div>' +
-          '<div>• передача запросов на доставку в CRM</div>' +
-          '<div>• выбор способа получения: склад, отправка, самовывоз</div>' +
+          '<div>• открыть адрес склада и офиса</div>' +
+          '<div>• проверить наличие перед заказом</div>' +
+          '<div>• уточнить сроки и способ получения</div>' +
+          '<div>• отправить запрос по доставке менеджеру</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -3487,7 +3487,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Доставка", "Логика отгрузки и маршрута клиента", "🚚", "👁 доставка по России");
+        setHeader("Доставка", "Получение заказа и связь по отгрузке", "🚚", "👁 доставка по России");
       }
 
       function renderSite() {
@@ -3496,23 +3496,23 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">🌐 Переход на сайт</div>' +
-          '<div class="post-copy">Этот экран показывает, как внутри канала будет устроен переход на сайт без резкого выпадения пользователя из Telegram-витрины. Сейчас это визуальный сценарий, а не боевой редирект.</div>' +
+          '<div class="post-copy">Сайт нужен для расширенной информации по товарам, оформления заказов и просмотра каталога в полном виде. Если нужен детальный переход, откройте сайт отсюда.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="open-site-link" data-site-url="catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Открыть карточку на сайте</div><div class="route-copy">Для сложных товаров сайт будет использоваться как расширенная карточка и источник технических данных.</div></button>' +
-          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Остаться в канале</div><div class="route-copy">Основная витрина и быстрый выбор должны оставаться внутри Telegram-структуры.</div></button>' +
-          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Возврат в каталог</div><div class="route-copy">После просмотра сайта клиент должен легко возвращаться в нужный раздел канала.</div></button>' +
-          '<button class="route-btn" data-action="sync"><div class="route-kicker">Сценарий</div><div class="route-title">Связка с CRM</div><div class="route-copy">На следующем этапе переходы с сайта и канала будут связываться в единую логику заявок.</div></button>' +
+          '<button class="route-btn" data-action="open-site-link" data-site-url="catalog"><div class="route-kicker">Сайт</div><div class="route-title">Открыть каталог</div><div class="route-copy">Перейти в полный каталог сайта и посмотреть расширенную информацию по товарам.</div></button>' +
+          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Сайт</div><div class="route-title">Уточнить по товару</div><div class="route-copy">Если нужен подбор или коммерческое предложение, откройте менеджера.</div></button>' +
+          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Приложение</div><div class="route-title">Вернуться в каталог</div><div class="route-copy">Быстро вернуться в витрину приложения и продолжить выбор.</div></button>' +
+          '<button class="route-btn" data-action="show-find"><div class="route-kicker">Контакты</div><div class="route-title">Адрес и телефоны</div><div class="route-copy">Открыть адрес, телефоны и маршруты до склада и офиса.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что фиксируем сейчас</div>' +
+          '<div class="mini-title">Когда использовать сайт</div>' +
           '<div class="mini-list">' +
-          '<div>• сайт остается источником каталога и контента</div>' +
-          '<div>• Telegram-канал остается витриной и навигацией</div>' +
-          '<div>• прямой переход на сайт подключим после финальной сборки структуры</div>' +
+          '<div>• если нужен полный каталог</div>' +
+          '<div>• если нужна расширенная карточка товара</div>' +
+          '<div>• если хотите продолжить выбор вне Telegram</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="sync">🔄 Сайт / CRM</button>' +
+          '<button class="inline-btn primary" data-action="open-site-link" data-site-url="catalog">🌐 Открыть сайт</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Вернуться в каталог</button>' +
           '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
           '<button class="inline-btn" data-action="show-find">📍 Наш адрес</button>' +
@@ -3520,7 +3520,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Сайт", "Сценарий перехода с витрины канала", "🌐", "👁 сайт и структура");
+        setHeader("Сайт", "Полный каталог и расширенные карточки товаров", "🌐", "👁 сайт и каталог");
       }
 
       function renderFindUs() {
@@ -3529,7 +3529,7 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📍 Нас найти</div>' +
-          '<div class="post-copy">Этот экран нужен, чтобы клиенту было удобно сразу выбрать привычный способ построить маршрут: Яндекс.Карты, Google Maps, 2GIS или быстрый звонок менеджеру.</div>' +
+          '<div class="post-copy">Здесь собраны адрес, телефоны и быстрые действия: построить маршрут, скопировать адрес или сразу связаться с менеджером удобным способом.</div>' +
           '<div class="address-box">' +
           '<div class="address-title">Адрес склада и офиса</div>' +
           '<div class="address-copy">' + LOCATION_INFO.city + '\n' + LOCATION_INFO.address + '\n' + LOCATION_INFO.phones.join('\n') + '\nРежим работы: ' + LOCATION_INFO.hours + '</div>' +
@@ -3541,28 +3541,27 @@
           '<button class="route-btn" data-action="copy-address"><div class="route-kicker">Адрес</div><div class="route-title">Скопировать адрес</div><div class="route-copy">Скопировать адрес для отправки водителю или логисту</div></button>' +
           '</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">WhatsApp</div><div class="route-copy">Визуальная точка входа для будущей связи с менеджером</div></button>' +
-          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">Telegram</div><div class="route-copy">Подготовленный слот под менеджера или Telegram-бота</div></button>' +
-          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Написать</div><div class="route-title">MAX</div><div class="route-copy">Заготовка под подключение канала связи на следующем этапе</div></button>' +
-          '<button class="route-btn" data-action="show-messengers"><div class="route-kicker">Контакт</div><div class="route-title">Отдел продаж</div><div class="route-copy">Экран будущих способов связи без боевой привязки</div></button>' +
+          '<button class="route-btn" data-action="open-whatsapp"><div class="route-kicker">Написать</div><div class="route-title">WhatsApp</div><div class="route-copy">Открыть WhatsApp и написать менеджеру по заказу или доставке.</div></button>' +
+          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Написать</div><div class="route-title">Telegram</div><div class="route-copy">Открыть Telegram менеджера для быстрого вопроса.</div></button>' +
+          '<button class="route-btn" data-action="open-max"><div class="route-kicker">Написать</div><div class="route-title">MAX</div><div class="route-copy">Открыть MAX, если вы используете его для связи.</div></button>' +
+          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Контакт</div><div class="route-title">Отдел продаж</div><div class="route-copy">Перейти на экран связи и выбрать удобный способ обращения.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Как это работает для клиента</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• клиент нажимает "Нас найти" в канале</div>' +
-          '<div>• выбирает привычный картографический сервис</div>' +
-          '<div>• сразу строит маршрут до склада или офиса</div>' +
-          '<div>• видит часы работы до выезда</div>' +
-          '<div>• при необходимости пишет в MAX, WhatsApp или Telegram</div>' +
+          '<div>• построить маршрут до склада или офиса</div>' +
+          '<div>• скопировать адрес для логиста или водителя</div>' +
+          '<div>• сразу открыть WhatsApp, Telegram или MAX</div>' +
+          '<div>• перейти к менеджеру, если нужен ответ по заказу</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
           '<button class="inline-btn primary" data-map="yandex">🧭 Построить маршрут</button>' +
-          '<button class="inline-btn" data-action="show-messengers">✈️ Написать в Telegram</button>' +
-          '<button class="inline-btn" data-action="show-messengers">💬 WhatsApp</button>' +
-          '<button class="inline-btn" data-action="show-messengers">⚡ MAX</button>' +
+          '<button class="inline-btn" data-action="open-telegram-link" data-telegram-link="manager">✈️ Написать в Telegram</button>' +
+          '<button class="inline-btn" data-action="open-whatsapp">💬 WhatsApp</button>' +
+          '<button class="inline-btn" data-action="open-max">⚡ MAX</button>' +
           '<button class="inline-btn" data-action="copy-address">📋 Скопировать адрес</button>' +
-          '<button class="inline-btn" data-action="show-messengers">📞 Связь с отделом</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Связь с отделом</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Вернуться в каталог</button>' +
           '</div>' +
           '</div>' +
@@ -3577,31 +3576,32 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">💬 Каналы связи</div>' +
-          '<div class="post-copy">Этот экран пока собирается как часть визуала и внутренней логики канала. Реальные привязки к Telegram, MAX, WhatsApp, ботам и менеджерам будут подключаться на следующем этапе.</div>' +
+          '<div class="post-copy">Выберите удобный способ связи: Telegram, WhatsApp, MAX или прямой переход к менеджеру. Все основные контакты собраны в одном месте.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="bot"><div class="route-kicker">Статус</div><div class="route-title">Telegram</div><div class="route-copy">Быстрый переход в Telegram-сценарий и каталог.</div></button>' +
+          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Telegram</div><div class="route-title">Менеджер</div><div class="route-copy">Открыть Telegram менеджера для вопроса по заказу, прайсу или наличию.</div></button>' +
           '<button class="route-btn" data-action="open-whatsapp"><div class="route-kicker">Статус</div><div class="route-title">WhatsApp</div><div class="route-copy">Открыть быстрый канал связи в WhatsApp.</div></button>' +
           '<button class="route-btn" data-action="open-max"><div class="route-kicker">Статус</div><div class="route-title">MAX</div><div class="route-copy">Открыть канал связи в MAX.</div></button>' +
           '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Статус</div><div class="route-title">Менеджер</div><div class="route-copy">Перейти к сценарию обращения и быстрой связи.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что фиксируем сейчас</div>' +
+          '<div class="mini-title">Когда использовать</div>' +
           '<div class="mini-list">' +
-          '<div>• место мессенджеров в канале уже определено</div>' +
-          '<div>• кнопки и сценарии связи предусмотрены в визуале</div>' +
-          '<div>• боевые ссылки и боты подключим после сборки структуры канала</div>' +
+          '<div>• Telegram — быстрый вопрос и связь с менеджером</div>' +
+          '<div>• WhatsApp — короткие уточнения по заказу и доставке</div>' +
+          '<div>• MAX — альтернативный канал связи</div>' +
+          '<div>• Менеджер — все сценарии обращения внутри приложения</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
           '<button class="inline-btn primary" data-action="show-find">📍 Назад к адресу</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
           '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
-          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
           '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Каналы связи", "Визуальная заготовка без боевых привязок", "💬", "👁 точки контакта");
+        setHeader("Каналы связи", "Telegram, WhatsApp, MAX и менеджер", "💬", "👁 точки контакта");
       }
 
       function renderStock() {
