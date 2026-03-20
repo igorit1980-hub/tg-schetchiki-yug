@@ -251,14 +251,14 @@
       }
 
       .logo {
-        width: 26px;
+        width: 38px;
         height: 26px;
-        border-radius: 6px;
+        border-radius: 8px;
         display: grid;
         place-items: center;
         background: var(--accent);
         color: #07120c;
-        font-size: 12px;
+        font-size: 10px;
         font-weight: 800;
         flex: 0 0 auto;
       }
@@ -298,7 +298,7 @@
       }
 
       .share-chip::before {
-        content: "СЮ";
+        content: "⋯";
         width: 38px;
         height: 38px;
         border-radius: 50%;
@@ -1911,9 +1911,9 @@
         }
 
         .logo {
-          width: 24px;
+          width: 34px;
           height: 24px;
-          font-size: 11px;
+          font-size: 9px;
         }
 
         .pill-right {
@@ -1969,17 +1969,16 @@
             <div class="hero-row">
               <button class="back-chip" id="backButton"><span>❮</span><b>1</b></button>
               <div class="pill">
-                <div class="logo">СЮ</div>
+                <div class="logo">ЮГ</div>
                 <div class="pill-copy">
-                  <div class="pill-title" id="pillTitle">Счетчики Юг | Каталог приборов учета</div>
-                  <div class="pill-sub" id="pillSub">Оптовый поставщик приборов учета и комплектующих</div>
+                  <div class="pill-title" id="pillTitle">Счетчики Юг</div>
+                  <div class="pill-sub" id="pillSub">Каталог приборов учета и комплектующих</div>
                 </div>
                 <div class="pill-right" id="pillRight">🔇</div>
               </div>
               <button class="share-chip" id="shareButton" aria-label="Поделиться"></button>
             </div>
             <div class="views-line" id="viewsLine">👁 137K изменено 09:42</div>
-            <div class="tg-status hidden" id="tgStatus"></div>
           </div>
 
           <div id="screenRoot"></div>
@@ -2045,7 +2044,6 @@
       const viewsLine = document.getElementById("viewsLine");
       const backButton = document.getElementById("backButton");
       const shareButton = document.getElementById("shareButton");
-      const tgStatus = document.getElementById("tgStatus");
       const dockButtons = Array.from(document.querySelectorAll(".dock-btn"));
       const telegramWebApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
@@ -2379,13 +2377,7 @@
       }
 
       function setTelegramStatus(text) {
-        if (!text) {
-          tgStatus.classList.add("hidden");
-          tgStatus.textContent = "";
-          return;
-        }
-        tgStatus.classList.remove("hidden");
-        tgStatus.textContent = text;
+        return;
       }
 
       function openExternal(url) {
