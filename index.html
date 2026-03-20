@@ -2950,8 +2950,8 @@
           '<div class="post-date">🔥 Акции</div>' +
           '<div class="post-copy">' +
           (liveItems.length
-            ? "Здесь собраны актуальные предложения из текущей витрины."
-            : "Акции должны жить отдельно от общего прайса. Здесь собираются временные предложения, которые менеджеры включают в Битрикс24 и выводят в канал на срок акции.") +
+            ? "Здесь собраны актуальные предложения витрины. Можно быстро сравнить старую и текущую цену, а потом перейти в каталог или уточнить резерв."
+            : "Здесь собираются временные предложения по товарам, которые выделены как акции в витрине.") +
           "</div>" +
           '<div class="list-text">' +
           (liveItems.length
@@ -2962,23 +2962,24 @@
               'Vector G4 — старая цена 2 950 ₽ / акция 2 790 ₽') +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Логика акций</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• акции задаются менеджером или руководителем отдела продаж</div>' +
-          '<div>• каждая акция имеет срок действия и отдельный заголовок для канала</div>' +
-          '<div>• после завершения акция автоматически уходит из витрины</div>' +
+          '<div>• посмотреть текущую акционную цену</div>' +
+          '<div>• перейти в каталог и продолжить выбор</div>' +
+          '<div>• уточнить резерв или наличие по акции</div>' +
+          '<div>• сравнить акции с хитами продаж</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="show-manager">📞 Уточнить акцию</button>' +
-          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
-          '<button class="inline-btn" data-action="show-popular">📦 Популярные товары</button>' +
-          '<button class="inline-btn" data-action="sync">🔄 Битрикс24</button>' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Смотреть каталог</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Уточнить цену</button>' +
+          '<button class="inline-btn" data-action="show-popular">⭐ Хиты продаж</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
           '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Акции", "Промо-блок канала с ограниченным сроком", "🔥", "👁 акции");
+        setHeader("Акции", "Текущие предложения и быстрый переход в каталог", "🔥", "👁 акции");
       }
 
       function renderContent() {

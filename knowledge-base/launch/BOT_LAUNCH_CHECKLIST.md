@@ -43,7 +43,7 @@ TELEGRAM_BOT_TOKEN=replace_with_botfather_token
 TELEGRAM_BOT_NAME=Счетчики Юг Bot
 TELEGRAM_CHANNEL_URL=https://t.me/schetchiki_yug
 TELEGRAM_MANAGER_USERNAME=schetchiki_yug
-TELEGRAM_MINIAPP_URL=https://igorit1980-hub.github.io/tg-schetchiki-yug/
+TELEGRAM_MINIAPP_URL=https://t.me/schetchiki_yug_bot/catalog
 TELEGRAM_BACKEND_BASE_URL=http://127.0.0.1:8787
 ```
 

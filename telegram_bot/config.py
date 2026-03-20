@@ -40,7 +40,7 @@ def load_bot_config() -> BotConfig:
     channel_url = os.environ.get("TELEGRAM_CHANNEL_URL", "https://t.me/schetchiki_yug").strip()
     miniapp_url = os.environ.get(
         "TELEGRAM_MINIAPP_URL",
-        "https://igorit1980-hub.github.io/tg-schetchiki-yug/",
+        "https://t.me/schetchiki_yug_bot/catalog",
     ).strip()
     backend_base_url = os.environ.get(
         "TELEGRAM_BACKEND_BASE_URL",
