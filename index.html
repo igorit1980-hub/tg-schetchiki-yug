@@ -173,6 +173,32 @@
         font-weight: 700;
       }
 
+      .mini-toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(var(--safe-bottom) + 104px);
+        transform: translateX(-50%) translateY(16px);
+        width: min(calc(100% - 24px), 420px);
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(17, 17, 17, 0.96);
+        color: var(--text);
+        box-shadow:
+          0 18px 48px rgba(0, 0, 0, 0.42),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+        z-index: 120;
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .mini-toast.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
       .content {
         position: relative;
         z-index: 5;
@@ -2420,16 +2446,19 @@
 
       function notifyTelegram(text) {
         if (!text) return;
-        try {
-          if (telegramWebApp && typeof telegramWebApp.showAlert === "function") {
-            telegramWebApp.showAlert(text);
-            return;
-          }
-        } catch (_error) {}
-        try {
-          window.alert(text);
-          return;
-        } catch (_error) {}
+        let toast = document.getElementById("miniToast");
+        if (!toast) {
+          toast = document.createElement("div");
+          toast.id = "miniToast";
+          toast.className = "mini-toast";
+          document.body.appendChild(toast);
+        }
+        toast.textContent = text;
+        toast.classList.add("is-visible");
+        clearTimeout(notifyTelegram._hideTimer);
+        notifyTelegram._hideTimer = setTimeout(() => {
+          toast.classList.remove("is-visible");
+        }, 2400);
         console.info(text);
       }
 
@@ -3679,10 +3708,15 @@
       function copyAddress() {
         const text = LOCATION_INFO.fullAddress;
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text);
-          notifyTelegram("Адрес скопирован");
+          Promise.resolve(navigator.clipboard.writeText(text))
+            .then(() => notifyTelegram("Адрес скопирован"))
+            .catch(() => fallbackCopyText(text, "Адрес скопирован"));
           return;
         }
+        fallbackCopyText(text, "Адрес скопирован");
+      }
+
+      function fallbackCopyText(text, successMessage) {
         const area = document.createElement("textarea");
         area.value = text;
         area.setAttribute("readonly", "");
@@ -3692,26 +3726,19 @@
         area.select();
         document.execCommand("copy");
         document.body.removeChild(area);
-        notifyTelegram("Адрес скопирован");
+        notifyTelegram(successMessage);
       }
 
       function copyManagerTelegramPhone() {
         const text = TELEGRAM_LINKS.manager;
+        const message = "Номер менеджера скопирован. Откройте Telegram и начните чат по номеру " + text;
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text);
-          notifyTelegram("Номер менеджера скопирован. Откройте Telegram и начните чат по номеру " + text);
+          Promise.resolve(navigator.clipboard.writeText(text))
+            .then(() => notifyTelegram(message))
+            .catch(() => fallbackCopyText(text, message));
           return;
         }
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.setAttribute("readonly", "");
-        area.style.position = "absolute";
-        area.style.left = "-9999px";
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand("copy");
-        document.body.removeChild(area);
-        notifyTelegram("Номер менеджера скопирован. Откройте Telegram и начните чат по номеру " + text);
+        fallbackCopyText(text, message);
       }
 
       function pushHistory(screen) {
