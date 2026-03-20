@@ -129,6 +129,12 @@ def run() -> int:
                         "mode": backend_mode,
                         "bitrix_webhook_configured": bool(config.bitrix_webhook),
                         "site_lookup_url": config.site_lookup_url,
+                        "site_links": {
+                            "domain_human": config.site_domain_human,
+                            "domain_technical": config.site_domain_technical,
+                            "wholesale_registration_url": config.site_wholesale_registration_url,
+                            "customer_account_url": config.site_customer_account_url,
+                        },
                         "storefront_path": str(config.output_path),
                         "catalog_path": str(config.local_catalog_path),
                         "diagnostics_path": str(config.diagnostics_path),

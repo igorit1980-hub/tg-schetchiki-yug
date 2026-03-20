@@ -1920,6 +1920,21 @@
         }
       }
 
+      async function refreshCustomerStateSilently(options = {}) {
+        try {
+          await refreshCustomerState();
+          if (options.rerender) {
+            const current = state.history[state.history.length - 1];
+            openScreen(current ? current.screen : "home", false);
+          }
+          if (options.notify) notifyTelegram("Статус клиента обновлен");
+          return true;
+        } catch (error) {
+          if (options.notify) notifyTelegram("Не удалось обновить статус: " + error.message);
+          return false;
+        }
+      }
+
       async function loadStorefrontState() {
         const data = await apiJson("/api/telegram/storefront");
         state.storefront = {
@@ -1966,46 +1981,52 @@
         window.localStorage.setItem("tg_preview_company_name", state.profileDraft.companyName || "");
       }
 
-      async function submitCardRegistration() {
-        const identity = telegramIdentity();
-        const phone = window.prompt("Телефон для заявки", state.profileDraft.phone || "+7 ");
-        if (phone === null) return;
-        const city = window.prompt("Город", state.profileDraft.city || LOCATION_INFO.city);
-        if (city === null) return;
-        const customerType = window.prompt("Тип клиента: installer / developer / wholesale", state.profileDraft.customerType || "installer");
-        if (customerType === null) return;
-        const companyName = window.prompt("Компания или ИП", state.profileDraft.companyName || "");
-        if (companyName === null) return;
+      function siteLink(key, fallback = "") {
+        const links = state.backend.health && state.backend.health.site_links ? state.backend.health.site_links : null;
+        if (links && links[key]) return links[key];
+        return fallback;
+      }
 
-        state.profileDraft.phone = phone.trim();
-        state.profileDraft.city = city.trim();
-        state.profileDraft.customerType = customerType.trim() || "installer";
-        state.profileDraft.companyName = companyName.trim();
-        persistProfileDraft();
+      function wholesaleRegistrationUrl() {
+        return siteLink("wholesale_registration_url", LOCATION_INFO.contactsPage);
+      }
 
-        try {
-          const response = await apiJson("/api/telegram/customer/register", {
-            method: "POST",
-            body: JSON.stringify({
-              first_name: identity.firstName,
-              last_name: identity.lastName,
-              phone: state.profileDraft.phone,
-              city: state.profileDraft.city,
-              customer_type: state.profileDraft.customerType,
-              company_name: state.profileDraft.companyName,
-              comment: "Регистрация из Telegram Mini App preview",
-              telegram_user_id: identity.userId,
-              telegram_username: identity.username,
-              telegram_chat_id: identity.chatId,
-              source: "telegram-mini-app",
-            }),
-          });
-          await refreshCustomerState();
-          openScreen("card", false);
-          notifyTelegram(response.message || "Заявка отправлена");
-        } catch (error) {
-          notifyTelegram("Не удалось отправить заявку: " + error.message);
+      function customerAccountUrl() {
+        return siteLink("customer_account_url", wholesaleRegistrationUrl());
+      }
+
+      function submitCardRegistration() {
+        const url = wholesaleRegistrationUrl();
+        notifyTelegram("Откроем форму регистрации оптовика на сайте. После проверки в Bitrix24 статус и карта подтянутся в Mini App автоматически.");
+        openExternal(url);
+      }
+
+      function buildPriceRows(node, options = {}) {
+        const sourceNode = node || state.selectedNode || firstNodeWithProducts();
+        const products = sourceNode && Array.isArray(sourceNode.products) ? sourceNode.products : [];
+        const limit = Number.isFinite(options.limit) ? options.limit : 12;
+        const items = products.slice(0, limit);
+        if (!items.length) {
+          return {
+            title: sourceNode ? sourceNode.title : "Каталог",
+            rows: "В этом разделе пока нет товаров для показа.",
+            count: 0,
+          };
         }
+        const rows = items.map((item) => {
+          const value = hasWholesaleAccess() ? (item.wholesale || item.retail) : (item.retail || item.wholesale);
+          const price = value ? formatPrice(value, item.currency || "RUB") : "цена по запросу";
+          const qtyNum = Number(item.quantity);
+          const stock = Number.isFinite(qtyNum)
+            ? (qtyNum > 0 ? " · в наличии " + qtyNum + " шт" : " · под заказ")
+            : "";
+          return (item.name || "Товар") + " — " + price + stock;
+        }).join("\n");
+        return {
+          title: sourceNode ? sourceNode.title : "Каталог",
+          rows,
+          count: items.length,
+        };
       }
 
       async function submitManagerRequest(requestType) {
@@ -2261,9 +2282,9 @@
         return (
           sectionLabel("Статус клиента") +
           '<div class="status-switch">' +
-          '<button class="status-pill ' + (state.cardStatus === "retail" ? "active" : "") + '" data-card-status="retail">Гость</button>' +
-          '<button class="status-pill ' + (state.cardStatus === "pending" ? "active" : "") + '" data-card-status="pending">На проверке</button>' +
-          '<button class="status-pill ' + (state.cardStatus === "approved" ? "active" : "") + '" data-card-status="approved">Карта активна</button>' +
+          '<div class="status-pill ' + (state.cardStatus === "retail" ? "active" : "") + '">Гость</div>' +
+          '<div class="status-pill ' + (state.cardStatus === "pending" ? "active" : "") + '">На проверке</div>' +
+          '<div class="status-pill ' + (state.cardStatus === "approved" ? "active" : "") + '">Карта активна</div>' +
           "</div>"
         );
       }
@@ -2432,35 +2453,21 @@
       }
 
       function renderPost() {
+        const priceList = buildPriceRows(state.selectedNode, { limit: 16 });
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
-          '<div class="post-date">Оптовый прайс / публикация каталога</div>' +
+          '<div class="post-date">' + escapeHtml(priceList.title) + " / " + (hasWholesaleAccess() ? "оптовый прайс" : "розничный прайс") + '</div>' +
           '<div class="post-copy"><strong>Сайт + Telegram + Битрикс24</strong><br>' +
           (hasWholesaleAccess()
-            ? "Карта подтверждена, поэтому публикации показывают только оптовые цены."
+            ? "Карта подтверждена, поэтому публикации и товарные списки показывают только оптовые цены."
             : state.cardStatus === "pending"
-              ? "Заявка на карту отправлена, но до подтверждения менеджером публикации показывают только розничные цены."
-              : "Карта клиента еще не подтверждена, поэтому публикации показывают только розничные цены.") +
+              ? "Заявка на оптовый доступ уже в Bitrix24. До подтверждения менеджером в каталоге остаются только розничные цены."
+              : "Пока карта клиента не подтверждена, в каталоге остаются только розничные цены. После одобрения в Bitrix24 Mini App автоматически переключится на оптовый режим.") +
           "</div>" +
           '<div class="list-text">' +
-          'С Ч Ё Т Ч И К И В О Д Ы\n' +
-          (hasWholesaleAccess()
-            ? 'ЭКО-М Ду15 — 890 ₽\\nITELMA Ду20 — 1 050 ₽\\nБЕТАР СГВ-15 — 980 ₽\\n\\n'
-            : 'ЭКО-М Ду15 — 950 ₽\\nITELMA Ду20 — 1 250 ₽\\nБЕТАР СГВ-15 — 1 100 ₽\\n\\n') +
-          'С Ч Ё Т Ч И К И Г А З А\n' +
-          (hasWholesaleAccess()
-            ? 'G4 — 2 700 ₽\\nG6 — 4 250 ₽\\n\\n'
-            : 'G4 — 2 900 ₽\\nG6 — 4 600 ₽\\n\\n') +
-          'М А Н О М Е Т Р Ы\n' +
-          (hasWholesaleAccess()
-            ? 'МП50 0–6 бар — 320 ₽\\nМП100 0–16 бар — 590 ₽\\n\\n'
-            : 'МП50 0–6 бар — 350 ₽\\nМП100 0–16 бар — 650 ₽\\n\\n') +
-          'Н А С О С Ы\n' +
-          (hasWholesaleAccess()
-            ? 'Wilo — 8 300 ₽\\nGrundfos — 9 900 ₽'
-            : 'Wilo — 8 900 ₽\\nGrundfos — 10 500 ₽') +
+          escapeHtml(priceList.rows) +
           '</div>' +
           '<div class="inline-grid">' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
@@ -2788,27 +2795,28 @@
             '</div>';
 
           actionBlock =
-            '<button class="inline-btn primary" data-action="show-card">💳 Открыть карту клиента</button>' +
-            '<button class="inline-btn" data-action="show-manager">📞 Напомнить менеджеру</button>' +
+            '<button class="inline-btn primary" data-action="refresh-status">🔄 Обновить статус</button>' +
+            '<button class="inline-btn" data-action="show-card">💳 Открыть карту клиента</button>' +
+            '<button class="inline-btn" data-action="open-site-registration">🌐 Заявка на сайте</button>' +
             '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
-            '<button class="inline-btn" data-action="show-post">📄 Розничный прайс</button>';
+            '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>';
         } else {
           topBlock =
             '<div class="card-stage retail">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации</div><div class="card-stage-copy">Без подтвержденной карты канал показывает только розничные цены. Чтобы открыть оптовый режим, клиент проходит регистрацию и подтверждение менеджером.</div></div>' +
+            '<div><div class="card-stage-title">Оптовый заказ начинается с заявки на сайте</div><div class="card-stage-copy">Клиент заполняет форму регистрации оптовика на сайте. После этого заявка попадает в Bitrix24, менеджер подтверждает клиента и Mini App автоматически открывает оптовые цены.</div></div>' +
             '<div class="card-stage-badge">Розница</div>' +
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Подать заявку</div><div class="route-copy">Клиент оставляет данные для карты и оптового доступа.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Проверка менеджером</div><div class="route-copy">Менеджер определяет, застройщик это, монтажник или оптовый покупатель.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Активация карты</div><div class="route-copy">После подтверждения открываются только оптовые цены и отдельные кнопки сценария.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Работа в канале</div><div class="route-copy">Клиент пользуется каталогом, остатками и прайсом уже как оптовик.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить форму на сайте</div><div class="route-copy">Заявка на оптовый доступ оформляется на сайте и сразу уходит в Bitrix24.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Проверка менеджером</div><div class="route-copy">Менеджер определяет тип клиента и подтверждает право на оптовый режим.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Выпуск карты</div><div class="route-copy">После одобрения клиент получает номер карты и идентификатор для ручного ввода.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в Mini App</div><div class="route-copy">Mini App при следующей синхронизации показывает только оптовые цены и открывает карту клиента.</div></button>' +
             '</div>';
 
           actionBlock =
-            '<button class="inline-btn primary" data-action="register-card">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn primary" data-action="open-site-registration">🌐 Регистрация оптовика</button>' +
             '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
             '<button class="inline-btn" data-action="show-post">📄 Смотреть розничный прайс</button>';
@@ -2840,7 +2848,6 @@
 
       function renderCard() {
         const meta = cardStatusMeta();
-        const stageClass = state.cardStatus;
         const liveCard = state.customerCard;
         let cardBody = "";
         let actionButtons = "";
@@ -2878,7 +2885,7 @@
             '<button class="inline-btn primary" data-action="open-root-catalog">📦 Перейти в каталог</button>' +
             '<button class="inline-btn" data-action="show-wholesale">💰 Открыть оптовый режим</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
-            '<button class="inline-btn" data-card-status="pending">↺ Вернуть на проверку</button>';
+            '<button class="inline-btn" data-action="open-site-account">🌐 Личный кабинет</button>';
         } else if (state.cardStatus === "pending") {
           const pendingName = liveCard && liveCard.full_name ? liveCard.full_name : "Иван";
           const pendingPhone = liveCard && liveCard.phone ? liveCard.phone : "+7 900 123-45-67";
@@ -2908,10 +2915,10 @@
             '</div>';
 
           actionButtons =
+            '<button class="inline-btn primary" data-action="refresh-status">🔄 Обновить статус</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Напомнить менеджеру</button>' +
-            '<button class="inline-btn" data-card-status="approved">✅ Подтвердить карту</button>' +
             '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
-            '<button class="inline-btn" data-card-status="retail">✏️ Редактировать заявку</button>';
+            '<button class="inline-btn" data-action="open-site-registration">🌐 Заявка на сайте</button>';
         } else {
           cardBody =
             '<div class="card-stage retail">' +
@@ -2923,14 +2930,14 @@
             '<div class="mini-card">' +
             '<div class="mini-title">Как работает карта</div>' +
             '<div class="journey-grid">' +
-            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация в боте</div><div class="journey-copy">Клиент оставляет имя, телефон, город и тип деятельности.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">👤</div><div><div class="journey-title">Проверка менеджером</div><div class="journey-copy">Менеджер проверяет, кто это: монтажник, застройщик или оптовый клиент.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Выпуск карты</div><div class="journey-copy">После подтверждения клиент получает QR-карту и доступ к оптовым ценам.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Форма на сайте</div><div class="journey-copy">Клиент регистрируется как оптовик через сайт и оставляет данные для проверки.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">👤</div><div><div class="journey-title">Проверка в Bitrix24</div><div class="journey-copy">Менеджер подтверждает тип клиента и право на оптовый доступ.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Карта и цены</div><div class="journey-copy">После одобрения Mini App показывает номер карты, идентификатор и только оптовые цены.</div></div></div>' +
             '</div>' +
             '</div>';
 
           actionButtons =
-            '<button class="inline-btn primary" data-action="register-card">📝 Подать заявку на карту</button>' +
+            '<button class="inline-btn primary" data-action="open-site-registration">🌐 Регистрация оптовика</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
             '<button class="inline-btn" data-action="open-root-catalog">📦 Смотреть каталог</button>' +
             '<button class="inline-btn" data-action="show-post">💰 Посмотреть розничный прайс</button>';
@@ -2943,7 +2950,7 @@
           '<div class="post-date">💳 Карта постоянного покупателя</div>' +
           '<div class="post-copy">' + meta.copy + '</div>' +
           cardBody +
-          sectionLabel("Тестовый сценарий статуса") +
+          sectionLabel("Текущий статус клиента") +
           statusSwitchHtml() +
           '<div class="inline-grid">' +
           actionButtons +
@@ -3213,20 +3220,14 @@
       }
 
       function renderStock() {
+        const stockList = buildPriceRows(state.selectedNode, { limit: 18 });
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
-          '<div class="post-date">Остатки склада</div>' +
+          '<div class="post-date">' + escapeHtml(stockList.title) + ' / остатки склада</div>' +
           '<div class="list-text">' +
-          'ЭКО-М Ду15 — 125 шт\n' +
-          'ЭКО-М Ду20 — 61 шт\n' +
-          'ITELMA Ду15 — 48 шт\n' +
-          'G4 — 73 шт\n' +
-          'G6 — 26 шт\n' +
-          'МП50 0-6 бар — 212 шт\n' +
-          'Wilo Star-RS 25/4 — 18 шт\n\n' +
-          'На этом этапе экран тестовый. Реальная автосинхронизация остатков будет подключаться из Битрикс24.' +
+          escapeHtml(stockList.rows) +
           '</div>' +
           '<div class="inline-grid">' +
           '<button class="inline-btn" data-action="show-price">📄 Прайс</button>' +
@@ -3453,6 +3454,18 @@
         if (action === "show-messengers") openScreen("messengers");
         if (action === "sync") openScreen("sync");
         if (action === "show-stock") openScreen("stock");
+        if (action === "open-site-registration") {
+          submitCardRegistration();
+          return;
+        }
+        if (action === "open-site-account") {
+          openExternal(customerAccountUrl());
+          return;
+        }
+        if (action === "refresh-status") {
+          refreshCustomerStateSilently({ rerender: true, notify: true });
+          return;
+        }
         if (action === "register-card") {
           submitCardRegistration();
           return;
@@ -3479,20 +3492,16 @@
         openMap(mapBtn.getAttribute("data-map"));
       });
 
-      document.addEventListener("click", (event) => {
-        const statusBtn = event.target.closest("[data-card-status]");
-        if (!statusBtn) return;
-        state.cardStatus = statusBtn.getAttribute("data-card-status");
-        const last = state.history[state.history.length - 1];
-        openScreen(last ? last.screen : "home", false);
-      });
-
       backButton.addEventListener("click", goBack);
       shareButton.addEventListener("click", shareCurrentScreen);
       document.getElementById("giftButton").addEventListener("click", () => openScreen("home"));
       document.getElementById("upButton").addEventListener("click", () => contentRoot.scrollTo({ top: 0, behavior: "smooth" }));
       document.getElementById("searchButton").addEventListener("click", () => openScreen("sync"));
       window.addEventListener("resize", updateViewportHeight);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) refreshCustomerStateSilently({ rerender: true });
+      });
+      window.addEventListener("focus", () => refreshCustomerStateSilently({ rerender: true }));
 
       initTelegramMiniApp();
       renderHome();

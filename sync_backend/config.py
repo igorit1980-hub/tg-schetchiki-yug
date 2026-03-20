@@ -44,7 +44,11 @@ class AppConfig:
     timezone: str
     bitrix_webhook: str
     bitrix_enabled: bool
+    site_domain_human: str
+    site_domain_technical: str
     site_lookup_url: str
+    site_wholesale_registration_url: str
+    site_customer_account_url: str
     output_path: Path
     diagnostics_path: Path
     empty_storefront_fallback_path: Path
@@ -95,6 +99,15 @@ def load_config() -> AppConfig:
     if not site_lookup_url:
         site_lookup_url = systems["site"]["domain"] + site["preferred_lookup_endpoint"]
 
+    site_domain_human = str(site.get("domain_human", "")).strip().rstrip("/")
+    site_domain_technical = str(site.get("domain_technical", "")).strip().rstrip("/")
+    site_wholesale_registration_url = os.environ.get("SITE_WHOLESALE_REGISTRATION_URL", "").strip()
+    if not site_wholesale_registration_url:
+        site_wholesale_registration_url = site_domain_technical + "/" if site_domain_technical else ""
+    site_customer_account_url = os.environ.get("SITE_CUSTOMER_ACCOUNT_URL", "").strip()
+    if not site_customer_account_url:
+        site_customer_account_url = site_wholesale_registration_url
+
     output_path = Path(
         os.environ.get(
             "STORE_OUTPUT_PATH",
@@ -106,7 +119,11 @@ def load_config() -> AppConfig:
         timezone=canonical["timezone"],
         bitrix_webhook=webhook.rstrip("/") + "/" if webhook else "",
         bitrix_enabled=bool(webhook),
+        site_domain_human=site_domain_human,
+        site_domain_technical=site_domain_technical,
         site_lookup_url=site_lookup_url,
+        site_wholesale_registration_url=site_wholesale_registration_url,
+        site_customer_account_url=site_customer_account_url,
         output_path=output_path,
         diagnostics_path=Path(
             os.environ.get(
