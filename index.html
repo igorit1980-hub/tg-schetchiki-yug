@@ -283,9 +283,16 @@
         font-size: 10px;
       }
 
+      .pill-sub.hidden {
+        display: none;
+      }
+
       .pill-right {
+        border: 0;
+        background: transparent;
         color: rgba(255, 255, 255, 0.6);
         font-size: 15px;
+        cursor: pointer;
       }
 
       .share-chip {
@@ -1687,6 +1694,7 @@
       }
 
       .sound-pill {
+        border: 0;
         position: absolute;
         left: 50%;
         bottom: 0;
@@ -1706,6 +1714,8 @@
         color: rgba(255, 255, 255, 0.9);
         font-size: 16px;
         font-weight: 500;
+        cursor: pointer;
+        pointer-events: auto;
       }
 
       .dock {
@@ -1969,12 +1979,12 @@
             <div class="hero-row">
               <button class="back-chip" id="backButton"><span>❮</span><b>1</b></button>
               <div class="pill">
-                <div class="logo">ЮГ</div>
+                <div class="logo">SU</div>
                 <div class="pill-copy">
                   <div class="pill-title" id="pillTitle">Счетчики Юг</div>
-                  <div class="pill-sub" id="pillSub">Каталог приборов учета и комплектующих</div>
+                  <div class="pill-sub hidden" id="pillSub"></div>
                 </div>
-                <div class="pill-right" id="pillRight">🔇</div>
+                <button class="pill-right" id="pillRight" aria-label="Переключить звук">🔇</button>
               </div>
               <button class="share-chip" id="shareButton" aria-label="Поделиться"></button>
             </div>
@@ -1988,7 +1998,7 @@
           <div class="float-left">
             <button class="float-btn" id="giftButton">🎁</button>
           </div>
-          <div class="sound-pill">Вкл. звук</div>
+          <button class="sound-pill" id="soundToggle">Вкл. звук</button>
           <div class="float-right">
             <button class="float-btn" id="upButton">⌄</button>
             <button class="float-btn" id="searchButton">⌕</button>
@@ -2026,6 +2036,7 @@
         },
         customerContext: null,
         customerCard: null,
+        soundEnabled: false,
         profileDraft: {
           firstName: window.localStorage.getItem("tg_preview_first_name") || "",
           lastName: window.localStorage.getItem("tg_preview_last_name") || "",
@@ -2042,6 +2053,7 @@
       const pillSub = document.getElementById("pillSub");
       const pillRight = document.getElementById("pillRight");
       const viewsLine = document.getElementById("viewsLine");
+      const soundToggle = document.getElementById("soundToggle");
       const backButton = document.getElementById("backButton");
       const shareButton = document.getElementById("shareButton");
       const dockButtons = Array.from(document.querySelectorAll(".dock-btn"));
@@ -2498,10 +2510,20 @@
         return walk(CATALOG);
       }
 
+      function updateSoundUi() {
+        pillRight.textContent = state.soundEnabled ? "🔊" : "🔇";
+        soundToggle.textContent = state.soundEnabled ? "Выкл. звук" : "Вкл. звук";
+      }
+
+      function toggleSound() {
+        state.soundEnabled = !state.soundEnabled;
+        updateSoundUi();
+      }
+
       function setHeader(title, sub, right = "🔇", views = "👁 137K изменено 09:42") {
         pillTitle.textContent = title;
-        pillSub.textContent = sub;
-        pillRight.textContent = right;
+        pillSub.textContent = sub || "";
+        pillSub.classList.toggle("hidden", !sub);
         viewsLine.textContent = views;
       }
 
@@ -3847,6 +3869,8 @@
 
       backButton.addEventListener("click", goBack);
       shareButton.addEventListener("click", shareCurrentScreen);
+      pillRight.addEventListener("click", toggleSound);
+      soundToggle.addEventListener("click", toggleSound);
       document.getElementById("giftButton").addEventListener("click", () => openScreen("home"));
       document.getElementById("upButton").addEventListener("click", () => contentRoot.scrollTo({ top: 0, behavior: "smooth" }));
       document.getElementById("searchButton").addEventListener("click", () => openScreen("sync"));
@@ -3857,6 +3881,7 @@
       window.addEventListener("focus", () => refreshCustomerStateSilently({ rerender: true }));
 
       initTelegramMiniApp();
+      updateSoundUi();
       renderHome();
       updateDock();
       bootstrapBackend().then(() => {
