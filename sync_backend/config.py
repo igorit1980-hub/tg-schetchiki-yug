@@ -49,6 +49,7 @@ class AppConfig:
     site_lookup_url: str
     site_wholesale_registration_url: str
     site_customer_account_url: str
+    site_wholesale_sync_api_url: str
     output_path: Path
     diagnostics_path: Path
     empty_storefront_fallback_path: Path
@@ -107,6 +108,7 @@ def load_config() -> AppConfig:
     site_customer_account_url = os.environ.get("SITE_CUSTOMER_ACCOUNT_URL", "").strip()
     if not site_customer_account_url:
         site_customer_account_url = site_wholesale_registration_url
+    site_wholesale_sync_api_url = os.environ.get("SITE_WHOLESALE_SYNC_API_URL", "").strip()
 
     output_path = Path(
         os.environ.get(
@@ -124,6 +126,7 @@ def load_config() -> AppConfig:
         site_lookup_url=site_lookup_url,
         site_wholesale_registration_url=site_wholesale_registration_url,
         site_customer_account_url=site_customer_account_url,
+        site_wholesale_sync_api_url=site_wholesale_sync_api_url,
         output_path=output_path,
         diagnostics_path=Path(
             os.environ.get(

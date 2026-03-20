@@ -173,6 +173,7 @@ def _registration_payload_from_json(data: dict) -> CustomerRegistrationPayload:
         first_name=str(data.get("first_name", "")).strip(),
         last_name=str(data.get("last_name", "")).strip(),
         phone=str(data.get("phone", "")).strip(),
+        email=str(data.get("email", "")).strip(),
         city=str(data.get("city", "")).strip(),
         customer_type=str(data.get("customer_type", "")).strip(),
         company_name=str(data.get("company_name", "")).strip(),

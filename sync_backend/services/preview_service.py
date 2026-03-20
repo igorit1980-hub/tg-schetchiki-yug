@@ -55,6 +55,7 @@ class PreviewService:
                 "first_name": payload.first_name.strip(),
                 "last_name": payload.last_name.strip(),
                 "phone": payload.phone.strip(),
+                "email": payload.email.strip(),
                 "phone_normalized": normalized_phone,
                 "city": payload.city.strip(),
                 "customer_type": payload.customer_type.strip(),
@@ -68,6 +69,11 @@ class PreviewService:
                 "last_sync_at": current_iso(),
             }
         )
+        if not contact.get("client_card_id"):
+            contact["client_card_id"] = generate_card_id(int(contact["id"]))
+        if not contact.get("client_qr_payload"):
+            contact["client_qr_payload"] = generate_qr_payload(contact["client_card_id"])
+        contact["card_status"] = "issued"
 
         self._save_state(state)
         context = self.get_customer_context(contact_id=contact["id"])
@@ -76,11 +82,12 @@ class PreviewService:
             "action": action,
             "contact_id": contact["id"],
             "company_id": contact.get("company_id"),
+            "client_card_id": contact.get("client_card_id"),
             "customer_state": context["customer_state"],
             "approval_status": context["approval_status"],
             "card_status": context["card_status"],
             "allowed_price_type": context["allowed_price_type"],
-            "message": "Заявка принята в локальном preview и ожидает подтверждения менеджером",
+            "message": "Карта зарегистрирована в локальном preview и ожидает подтверждения менеджером",
         }
 
     def get_customer_context(

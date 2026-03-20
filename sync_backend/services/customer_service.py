@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import asdict
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import json
+from urllib.request import Request, urlopen
 
 from ..config import AppConfig
 from ..models import CustomerContext, CustomerRegistrationPayload
@@ -46,17 +48,32 @@ class CustomerService:
         else:
             contact_id = self.bitrix.create_contact(fields)
 
+        card_id = generate_card_id(contact_id)
+        qr_payload = generate_qr_payload(card_id)
+        self.bitrix.update_contact(
+            contact_id,
+            {
+                self.f["client_card_id"]: card_id,
+                self.f["client_qr_payload"]: qr_payload,
+                self.f["card_status"]: "issued",
+                self.f["last_sync_at"]: current_iso(),
+            },
+        )
+
+        site_sync = self._sync_registration_to_site(payload, contact_id=contact_id, company_id=company_id, card_id=card_id)
         context = self.get_customer_context(contact_id=contact_id)
         return {
             "ok": True,
             "action": action,
             "contact_id": contact_id,
             "company_id": company_id,
+            "client_card_id": card_id,
+            "site_sync": site_sync,
             "customer_state": context["customer_state"],
             "approval_status": context["approval_status"],
             "card_status": context["card_status"],
             "allowed_price_type": context["allowed_price_type"],
-            "message": "Заявка принята и ожидает подтверждения менеджером",
+            "message": "Карта зарегистрирована. Заявка отправлена на проверку менеджеру",
         }
 
     def get_customer_context(
@@ -213,10 +230,12 @@ class CustomerService:
             self.f["customer_type"]: payload.customer_type.strip(),
             self.f["approval_status"]: "pending_review",
             self.f["allowed_price_type"]: "retail",
-            self.f["card_status"]: "not_created",
+            self.f["card_status"]: "issued",
             self.f["last_sync_at"]: now,
             self.f["company_name_snapshot"]: payload.company_name.strip(),
         }
+        if payload.email.strip():
+            fields["EMAIL"] = [{"VALUE": payload.email.strip(), "VALUE_TYPE": "WORK"}]
         if payload.city.strip():
             fields["CITY"] = payload.city.strip()
         return fields
@@ -241,7 +260,48 @@ class CustomerService:
             self.f["discount_percent"],
             self.f["last_sync_at"],
             self.f["company_name_snapshot"],
+            "EMAIL",
         ]
+
+    def _sync_registration_to_site(
+        self,
+        payload: CustomerRegistrationPayload,
+        *,
+        contact_id: int,
+        company_id: Optional[int],
+        card_id: str,
+    ) -> Dict[str, Any]:
+        if not self.config.site_wholesale_sync_api_url:
+            return {"ok": False, "mode": "skipped", "reason": "SITE_WHOLESALE_SYNC_API_URL not configured"}
+
+        body = {
+            "first_name": payload.first_name.strip(),
+            "last_name": payload.last_name.strip(),
+            "phone": payload.phone.strip(),
+            "email": payload.email.strip(),
+            "city": payload.city.strip(),
+            "customer_type": payload.customer_type.strip(),
+            "company_name": payload.company_name.strip(),
+            "inn": payload.inn.strip(),
+            "telegram_user_id": payload.telegram_user_id.strip(),
+            "telegram_username": payload.telegram_username.strip(),
+            "contact_id": contact_id,
+            "company_id": company_id,
+            "client_card_id": card_id,
+            "source": payload.source.strip() or "telegram",
+        }
+        try:
+            request = Request(
+                self.config.site_wholesale_sync_api_url,
+                data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+                headers={"Content-Type": "application/json; charset=utf-8", "Accept": "application/json"},
+                method="POST",
+            )
+            with urlopen(request, timeout=20) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            return {"ok": True, "mode": "api", "response": data}
+        except Exception as exc:
+            return {"ok": False, "mode": "api", "reason": str(exc)}
 
     def _contact_to_context(self, contact: Dict[str, Any]) -> CustomerContext:
         phone = extract_primary_phone(contact.get("PHONE", []))
