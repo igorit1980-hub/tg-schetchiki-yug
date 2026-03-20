@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Счетчики Юг channel avatar</title>
+  <desc id="desc">Round Telegram channel avatar for Счетчики Юг with CJ monogram and engineering meter motif.</desc>
+  <defs>
+    <radialGradient id="bgGlow" cx="22%" cy="18%" r="90%">
+      <stop offset="0%" stop-color="#1d4f67"/>
+      <stop offset="48%" stop-color="#0d1820"/>
+      <stop offset="100%" stop-color="#050809"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#47c1db"/>
+      <stop offset="100%" stop-color="#4fd08e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7ce7ff"/>
+      <stop offset="100%" stop-color="#70ffb6"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="256" r="256" fill="url(#bgGlow)"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="rgba(255,255,255,0.08)"/>
+
+  <g opacity="0.12">
+    <circle cx="256" cy="256" r="170" fill="none" stroke="#c7f8ff" stroke-width="2"/>
+    <circle cx="256" cy="256" r="136" fill="none" stroke="#c7f8ff" stroke-width="2"/>
+    <path d="M120 256H392" stroke="#c7f8ff" stroke-width="2"/>
+    <path d="M256 120V392" stroke="#c7f8ff" stroke-width="2"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <path d="M154 334C121 303 104 261 111 211C120 144 171 96 240 89C310 82 377 122 404 189" fill="none" stroke="url(#ring)" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="404" cy="189" r="14" fill="#4fd08e"/>
+    <path d="M238 118L252 138L275 140L259 157L263 180L238 169L213 180L217 157L201 140L224 138Z" fill="#d4fbff" opacity="0.9"/>
+  </g>
+
+  <g transform="translate(0 4)">
+    <text x="256" y="294" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="158" font-weight="700" letter-spacing="-10" fill="#f4fdff">СЮ</text>
+    <rect x="138" y="319" width="236" height="8" rx="4" fill="url(#accent)" opacity="0.95"/>
+    <text x="256" y="377" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" letter-spacing="7" fill="#c7f8ff">СЧЕТЧИКИ ЮГ</text>
+  </g>
+
+  <g opacity="0.9">
+    <path d="M356 114C369 129 376 145 376 162C376 192 352 214 322 214C292 214 268 192 268 162C268 145 275 129 288 114L322 71L356 114Z" fill="#59d7ff"/>
+    <path d="M322 91L346 125C355 136 360 149 360 161C360 182 343 198 322 198C301 198 284 182 284 161C284 149 289 136 298 125L322 91Z" fill="#dff9ff"/>
+  </g>
+</svg>

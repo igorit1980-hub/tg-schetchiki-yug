@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#213327"/>
+      <stop offset="55%" stop-color="#111915"/>
+      <stop offset="100%" stop-color="#060907"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7fef9f"/>
+      <stop offset="100%" stop-color="#caffb7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="846" cy="220" r="184" fill="#7fef9f" opacity="0.13"/>
+  <circle cx="218" cy="1114" r="236" fill="#8ad66f" opacity="0.08"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#c5f7b4" stroke-opacity="0.14" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#a9f3a0" fill-opacity="0.11" stroke="#c9f8bc" stroke-opacity="0.26"/>
+  <text x="158" y="144" fill="#f4fff0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(704 194)" opacity="0.95">
+    <path d="M70 40 L192 162" stroke="#edfbe9" stroke-width="30" stroke-linecap="round"/>
+    <path d="M186 46 L76 156" stroke="#a7f3b4" stroke-width="18" stroke-linecap="round"/>
+    <circle cx="70" cy="40" r="24" fill="#edfbe9"/>
+    <circle cx="192" cy="162" r="24" fill="#edfbe9"/>
+  </g>
+
+  <text x="120" y="500" fill="#f6fff2" font-family="Arial, Helvetica, sans-serif" font-size="104" font-weight="800">КОМПЛЕКТУЮЩИЕ</text>
+  <rect x="124" y="540" width="410" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="634" fill="#d6ecd2" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Монтажные и соединительные элементы</text>
+  <text x="120" y="718" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• фильтры и клапаны</text>
+  <text x="120" y="778" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• переходники и арматура</text>
+  <text x="120" y="838" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• комплектующие под монтаж</text>
+
+  <text x="120" y="1094" fill="#aad6a2" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Подбор • Комплектация • Заказ</text>
+</svg>

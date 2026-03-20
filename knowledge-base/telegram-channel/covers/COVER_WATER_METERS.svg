@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f4a50"/>
+      <stop offset="52%" stop-color="#0b1e22"/>
+      <stop offset="100%" stop-color="#05090a"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#5de1d6"/>
+      <stop offset="100%" stop-color="#8bfff4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="840" cy="234" r="182" fill="#69fff4" opacity="0.14"/>
+  <circle cx="244" cy="1090" r="248" fill="#4ee5c8" opacity="0.1"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#86fff4" stroke-opacity="0.16" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#7ffef1" fill-opacity="0.12" stroke="#9afff6" stroke-opacity="0.32"/>
+  <text x="158" y="144" fill="#e4fffd" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(716 216)" opacity="0.92">
+    <circle cx="110" cy="110" r="102" fill="none" stroke="#d7fffb" stroke-width="16"/>
+    <circle cx="110" cy="110" r="22" fill="#d7fffb"/>
+    <path d="M110 110 L164 74" stroke="#d7fffb" stroke-width="14" stroke-linecap="round"/>
+    <path d="M34 64 C54 10, 166 10, 186 64" fill="none" stroke="#8efff7" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <text x="120" y="500" fill="#effffd" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="1">СЧЕТЧИКИ</text>
+  <text x="120" y="614" fill="#effffd" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="1">ВОДЫ</text>
+  <rect x="124" y="650" width="314" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="742" fill="#c8ece7" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Подбор для квартиры, дома и объекта</text>
+  <text x="120" y="826" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• бытовые и объектные решения</text>
+  <text x="120" y="886" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• модели под разные задачи</text>
+  <text x="120" y="946" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• поставка по России</text>
+
+  <text x="120" y="1094" fill="#8fd2c8" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Наличие • Подбор • Заказ</text>
+</svg>

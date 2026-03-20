@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#20364a"/>
+      <stop offset="55%" stop-color="#101922"/>
+      <stop offset="100%" stop-color="#06090c"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7fb7ff"/>
+      <stop offset="100%" stop-color="#b4dbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="850" cy="230" r="180" fill="#8dbfff" opacity="0.14"/>
+  <circle cx="230" cy="1110" r="240" fill="#5e8fd6" opacity="0.09"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#b0d3ff" stroke-opacity="0.15" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#95c3ff" fill-opacity="0.11" stroke="#b5d9ff" stroke-opacity="0.28"/>
+  <text x="158" y="144" fill="#edf6ff" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(704 196)" opacity="0.95">
+    <circle cx="118" cy="118" r="82" fill="none" stroke="#eef7ff" stroke-width="20"/>
+    <circle cx="118" cy="118" r="26" fill="#eef7ff"/>
+    <rect x="26" y="92" width="60" height="52" rx="18" fill="#d9ebff"/>
+    <rect x="150" y="92" width="60" height="52" rx="18" fill="#d9ebff"/>
+    <path d="M118 118 L168 78" stroke="#7fb7ff" stroke-width="14" stroke-linecap="round"/>
+  </g>
+
+  <text x="120" y="500" fill="#f3f8ff" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800">НАСОСНОЕ</text>
+  <text x="120" y="600" fill="#f3f8ff" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800">ОБОРУДОВАНИЕ</text>
+  <rect x="124" y="640" width="392" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="736" fill="#cfdded" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Решения для отопления и водоснабжения</text>
+  <text x="120" y="820" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• циркуляционные и объектные решения</text>
+  <text x="120" y="880" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• подбор под задачу</text>
+  <text x="120" y="940" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• поставка по запросу</text>
+
+  <text x="120" y="1094" fill="#99b4d4" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Подбор • Наличие • Поставка</text>
+</svg>

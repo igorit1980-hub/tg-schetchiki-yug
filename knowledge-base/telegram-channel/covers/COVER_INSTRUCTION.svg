@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#123a56"/>
+      <stop offset="55%" stop-color="#0a1825"/>
+      <stop offset="100%" stop-color="#06090d"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#58c7ff"/>
+      <stop offset="100%" stop-color="#77f0ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="864" cy="232" r="178" fill="#6fd7ff" opacity="0.14"/>
+  <circle cx="214" cy="1164" r="228" fill="#58c7ff" opacity="0.08"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#78deff" stroke-opacity="0.18" stroke-width="2"/>
+
+  <g opacity="0.18">
+    <rect x="150" y="170" width="780" height="170" rx="26" fill="none" stroke="#d8fbff" stroke-width="2"/>
+    <rect x="150" y="390" width="780" height="170" rx="26" fill="none" stroke="#d8fbff" stroke-width="2"/>
+    <rect x="150" y="610" width="780" height="170" rx="26" fill="none" stroke="#d8fbff" stroke-width="2"/>
+  </g>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#72d7ff" fill-opacity="0.14" stroke="#83e0ff" stroke-opacity="0.35"/>
+  <text x="158" y="144" fill="#dffbff" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <text x="120" y="500" fill="#ecfdff" font-family="Arial, Helvetica, sans-serif" font-size="128" font-weight="800" letter-spacing="2">ИНСТРУКЦИЯ</text>
+  <rect x="124" y="548" width="346" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="648" fill="#d4ebf5" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="500">Как пользоваться каналом</text>
+  <text x="120" y="726" fill="#f5fcff" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">1. Открой нужный раздел</text>
+  <text x="120" y="786" fill="#f5fcff" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">2. Посмотри подборку</text>
+  <text x="120" y="846" fill="#f5fcff" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">3. Напиши менеджеру</text>
+
+  <text x="120" y="1088" fill="#9bc8dc" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM STOREFRONT</text>
+  <text x="120" y="1142" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Каталог • Акции • Заказ</text>
+</svg>

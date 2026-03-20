@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a3911"/>
+      <stop offset="55%" stop-color="#1d1609"/>
+      <stop offset="100%" stop-color="#080705"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f4c45e"/>
+      <stop offset="100%" stop-color="#ffe38a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="850" cy="214" r="188" fill="#ffd36d" opacity="0.14"/>
+  <circle cx="210" cy="1098" r="236" fill="#e8b14f" opacity="0.08"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#f1d08f" stroke-opacity="0.14" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#f5cf7b" fill-opacity="0.11" stroke="#f8dd9d" stroke-opacity="0.28"/>
+  <text x="158" y="144" fill="#fff9ec" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(704 172)" opacity="0.96">
+    <path d="M118 20 L148 92 L224 98 L166 146 L184 220 L118 178 L52 220 L70 146 L12 98 L88 92 Z" fill="#fff3d1"/>
+    <circle cx="118" cy="118" r="28" fill="#f4c45e"/>
+  </g>
+
+  <text x="120" y="500" fill="#fff9f0" font-family="Arial, Helvetica, sans-serif" font-size="116" font-weight="800">ХИТЫ</text>
+  <text x="120" y="610" fill="#fff9f0" font-family="Arial, Helvetica, sans-serif" font-size="116" font-weight="800">ПРОДАЖ</text>
+  <rect x="124" y="648" width="304" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="742" fill="#ebdbb7" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Самые востребованные позиции</text>
+  <text x="120" y="826" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• ходовые товары</text>
+  <text x="120" y="886" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• проверенные решения</text>
+  <text x="120" y="946" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• быстрый вход в заказ</text>
+
+  <text x="120" y="1094" fill="#d7be81" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Спрос • Выбор • Заказ</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a2452"/>
+      <stop offset="55%" stop-color="#181022"/>
+      <stop offset="100%" stop-color="#07060b"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c38cff"/>
+      <stop offset="100%" stop-color="#f0b2ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="850" cy="214" r="188" fill="#c38cff" opacity="0.15"/>
+  <circle cx="200" cy="1108" r="232" fill="#8d6dff" opacity="0.08"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#d6b5ff" stroke-opacity="0.14" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#c59fff" fill-opacity="0.11" stroke="#dfc0ff" stroke-opacity="0.28"/>
+  <text x="158" y="144" fill="#faf3ff" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(710 184)" opacity="0.96">
+    <circle cx="108" cy="94" r="44" fill="#f7ecff"/>
+    <path d="M40 212 C40 155 78 124 108 124 C138 124 176 155 176 212" fill="#d7b3ff"/>
+    <path d="M20 216 H196" stroke="#f3d7ff" stroke-width="18" stroke-linecap="round"/>
+  </g>
+
+  <text x="120" y="500" fill="#fff6ff" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="800">МЕНЕДЖЕР</text>
+  <rect x="124" y="542" width="262" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="636" fill="#e6d8f2" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Подбор, консультация и заказ</text>
+  <text x="120" y="720" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• наличие и цены</text>
+  <text x="120" y="780" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• оптовый расчет</text>
+  <text x="120" y="840" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• подбор под задачу</text>
+
+  <text x="120" y="1094" fill="#caafe3" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Подбор • Консультация • Заказ</text>
+</svg>

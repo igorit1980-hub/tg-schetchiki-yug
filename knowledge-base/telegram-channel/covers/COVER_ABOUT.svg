@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#243239"/>
+      <stop offset="55%" stop-color="#11181c"/>
+      <stop offset="100%" stop-color="#060809"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8fd3e7"/>
+      <stop offset="100%" stop-color="#d8f8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <circle cx="850" cy="216" r="186" fill="#95d8e8" opacity="0.13"/>
+  <circle cx="206" cy="1104" r="236" fill="#73b8d0" opacity="0.08"/>
+  <rect x="70" y="70" width="940" height="1210" rx="46" fill="none" stroke="#c7eff8" stroke-opacity="0.14" stroke-width="2"/>
+
+  <rect x="120" y="108" width="286" height="54" rx="27" fill="#9ad9e8" fill-opacity="0.11" stroke="#caf0f8" stroke-opacity="0.28"/>
+  <text x="158" y="144" fill="#f2fdff" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">СЧЕТЧИКИ ЮГ</text>
+
+  <g transform="translate(708 180)" opacity="0.96">
+    <rect x="26" y="56" width="164" height="158" rx="26" fill="#edf9fc"/>
+    <rect x="60" y="24" width="96" height="46" rx="12" fill="#b8e4ee"/>
+    <path d="M60 116 H156" stroke="#6da8b8" stroke-width="14" stroke-linecap="round"/>
+    <path d="M60 154 H142" stroke="#6da8b8" stroke-width="14" stroke-linecap="round"/>
+  </g>
+
+  <text x="120" y="500" fill="#f4fdff" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="800">О КОМПАНИИ</text>
+  <rect x="124" y="542" width="344" height="8" rx="4" fill="url(#line)"/>
+
+  <text x="120" y="636" fill="#d3e8ee" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="500">Поставка инженерного оборудования</text>
+  <text x="120" y="720" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• для монтажников и УК</text>
+  <text x="120" y="780" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• для застройщиков и опта</text>
+  <text x="120" y="840" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">• доставка по России</text>
+
+  <text x="120" y="1094" fill="#a9d0d9" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="3">TELEGRAM VITRINA</text>
+  <text x="120" y="1148" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700">Оборудование • Подбор • Поставка</text>
+</svg>

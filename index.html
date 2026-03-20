@@ -741,6 +741,189 @@
         cursor: pointer;
       }
 
+      .channel-menu {
+        display: grid;
+        gap: 8px;
+      }
+
+      .channel-menu-head {
+        padding: 14px 14px 16px;
+        border-radius: 22px;
+        background:
+          radial-gradient(circle at 78% 22%, rgba(73, 201, 137, 0.15), transparent 26%),
+          linear-gradient(180deg, rgba(8, 10, 12, 0.98), rgba(3, 4, 5, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
+      }
+
+      .channel-menu-kicker {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .channel-menu-title {
+        margin-top: 12px;
+        font-size: 24px;
+        line-height: 1.02;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .channel-menu-copy {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        line-height: 1.42;
+      }
+
+      .channel-menu-meta {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .channel-meta-tile {
+        min-height: 72px;
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .channel-meta-value {
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .channel-meta-label {
+        margin-top: 7px;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 11px;
+        line-height: 1.22;
+      }
+
+      .channel-status-strip {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(25, 60, 80, 0.34);
+        border: 1px solid rgba(71, 163, 210, 0.22);
+        color: rgba(232, 244, 255, 0.9);
+        font-size: 13px;
+        line-height: 1.38;
+        text-align: left;
+        cursor: pointer;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+      }
+
+      .channel-service-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .channel-service-btn,
+      .channel-grid-btn,
+      .channel-bottom-cta {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.18s ease, filter 0.18s ease, background 0.18s ease;
+      }
+
+      .channel-service-btn:active,
+      .channel-grid-btn:active,
+      .channel-bottom-cta:active {
+        transform: scale(0.985);
+        filter: brightness(1.06);
+      }
+
+      .channel-service-btn,
+      .channel-grid-btn {
+        padding: 16px 42px 16px 16px;
+        border-radius: 16px;
+        text-align: left;
+        background:
+          linear-gradient(180deg, rgba(10, 10, 10, 0.98), rgba(0, 0, 0, 0.98)),
+          #000;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+      }
+
+      .channel-service-btn::after,
+      .channel-grid-btn::after,
+      .channel-bottom-cta::after {
+        content: "↗";
+        position: absolute;
+        right: 14px;
+        top: 12px;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 18px;
+      }
+
+      .channel-service-btn {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .channel-service-btn.info {
+        background: linear-gradient(180deg, #2d8fbe, #2577a6);
+        border-color: rgba(121, 216, 255, 0.18);
+      }
+
+      .channel-service-btn.warn {
+        background: linear-gradient(180deg, #b24747, #913838);
+        border-color: rgba(255, 154, 154, 0.18);
+      }
+
+      .channel-service-btn.accent {
+        background: linear-gradient(180deg, #1298a1, #0d7a82);
+        border-color: rgba(95, 231, 238, 0.18);
+      }
+
+      .channel-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .channel-grid-btn {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 17px;
+        line-height: 1.15;
+        font-weight: 600;
+      }
+
+      .channel-bottom-cta {
+        margin-top: 2px;
+        padding: 18px 46px 18px 20px;
+        border-radius: 16px;
+        text-align: center;
+        background: linear-gradient(180deg, #44a548, #38893b);
+        border: 1px solid rgba(179, 255, 183, 0.2);
+        box-shadow: 0 18px 34px rgba(24, 72, 28, 0.34);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
       .feed-card {
         position: relative;
         overflow: hidden;
@@ -1696,10 +1879,20 @@
       }
 
       function backendLabel() {
-        if (!state.backend.connected) return "offline";
-        if (state.backend.mode === "local_preview") return "local preview";
-        if (state.backend.mode === "bitrix24") return "Bitrix24";
-        return state.backend.mode || "online";
+        if (!state.backend.connected) return "Каталог";
+        if (state.backend.mode === "local_preview") return "Каталог";
+        if (state.backend.mode === "bitrix24") return "Онлайн";
+        return "Онлайн";
+      }
+
+      function homeStatusText(fallbackActive) {
+        if (!state.backend.connected) {
+          return "Каталог доступен. Если обновление витрины приходит с задержкой, используйте разделы ниже или откройте статус синхронизации.";
+        }
+        if (fallbackActive) {
+          return "Каталог открыт. Хиты и акции доступны, часть витрины сейчас показана из опубликованной версии. Нажмите, чтобы посмотреть статус обновления.";
+        }
+        return "Каталог обновлен. Хиты, акции и клиентские сценарии доступны в рабочем режиме. Нажмите, чтобы посмотреть статус витрины.";
       }
 
       async function apiJson(path, options = {}) {
@@ -1746,12 +1939,11 @@
           await loadStorefrontState();
           await refreshCustomerState();
 
-          const modeLabel = state.backend.mode === "local_preview" ? "Локальный preview backend" : "Mini App backend";
-          setTelegramStatus(modeLabel + " подключен: " + backendLabel());
+          setTelegramStatus("Счетчики Юг в Telegram");
         } catch (error) {
           state.backend.connected = false;
           state.backend.error = error.message || "backend unavailable";
-          setTelegramStatus("Локальный режим прототипа. Backend недоступен, поэтому включен статический fallback.");
+          setTelegramStatus("Счетчики Юг в Telegram");
         }
       }
 
@@ -1917,7 +2109,7 @@
 
       function initTelegramMiniApp() {
         if (!telegramWebApp) {
-          setTelegramStatus("Локальный режим прототипа. Для Mini App откройте этот экран внутри Telegram.");
+          setTelegramStatus("Откройте экран внутри Telegram, чтобы использовать Mini App.");
           updateViewportHeight();
           return;
         }
@@ -1936,9 +2128,8 @@
         } catch (error) {}
 
         const user = telegramWebApp.initDataUnsafe && telegramWebApp.initDataUnsafe.user;
-        const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "гость";
-        const platform = telegramWebApp.platform || "telegram";
-        setTelegramStatus("Mini App подключен: " + userName + " • " + platform);
+        const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "";
+        setTelegramStatus(userName ? "Счетчики Юг в Telegram · " + userName : "Счетчики Юг в Telegram");
 
         if (telegramWebApp.BackButton && typeof telegramWebApp.BackButton.onClick === "function") {
           telegramWebApp.BackButton.onClick(goBack);
@@ -2067,7 +2258,7 @@
 
       function renderHome() {
         const categories = rootCategories();
-        const quickItems = categories.slice(0, 6);
+        const menuItems = categories.slice(0, 14);
         const storefrontCounts = state.backend.health && state.backend.health.storefront_counts
           ? state.backend.health.storefront_counts
           : {
@@ -2075,75 +2266,33 @@
               promotions: state.storefront.promotions.length,
             };
         const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
-        const heroKicker = fallbackActive ? "Preview storefront" : "Telegram Mini App";
+        const modeLabel = "Каталог Счетчики Юг";
         screenRoot.innerHTML =
-          '<section class="hero-panel">' +
-          '<div class="hero-kicker">' + heroKicker + "</div>" +
-          '<div class="hero-title">Каталог, заявки и оптовый доступ в одном экране</div>' +
-          '<div class="hero-copy">Главный вход в Mini App: клиент видит витрину, быстрые маршруты по каталогу и живой статус синхронизации с backend.</div>' +
-          '<div class="hero-meta">' +
-          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="hero-stat-label">популярных позиций</div></div>' +
-          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(String(storefrontCounts.promotions || 0)) + '</div><div class="hero-stat-label">акций в витрине</div></div>' +
-          '<div class="hero-stat"><div class="hero-stat-value">' + escapeHtml(backendLabel()) + '</div><div class="hero-stat-label">режим backend</div></div>' +
+          '<div class="channel-menu">' +
+          '<section class="channel-menu-head">' +
+          '<div class="channel-menu-kicker">' + escapeHtml(modeLabel) + '</div>' +
+          '<div class="channel-menu-title">Каталог, акции и оптовый доступ в одном окне</div>' +
+          '<div class="channel-menu-copy">Главный вход в витрину Счетчики Юг: быстрые разделы, хиты, акции и прямой переход к менеджеру без лишних экранов.</div>' +
+          '<div class="channel-menu-meta">' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></div>' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">режим backend</div></div>' +
           '</div>' +
           '</section>' +
           infoCardHtml() +
           statusSwitchHtml() +
-          sectionLabel("Каталог") +
-          '<div class="quick-search">' +
-          '<div class="quick-title">Открыть каталог сразу</div>' +
-          '<div class="quick-copy">Это главный экран витрины. Сразу вход в основные разделы без ощущения закрепов и служебных постов наверху.</div>' +
-          '<div class="quick-grid">' +
-          quickItems
-            .map((item) => '<button class="quick-chip" data-root-code="' + item.code + '">' + item.title + "</button>")
+          '<button class="channel-status-strip" data-action="sync">' + escapeHtml(homeStatusText(fallbackActive)) + '</button>' +
+          '<div class="channel-service-list">' +
+          '<button class="channel-service-btn info" data-action="show-service">⚙️ Сервис и гарантия</button>' +
+          '<button class="channel-service-btn warn" data-action="show-wholesale">💸 Оптовый заказ</button>' +
+          '<button class="channel-service-btn accent" data-action="show-manager">💬 Менеджер</button>' +
+          '</div>' +
+          '<div class="channel-grid">' +
+          menuItems
+            .map((item) => '<button class="channel-grid-btn" data-root-code="' + item.code + '">' + item.title + "</button>")
             .join("") +
           '</div>' +
-          '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть весь каталог</button>' +
-          '<button class="inline-btn" data-action="show-wholesale">💰 Оптовый режим</button>' +
-          '<button class="inline-btn" data-action="show-find">📍 Наш адрес</button>' +
-          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
-          '</div>' +
-          '</div>' +
-          sectionLabel("Подборки и витрина") +
-          '<div class="feed-stack">' +
-          '<button class="feed-card promotions" data-action="show-promotions">' +
-          '<div class="feed-top"><div class="feed-tag">Акция дня</div><div class="feed-time">сегодня</div></div>' +
-          '<div class="feed-title">Снижение цены на популярные счетчики воды</div>' +
-          '<div class="feed-copy">Небольшой ежедневный пост, который занимает компактный кусок экрана и быстро переводит клиента в акционный блок.</div>' +
-          '<div class="feed-meta">Переход: Акции → менеджер / каталог</div>' +
-          '</button>' +
-          '<button class="feed-card popular" data-action="show-popular">' +
-          '<div class="feed-top"><div class="feed-tag">Популярное</div><div class="feed-time">сегодня</div></div>' +
-          '<div class="feed-title">ТОП ходовых позиций по воде и газу</div>' +
-          '<div class="feed-copy">Компактная подборка товаров, которую клиент быстро просматривает прямо в ленте без перегруза интерфейса.</div>' +
-          '<div class="feed-meta">Переход: Популярные товары → каталог</div>' +
-          '</button>' +
-          '<button class="feed-card content" data-action="show-content">' +
-          '<div class="feed-top"><div class="feed-tag">Полезное</div><div class="feed-time">сегодня</div></div>' +
-          '<div class="feed-title">Как выбрать счетчик под квартиру, дом или объект</div>' +
-          '<div class="feed-copy">Контентный пост небольшого размера, который прогревает клиента и ведет в нужный раздел каталога или к менеджеру.</div>' +
-          '<div class="feed-meta">Переход: Полезный контент → каталог / менеджер</div>' +
-          '</button>' +
-          '</div>' +
-          '<div class="feed-note">Основной акцент сверху теперь на каталоге. Подборки и служебные переходы остаются ниже, чтобы экран ощущался как витрина, а не как Telegram-лента.</div>' +
-          sectionLabel("Служебные разделы") +
-          '<div class="pin-stack">' +
-          '<button class="pin-card" data-action="show-card"><div class="pin-kicker">Клиент</div><div class="pin-title">Карта клиента и оптовый доступ</div><div class="pin-copy">Регистрация, подтверждение менеджером, ручной ввод номера карты и переход в оптовый режим.</div></button>' +
-          '<button class="pin-card" data-action="show-manager"><div class="pin-kicker">Связь</div><div class="pin-title">Запрос менеджеру</div><div class="pin-copy">Быстрый вход в сценарии подбора товара, оптового запроса, доставки и сервиса.</div></button>' +
-          '<button class="pin-card" data-action="show-content-channel"><div class="pin-kicker">Контент</div><div class="pin-title">Информационный канал</div><div class="pin-copy">Отдельная лента с полезными материалами, инструкциями и регулярными постами для клиентов.</div></button>' +
-          '<button class="pin-card" data-action="sync"><div class="pin-kicker">Система</div><div class="pin-title">Синхронизация витрины</div><div class="pin-copy">Статус backend, storefront, fallback-режима и связки сайта с CRM.</div></button>' +
-          '</div>' +
-          sectionLabel("Ещё разделы") +
-          '<div class="info-links">' +
-          '<button class="info-link" data-action="show-popular">📦 Популярные товары</button>' +
-          '<button class="info-link" data-action="show-promotions">🔥 Акции</button>' +
-          '<button class="info-link" data-action="show-content">📰 Полезный контент</button>' +
-          '<button class="info-link" data-action="show-history">🕰 История</button>' +
-          '<button class="info-link" data-action="show-project">🧩 Проект</button>' +
-          '<button class="info-link" data-action="show-service">⚙️ Сервис и гарантия</button>' +
-          '<button class="info-link" data-action="show-delivery">🚚 Доставка по России</button>' +
-          '<button class="info-link" data-action="show-site">🌐 Перейти на сайт</button>' +
+          '<button class="channel-bottom-cta" data-action="show-manager">⚙️ Заказать у менеджера</button>' +
           "</div>";
 
         setHeader(

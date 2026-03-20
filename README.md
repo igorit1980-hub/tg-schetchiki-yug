@@ -6,12 +6,14 @@ Telegram storefront prototype for "Счетчики Юг" with:
 - product and promo source files in `catalog_*.json`
 - shared integration docs in `knowledge-base/`
 - Python sync backend in `sync_backend/`
+- Telegram bot layer in `telegram_bot/`
 
 ## Repository layout
 
 - `index.html` - storefront prototype
 - `knowledge-base/` - data contracts and integration notes
 - `sync_backend/` - Bitrix24/site sync skeleton
+- `telegram_bot/` - Telegram bot entrypoint and config
 - `output/` - generated local artifacts
 
 ## Local setup
@@ -29,6 +31,13 @@ python3 sync_backend/main.py
 
 ```bash
 python3 sync_backend/customer_api.py
+```
+
+6. If you want to launch the Telegram bot:
+
+```bash
+python3 -m pip install -r requirements-bot.txt
+python3 -m telegram_bot.app
 ```
 
 If `BITRIX24_WEBHOOK` is missing, `customer_api.py` now starts in `local_preview` mode:
@@ -76,6 +85,7 @@ The backend now covers these directions:
 - `output/storefront.test.json` - temporary fallback storefront for local preview
 - `output/preview_state.json` - local preview registrations and requests
 - `knowledge-base/bitrix24-first-items-checklist.md` - checklist for the first test records in Bitrix24
+- `knowledge-base/launch/BOT_LAUNCH_CHECKLIST.md` - BotFather and local bot startup checklist
 
 ## Notes for GitHub
 
