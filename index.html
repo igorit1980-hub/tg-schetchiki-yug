@@ -2418,9 +2418,8 @@
       }
 
       function notifyTelegram(text) {
-        if (telegramWebApp && typeof telegramWebApp.showAlert === "function") {
-          telegramWebApp.showAlert(text);
-        }
+        if (!text) return;
+        console.info(text);
       }
 
       function shareCurrentScreen() {
