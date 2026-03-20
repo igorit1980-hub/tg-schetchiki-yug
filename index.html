@@ -2603,11 +2603,9 @@
               promotions: state.storefront.promotions.length,
             };
         const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
-        const modeLabel = "Каталог Счетчики Юг";
         screenRoot.innerHTML =
           '<div class="channel-menu">' +
           '<section class="channel-menu-head">' +
-          '<div class="channel-menu-kicker">' + escapeHtml(modeLabel) + '</div>' +
           '<div class="channel-menu-title">Каталог и акции в одном окне</div>' +
           '<div class="channel-menu-meta">' +
           '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
