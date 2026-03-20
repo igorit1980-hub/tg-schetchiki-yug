@@ -2463,8 +2463,8 @@
       }
 
       function shareCurrentScreen() {
-        const shareUrl = LOCATION_INFO.contactsPage;
-        const shareText = encodeURIComponent("Счетчики Юг: витрина каталога и быстрый вход в разделы");
+        const shareUrl = TELEGRAM_LINKS.catalog;
+        const shareText = encodeURIComponent("Счетчики Юг: каталог, акции и быстрый переход к менеджеру");
         const url = "https://t.me/share/url?url=" + encodeURIComponent(shareUrl) + "&text=" + shareText;
         if (telegramWebApp && typeof telegramWebApp.openTelegramLink === "function") {
           telegramWebApp.openTelegramLink(url);
