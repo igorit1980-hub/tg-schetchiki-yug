@@ -2086,6 +2086,12 @@
         contactsPage: "https://xn----7sbhjpnneqb.xn--p1ai/contacts/",
       };
 
+      const TELEGRAM_LINKS = {
+        channel: "https://t.me/schetchiki_yug",
+        bot: "https://t.me/schetchiki_yug_bot",
+        catalog: "https://t.me/schetchiki_yug_bot/catalog",
+      };
+
       function telegramIdentity() {
         const user = telegramWebApp && telegramWebApp.initDataUnsafe ? telegramWebApp.initDataUnsafe.user : null;
         if (user) {
@@ -2247,6 +2253,10 @@
         return siteLink("customer_account_url", LOCATION_INFO.contactsPage);
       }
 
+      function catalogSiteUrl() {
+        return siteLink("catalog_url", LOCATION_INFO.contactsPage);
+      }
+
       function syncProfileDraftFromForm() {
         const root = screenRoot;
         if (!root.querySelector("[data-register-form]")) return;
@@ -2339,6 +2349,12 @@
             ? "Нужны оптовые условия и подтверждение карты клиента."
             : requestType === "product"
               ? "Нужна помощь с подбором товара."
+              : requestType === "service"
+                ? "Нужна помощь по сервису или гарантии."
+                : requestType === "order"
+                  ? "Нужно уточнить статус заказа и комплектность."
+                  : requestType === "delivery"
+                    ? "Нужно уточнить доставку и сроки отгрузки."
               : "Нужна связь с менеджером.";
         const message = window.prompt("Сообщение менеджеру", defaultMessage);
         if (message === null) return;
@@ -2884,10 +2900,10 @@
           '<div class="post-date">📰 Полезный контент</div>' +
           '<div class="post-copy">В канале нужен не только каталог, но и полезные посты: инструкции, разборы моделей, правила выбора, кейсы по монтажу и объяснение отличий бытовых и промышленных приборов.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Инструкции</div><div class="route-copy">Поверка, монтаж, передача показаний, выбор модели.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Сравнение моделей</div><div class="route-copy">Чем отличаются Бетар, Экомера, Вектор, ЭКО НОМ и другие бренды.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Кейсы объектов</div><div class="route-copy">Примеры поставки на монтаж, объект и оптовую закупку.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Контент</div><div class="route-title">Новости и изменения</div><div class="route-copy">Новые позиции, сроки поставки, изменения по наличию и акциям.</div></button>' +
+          '<button class="route-btn" data-action="show-content-channel"><div class="route-kicker">Контент</div><div class="route-title">Инструкции</div><div class="route-copy">Поверка, монтаж, передача показаний, выбор модели.</div></button>' +
+          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Контент</div><div class="route-title">Сравнение моделей</div><div class="route-copy">Чем отличаются Бетар, Экомера, Вектор, ЭКО НОМ и другие бренды.</div></button>' +
+          '<button class="route-btn" data-action="show-wholesale"><div class="route-kicker">Контент</div><div class="route-title">Кейсы объектов</div><div class="route-copy">Примеры поставки на монтаж, объект и оптовую закупку.</div></button>' +
+          '<button class="route-btn" data-action="sync"><div class="route-kicker">Контент</div><div class="route-title">Новости и изменения</div><div class="route-copy">Новые позиции, сроки поставки, изменения по наличию и акциям.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Как встроить в канал</div>' +
@@ -2992,10 +3008,10 @@
           '<div class="post-date">🧩 Схема системы</div>' +
           '<div class="post-copy">Витрина продаж и обслуживания работает как единая система: сайт отдает каталог, Telegram показывает путь клиента, а Битрикс24 управляет коммерческой частью и статусами.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Источник</div><div class="route-title">Сайт</div><div class="route-copy">Категории, бренды, карточки товаров, описания и изображения.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Витрина</div><div class="route-title">Telegram-канал</div><div class="route-copy">Навигация, публикации, акции, полезный контент и вход в каталог.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарии</div><div class="route-title">Telegram-бот</div><div class="route-copy">Регистрация клиента, карта, оптовый доступ и отправка заявок.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Коммерция</div><div class="route-title">Битрикс24</div><div class="route-copy">Цены, остатки, клиенты, статусы, сделки и менеджерская логика.</div></button>' +
+          '<button class="route-btn" data-action="show-site"><div class="route-kicker">Источник</div><div class="route-title">Сайт</div><div class="route-copy">Категории, бренды, карточки товаров, описания и изображения.</div></button>' +
+          '<button class="route-btn" data-action="show-content-channel"><div class="route-kicker">Витрина</div><div class="route-title">Telegram-канал</div><div class="route-copy">Навигация, публикации, акции, полезный контент и вход в каталог.</div></button>' +
+          '<button class="route-btn" data-action="show-card"><div class="route-kicker">Сценарии</div><div class="route-title">Telegram-бот</div><div class="route-copy">Регистрация клиента, карта, оптовый доступ и отправка заявок.</div></button>' +
+          '<button class="route-btn" data-action="sync"><div class="route-kicker">Коммерция</div><div class="route-title">Битрикс24</div><div class="route-copy">Цены, остатки, клиенты, статусы, сделки и менеджерская логика.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Главные правила</div>' +
@@ -3066,10 +3082,10 @@
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
-            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает публикации и списки товаров уже в оптовом режиме.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Оформить заявку</div><div class="route-copy">Клиент сможет отправить запрос на отгрузку после связки с CRM.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Запросить остатки</div><div class="route-copy">Отдельный путь для оперативной проверки доступности товара.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Опт</div><div class="route-title">Связаться с менеджером</div><div class="route-copy">Быстрый маршрут к оптовому менеджеру без выхода из логики канала.</div></button>' +
+            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает публикации и списки товаров уже в оптовом режиме.</div></button>' +
+            '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Оформить заявку</div><div class="route-copy">Клиент сможет отправить запрос на отгрузку после связки с CRM.</div></button>' +
+            '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Опт</div><div class="route-title">Запросить остатки</div><div class="route-copy">Отдельный путь для оперативной проверки доступности товара.</div></button>' +
+            '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Опт</div><div class="route-title">Связаться с менеджером</div><div class="route-copy">Быстрый маршрут к оптовому менеджеру без выхода из логики канала.</div></button>' +
             '</div>';
 
           actionBlock =
@@ -3104,15 +3120,15 @@
           topBlock =
             '<div class="card-stage retail">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в приложении: имя, телефон, email и тип деятельности. После этого заявка уходит на сайт и в Bitrix24 для подтверждения.</div></div>' +
+            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в приложении: имя, телефон, email и тип клиента. После отправки заявка уходит в сайт и Bitrix24, а менеджер подтверждает оптовый доступ.</div></div>' +
             '<div class="card-stage-badge">Розница</div>' +
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в приложении</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Регистрация на сайте</div><div class="route-copy">Интеграция регистрирует клиента на сайте как оптового покупателя и привязывает номер карты.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Синхронизация в Bitrix24</div><div class="route-copy">Заявка и статус карты попадают в CRM, где менеджер подтверждает оптовый доступ.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в каталоге</div><div class="route-copy">После одобрения приложение показывает номер карты, статус и только оптовые цены.</div></button>' +
+            '<button class="route-btn" data-action="register-card"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в приложении</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
+            '<button class="route-btn" data-action="sync"><div class="route-kicker">Шаг 2</div><div class="route-title">Заявка уходит в систему</div><div class="route-copy">После отправки данные попадают на сайт и в Bitrix24 для проверки клиента.</div></button>' +
+            '<button class="route-btn" data-action="show-card"><div class="route-kicker">Шаг 3</div><div class="route-title">Статус карты</div><div class="route-copy">В приложении видно, когда карта еще на проверке и когда доступ уже подтвержден.</div></button>' +
+            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в каталоге</div><div class="route-copy">После одобрения приложение показывает номер карты, статус и только оптовые цены.</div></button>' +
             '</div>';
 
           actionBlock =
@@ -3383,7 +3399,7 @@
           '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а обращение сразу уходит менеджеру.</div></button>' +
           '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карте клиента сразу уходит как отдельный тип заявки.</div></button>' +
           '<button class="route-btn" data-action="submit-request" data-request-type="product"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер получит сообщение с текущим разделом каталога или товарной логикой.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
+          '<button class="route-btn" data-action="show-service"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что доступно</div>' +
@@ -3415,10 +3431,10 @@
           '<div class="post-date">⚙️ Гарантийный сервис</div>' +
           '<div class="post-copy">Экран сервиса собирает путь клиента после покупки: гарантийный вопрос, сверка по заказу, обращение по прибору и возврат к менеджеру. Сейчас это внутренняя логика канала без боевой привязки.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Клиент сможет сообщить о проблеме по прибору и приложить номер заказа или фото.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Отдельный путь для сверки по отгрузке, комплектности и документам.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Сценарий для уточнения модели, даты покупки и типа неисправности.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сервис</div><div class="route-title">Маршрут в менеджера</div><div class="route-copy">После сборки бота это обращение будет уходить в нужную очередь CRM.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Клиент сможет сообщить о проблеме по прибору и приложить номер заказа или фото.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="order"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Отдельный путь для сверки по отгрузке, комплектности и документам.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Сценарий для уточнения модели, даты покупки и типа неисправности.</div></button>' +
+          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Сервис</div><div class="route-title">Маршрут в менеджера</div><div class="route-copy">После сборки бота это обращение будет уходить в нужную очередь CRM.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что подключим позже</div>' +
@@ -3449,10 +3465,10 @@
           '<div class="post-date">🚚 Доставка по России</div>' +
           '<div class="post-copy">Экран доставки нужен, чтобы клиент сразу понимал, как будет происходить отгрузка: со склада в Ростове-на-Дону, по каким сценариям и куда дальше его вести внутри канала.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Со склада в Ростове</div><div class="route-copy">Основные позиции отгружаются со склада в Ростове-на-Дону.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">По России</div><div class="route-copy">Для канала предусмотрим сценарий отправки в любой регион России.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Сроки и наличие</div><div class="route-copy">Клиент будет понимать, что в наличии, а что идет под доставку.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Доставка</div><div class="route-title">Связь по отгрузке</div><div class="route-copy">Отдельная точка связи для согласования отправки и логистики.</div></button>' +
+          '<button class="route-btn" data-action="show-find"><div class="route-kicker">Доставка</div><div class="route-title">Со склада в Ростове</div><div class="route-copy">Основные позиции отгружаются со склада в Ростове-на-Дону.</div></button>' +
+          '<button class="route-btn" data-action="show-find"><div class="route-kicker">Доставка</div><div class="route-title">По России</div><div class="route-copy">Для канала предусмотрим сценарий отправки в любой регион России.</div></button>' +
+          '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Доставка</div><div class="route-title">Сроки и наличие</div><div class="route-copy">Клиент будет понимать, что в наличии, а что идет под доставку.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="delivery"><div class="route-kicker">Доставка</div><div class="route-title">Связь по отгрузке</div><div class="route-copy">Отдельная точка связи для согласования отправки и логистики.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что будет на следующем этапе</div>' +
@@ -3483,10 +3499,10 @@
           '<div class="post-date">🌐 Переход на сайт</div>' +
           '<div class="post-copy">Этот экран показывает, как внутри канала будет устроен переход на сайт без резкого выпадения пользователя из Telegram-витрины. Сейчас это визуальный сценарий, а не боевой редирект.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Открыть карточку на сайте</div><div class="route-copy">Для сложных товаров сайт будет использоваться как расширенная карточка и источник технических данных.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Остаться в канале</div><div class="route-copy">Основная витрина и быстрый выбор должны оставаться внутри Telegram-структуры.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Возврат в каталог</div><div class="route-copy">После просмотра сайта клиент должен легко возвращаться в нужный раздел канала.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Связка с CRM</div><div class="route-copy">На следующем этапе переходы с сайта и канала будут связываться в единую логику заявок.</div></button>' +
+          '<button class="route-btn" data-action="open-site-link" data-site-url="catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Открыть карточку на сайте</div><div class="route-copy">Для сложных товаров сайт будет использоваться как расширенная карточка и источник технических данных.</div></button>' +
+          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Остаться в канале</div><div class="route-copy">Основная витрина и быстрый выбор должны оставаться внутри Telegram-структуры.</div></button>' +
+          '<button class="route-btn" data-action="open-root-catalog"><div class="route-kicker">Сценарий</div><div class="route-title">Возврат в каталог</div><div class="route-copy">После просмотра сайта клиент должен легко возвращаться в нужный раздел канала.</div></button>' +
+          '<button class="route-btn" data-action="sync"><div class="route-kicker">Сценарий</div><div class="route-title">Связка с CRM</div><div class="route-copy">На следующем этапе переходы с сайта и канала будут связываться в единую логику заявок.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что фиксируем сейчас</div>' +
@@ -3564,10 +3580,10 @@
           '<div class="post-date">💬 Каналы связи</div>' +
           '<div class="post-copy">Этот экран пока собирается как часть визуала и внутренней логики канала. Реальные привязки к Telegram, MAX, WhatsApp, ботам и менеджерам будут подключаться на следующем этапе.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">Telegram</div><div class="route-copy">Подготовим связку с каналом, ботом и менеджером после финального согласования визуала.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">WhatsApp</div><div class="route-copy">Кнопка и сценарий предусмотрены, боевую ссылку подключим позже.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">MAX</div><div class="route-copy">Есть место в интерфейсе под MAX, но без реальной интеграции на текущем этапе.</div></button>' +
-          '<button class="route-btn"><div class="route-kicker">Статус</div><div class="route-title">Менеджер</div><div class="route-copy">Отдельный маршрут обращения и передача в CRM будут подключаться после сборки канала.</div></button>' +
+          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="bot"><div class="route-kicker">Статус</div><div class="route-title">Telegram</div><div class="route-copy">Быстрый переход в Telegram-сценарий и каталог.</div></button>' +
+          '<button class="route-btn" data-action="open-whatsapp"><div class="route-kicker">Статус</div><div class="route-title">WhatsApp</div><div class="route-copy">Открыть быстрый канал связи в WhatsApp.</div></button>' +
+          '<button class="route-btn" data-action="open-max"><div class="route-kicker">Статус</div><div class="route-title">MAX</div><div class="route-copy">Открыть канал связи в MAX.</div></button>' +
+          '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Статус</div><div class="route-title">Менеджер</div><div class="route-copy">Перейти к сценарию обращения и быстрой связи.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что фиксируем сейчас</div>' +
@@ -3828,6 +3844,27 @@
         if (action === "show-stock") openScreen("stock");
         if (action === "open-site-account") {
           openExternal(customerAccountUrl());
+          return;
+        }
+        if (action === "open-site-link") {
+          const key = actionBtn.getAttribute("data-site-url");
+          if (key === "catalog") openExternal(catalogSiteUrl());
+          else openExternal(LOCATION_INFO.contactsPage);
+          return;
+        }
+        if (action === "open-telegram-link") {
+          const key = actionBtn.getAttribute("data-telegram-link");
+          if (key === "channel") openExternal(TELEGRAM_LINKS.channel);
+          else if (key === "catalog") openExternal(TELEGRAM_LINKS.catalog);
+          else openExternal(TELEGRAM_LINKS.bot);
+          return;
+        }
+        if (action === "open-whatsapp") {
+          openExternal(LOCATION_INFO.whatsapp);
+          return;
+        }
+        if (action === "open-max") {
+          openExternal(LOCATION_INFO.max);
           return;
         }
         if (action === "refresh-status") {
