@@ -2613,7 +2613,6 @@
           '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">статус витрины</div></div>' +
           '</div>' +
           '</section>' +
-          infoCardHtml() +
           statusSwitchHtml() +
           '<button class="channel-status-strip" data-action="sync">' + escapeHtml(homeStatusText(fallbackActive)) + '</button>' +
           '<div class="channel-service-list">' +
@@ -2626,6 +2625,7 @@
             .map((item) => '<button class="channel-grid-btn" data-root-code="' + item.code + '">' + item.title + "</button>")
             .join("") +
           '</div>' +
+          infoCardHtml() +
           '<button class="channel-bottom-cta" data-action="show-manager">⚙️ Заказать у менеджера</button>' +
           "</div>";
 
