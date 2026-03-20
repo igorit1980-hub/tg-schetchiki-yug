@@ -2434,7 +2434,7 @@
 
       function initTelegramMiniApp() {
         if (!telegramWebApp) {
-          setTelegramStatus("Откройте каталог внутри Telegram, чтобы использовать все функции витрины.");
+          setTelegramStatus("");
           updateViewportHeight();
           return;
         }
@@ -2452,9 +2452,7 @@
           }
         } catch (error) {}
 
-        const user = telegramWebApp.initDataUnsafe && telegramWebApp.initDataUnsafe.user;
-        const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "";
-        setTelegramStatus(userName ? "Счетчики Юг в Telegram · " + userName : "Счетчики Юг в Telegram");
+        setTelegramStatus("");
 
         if (telegramWebApp.BackButton && typeof telegramWebApp.BackButton.onClick === "function") {
           telegramWebApp.BackButton.onClick(goBack);
