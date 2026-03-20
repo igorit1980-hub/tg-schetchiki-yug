@@ -37,8 +37,8 @@ class CustomerService:
                 "message": "Найдено несколько контактов, нужна ручная проверка",
             }
 
-        company_id = self._resolve_company_id(payload.company_name, payload.inn, payload.customer_type)
-        fields = self._build_registration_fields(payload, normalized_phone, company_id)
+        company_id = None
+        fields = self._build_registration_fields(payload, normalized_phone)
 
         action = "created"
         if contacts:
@@ -192,37 +192,17 @@ class CustomerService:
             return None if not contacts else contacts[0]
         return contacts[0]
 
-    def _resolve_company_id(self, company_name: str, inn: str, customer_type: str) -> Optional[int]:
-        company_name = (company_name or "").strip()
-        if not company_name:
-            return None
-        companies = self.bitrix.list_companies({"TITLE": company_name}, select=["ID", "TITLE"])
-        if companies:
-            return int(companies[0]["ID"])
-        fields: Dict[str, Any] = {
-            "TITLE": company_name,
-            self.f["company_sync_source"]: "telegram",
-        }
-        if inn:
-            fields[self.f["company_inn"]] = inn
-        if customer_type:
-            fields[self.f["company_type_b2b"]] = customer_type
-        return self.bitrix.create_company(fields)
-
     def _build_registration_fields(
         self,
         payload: CustomerRegistrationPayload,
         normalized_phone: str,
-        company_id: Optional[int],
     ) -> Dict[str, Any]:
-        full_name = " ".join(part for part in [payload.first_name.strip(), payload.last_name.strip()] if part)
         now = current_iso()
         fields: Dict[str, Any] = {
             "NAME": payload.first_name.strip(),
             "LAST_NAME": payload.last_name.strip(),
             "PHONE": [{"VALUE": payload.phone.strip(), "VALUE_TYPE": "WORK"}],
             "COMMENTS": build_registration_comment(payload),
-            "COMPANY_ID": company_id or "",
             self.f["phone_normalized"]: normalized_phone,
             self.f["telegram_user_id"]: payload.telegram_user_id.strip(),
             self.f["telegram_username"]: payload.telegram_username.strip(),
@@ -232,7 +212,6 @@ class CustomerService:
             self.f["allowed_price_type"]: "retail",
             self.f["card_status"]: "issued",
             self.f["last_sync_at"]: now,
-            self.f["company_name_snapshot"]: payload.company_name.strip(),
         }
         if self.f.get("card_comment"):
             fields[self.f["card_comment"]] = "Заявка на карту и оптовый доступ из Telegram-канала Счетчики Юг"
@@ -283,8 +262,6 @@ class CustomerService:
             "email": payload.email.strip(),
             "city": payload.city.strip(),
             "customer_type": payload.customer_type.strip(),
-            "company_name": payload.company_name.strip(),
-            "inn": payload.inn.strip(),
             "telegram_user_id": payload.telegram_user_id.strip(),
             "telegram_username": payload.telegram_username.strip(),
             "contact_id": contact_id,
@@ -362,8 +339,6 @@ def build_registration_comment(payload: CustomerRegistrationPayload) -> str:
     ]
     if payload.customer_type.strip():
         lines.append(f"Тип клиента: {payload.customer_type.strip()}.")
-    if payload.company_name.strip():
-        lines.append(f"Компания: {payload.company_name.strip()}.")
     if payload.comment.strip():
         lines.append(payload.comment.strip())
     return "\n".join(lines)

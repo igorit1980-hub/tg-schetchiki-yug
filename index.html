@@ -2034,8 +2034,6 @@
           email: window.localStorage.getItem("tg_preview_email") || "",
           city: window.localStorage.getItem("tg_preview_city") || "Ростов-на-Дону",
           customerType: window.localStorage.getItem("tg_preview_customer_type") || "installer",
-          companyName: window.localStorage.getItem("tg_preview_company_name") || "",
-          inn: window.localStorage.getItem("tg_preview_inn") || "",
         },
       };
 
@@ -2227,8 +2225,6 @@
         window.localStorage.setItem("tg_preview_email", state.profileDraft.email || "");
         window.localStorage.setItem("tg_preview_city", state.profileDraft.city || "");
         window.localStorage.setItem("tg_preview_customer_type", state.profileDraft.customerType || "");
-        window.localStorage.setItem("tg_preview_company_name", state.profileDraft.companyName || "");
-        window.localStorage.setItem("tg_preview_inn", state.profileDraft.inn || "");
       }
 
       function siteLink(key, fallback = "") {
@@ -2254,8 +2250,6 @@
         state.profileDraft.email = read("email");
         state.profileDraft.city = read("city");
         state.profileDraft.customerType = read("customer_type") || "installer";
-        state.profileDraft.companyName = read("company_name");
-        state.profileDraft.inn = read("inn");
         persistProfileDraft();
       }
 
@@ -2282,8 +2276,8 @@
               email: state.profileDraft.email,
               city: state.profileDraft.city,
               customer_type: state.profileDraft.customerType,
-              company_name: state.profileDraft.companyName,
-              inn: state.profileDraft.inn,
+              company_name: "",
+              inn: "",
               comment: "Регистрация карты клиента из Mini App канала Счетчики Юг",
               telegram_user_id: identity.userId,
               telegram_username: identity.username,
@@ -2349,7 +2343,7 @@
               first_name: identity.firstName,
               last_name: identity.lastName,
               phone: state.profileDraft.phone,
-              company_name: state.profileDraft.companyName,
+              company_name: "",
               city: state.profileDraft.city,
               telegram_user_id: identity.userId,
               telegram_username: identity.username,
@@ -3187,7 +3181,6 @@
         } else if (state.cardStatus === "pending") {
           const pendingName = liveCard && liveCard.full_name ? liveCard.full_name : "Иван";
           const pendingPhone = liveCard && liveCard.phone ? liveCard.phone : "+7 900 123-45-67";
-          const pendingCompany = liveCard && liveCard.company_name ? liveCard.company_name : "—";
           const pendingCustomerType = liveCard && liveCard.customer_type ? liveCard.customer_type : "монтажник / застройщик / оптовик";
           cardBody =
             '<div class="card-stage pending">' +
@@ -3204,7 +3197,6 @@
             '<div>Email: ' + escapeHtml(state.profileDraft.email || "—") + '</div>' +
             '<div>Город: ' + escapeHtml(state.profileDraft.city || LOCATION_INFO.city) + '</div>' +
             '<div>Тип клиента: ' + escapeHtml(pendingCustomerType) + '</div>' +
-            '<div>Компания: ' + escapeHtml(pendingCompany) + '</div>' +
             '</div>' +
             '<div class="journey-grid">' +
             '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Заявка создана</div><div class="journey-copy">Контакт и карточка клиента уже отправлены менеджеру для проверки.</div></div></div>' +
@@ -3299,7 +3291,7 @@
           '</div>' +
           '<div class="mini-card form-shell">' +
           '<div class="form-section-title">Данные для регистрации</div>' +
-          '<div class="form-section-copy">Поля ниже станут основой карточки клиента. Их можно будет поправить до отправки и обновить позже, если менеджер запросит уточнение.</div>' +
+          '<div class="form-section-copy">Ниже только базовая регистрация клиента: имя, фамилия, телефон, email, город и тип клиента. Этого достаточно, чтобы завести карту и передать клиента в сайт и Bitrix24.</div>' +
           '<div class="form-grid" data-register-form="true">' +
           '<div class="form-row">' +
           '<label class="form-field"><span class="form-label">Имя</span><input class="form-input" data-field="first_name" type="text" placeholder="Игорь" value="' + escapeHtml(state.profileDraft.firstName || "") + '"></label>' +
@@ -3313,8 +3305,6 @@
           '<label class="form-field"><span class="form-label">Город</span><input class="form-input" data-field="city" type="text" placeholder="Ростов-на-Дону" value="' + escapeHtml(state.profileDraft.city || LOCATION_INFO.city) + '"></label>' +
           '<label class="form-field"><span class="form-label">Тип клиента</span><select class="form-select" data-field="customer_type">' + selectOptions + "</select></label>" +
           '</div>' +
-          '<label class="form-field full"><span class="form-label">Компания или ИП</span><input class="form-input" data-field="company_name" type="text" placeholder="ООО Счетчики Юг" value="' + escapeHtml(state.profileDraft.companyName || "") + '"></label>' +
-          '<label class="form-field full"><span class="form-label">ИНН</span><input class="form-input" data-field="inn" type="text" inputmode="numeric" placeholder="6165000000" value="' + escapeHtml(state.profileDraft.inn || "") + '"></label>' +
           '</div>' +
           '<div class="form-help">После отправки заявка уходит на регистрацию карты клиента. До одобрения менеджером в каталоге останутся розничные цены.</div>' +
           '<div class="form-note">Если сайт или CRM временно недоступны, приложение покажет понятный статус. Данные останутся в форме, и регистрацию можно будет отправить повторно без потери информации.</div>' +
