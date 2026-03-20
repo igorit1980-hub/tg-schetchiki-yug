@@ -2613,15 +2613,15 @@
           '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">статус витрины</div></div>' +
           '</div>' +
           '</section>' +
-          '<div class="channel-service-list">' +
-          '<button class="channel-service-btn info" data-action="show-service">⚙️ Сервис и гарантия</button>' +
-          '<button class="channel-service-btn warn" data-action="show-wholesale">💸 Оптовый заказ</button>' +
-          '<button class="channel-service-btn accent" data-action="show-manager">💬 Менеджер</button>' +
-          '</div>' +
           '<div class="channel-grid">' +
           menuItems
             .map((item) => '<button class="channel-grid-btn" data-root-code="' + item.code + '">' + item.title + "</button>")
             .join("") +
+          '</div>' +
+          '<div class="channel-service-list">' +
+          '<button class="channel-service-btn info" data-action="show-service">⚙️ Сервис и гарантия</button>' +
+          '<button class="channel-service-btn warn" data-action="show-wholesale">💸 Оптовый заказ</button>' +
+          '<button class="channel-service-btn accent" data-action="show-manager">💬 Менеджер</button>' +
           '</div>' +
           statusSwitchHtml() +
           infoCardHtml() +
