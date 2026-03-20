@@ -711,6 +711,157 @@
         line-height: 1.38;
       }
 
+      .registration-hero {
+        position: relative;
+        overflow: hidden;
+        margin-top: 10px;
+        padding: 16px 15px 15px;
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 82% 18%, rgba(73, 201, 137, 0.18), transparent 26%),
+          radial-gradient(circle at 16% 0%, rgba(52, 176, 218, 0.14), transparent 24%),
+          linear-gradient(180deg, rgba(13, 16, 19, 0.98), rgba(6, 7, 9, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.26);
+      }
+
+      .registration-hero::after {
+        content: "";
+        position: absolute;
+        right: -30px;
+        top: -26px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.09), transparent 66%);
+        pointer-events: none;
+      }
+
+      .registration-kicker {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .registration-title {
+        position: relative;
+        z-index: 1;
+        margin-top: 12px;
+        max-width: 290px;
+        font-size: 24px;
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+        font-weight: 800;
+      }
+
+      .registration-copy {
+        position: relative;
+        z-index: 1;
+        margin-top: 10px;
+        max-width: 310px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .registration-meta {
+        position: relative;
+        z-index: 1;
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .registration-chip {
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .registration-steps {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .registration-step {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .registration-step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(73, 201, 137, 0.16);
+        color: #def8e9;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .registration-step-title {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .registration-step-copy {
+        margin-top: 3px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        line-height: 1.34;
+      }
+
+      .form-shell {
+        padding: 14px 14px 15px;
+        background:
+          linear-gradient(180deg, rgba(16, 19, 24, 0.98), rgba(8, 10, 13, 0.98));
+      }
+
+      .form-section-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .form-section-copy {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.64);
+        font-size: 12.5px;
+        line-height: 1.36;
+      }
+
+      .form-actions {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .inline-btn.full {
+        width: 100%;
+      }
+
       .pin-stack,
       .feed-stack {
         display: grid;
@@ -3131,9 +3282,24 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📝 Регистрация карты клиента</div>' +
-          '<div class="post-copy">Клиент заполняет данные прямо в Mini App. После отправки заявка уходит в интеграцию сайта и CRM, а после проверки менеджером приложение открывает номер карты и оптовые цены.</div>' +
-          '<div class="mini-card">' +
-          '<div class="mini-title">Данные для регистрации</div>' +
+          '<div class="registration-hero">' +
+          '<div class="registration-kicker">Telegram Mini App</div>' +
+          '<div class="registration-title">Карта клиента и доступ к оптовым ценам</div>' +
+          '<div class="registration-copy">Регистрация начинается прямо в приложении. После проверки менеджером Mini App показывает номер карты, статус клиента и только оптовые цены.</div>' +
+          '<div class="registration-meta">' +
+          '<div class="registration-chip">Канал Счетчики Юг</div>' +
+          '<div class="registration-chip">Сайт + CRM</div>' +
+          '<div class="registration-chip">' + escapeHtml(backendLabel()) + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="registration-steps">' +
+          '<div class="registration-step"><div class="registration-step-num">1</div><div><div class="registration-step-title">Заполните данные</div><div class="registration-step-copy">Имя, телефон, email, тип клиента и компания сохраняются прямо в Mini App.</div></div></div>' +
+          '<div class="registration-step"><div class="registration-step-num">2</div><div><div class="registration-step-title">Интеграция уходит в сайт и CRM</div><div class="registration-step-copy">Заявка получает источник Telegram-канала Счетчики Юг и уходит на регистрацию карты.</div></div></div>' +
+          '<div class="registration-step"><div class="registration-step-num">3</div><div><div class="registration-step-title">Менеджер подтверждает доступ</div><div class="registration-step-copy">После проверки клиент получает номер карты и приложению открываются оптовые цены.</div></div></div>' +
+          '</div>' +
+          '<div class="mini-card form-shell">' +
+          '<div class="form-section-title">Данные для регистрации</div>' +
+          '<div class="form-section-copy">Поля ниже станут основой карточки клиента. Их можно будет поправить до отправки и обновить позже, если менеджер запросит уточнение.</div>' +
           '<div class="form-grid" data-register-form="true">' +
           '<div class="form-row">' +
           '<label class="form-field"><span class="form-label">Имя</span><input class="form-input" data-field="first_name" type="text" placeholder="Игорь" value="' + escapeHtml(state.profileDraft.firstName || "") + '"></label>' +
@@ -3150,14 +3316,17 @@
           '<label class="form-field full"><span class="form-label">Компания или ИП</span><input class="form-input" data-field="company_name" type="text" placeholder="ООО Счетчики Юг" value="' + escapeHtml(state.profileDraft.companyName || "") + '"></label>' +
           '<label class="form-field full"><span class="form-label">ИНН</span><input class="form-input" data-field="inn" type="text" inputmode="numeric" placeholder="6165000000" value="' + escapeHtml(state.profileDraft.inn || "") + '"></label>' +
           '</div>' +
-          '<div class="form-help">После отправки заявка регистрируется в системе клиента, менеджер проверяет тип доступа и после подтверждения Mini App автоматически показывает номер карты и оптовые цены.</div>' +
-          '<div class="form-note">Если CRM временно недоступна, приложение покажет понятный статус ошибки. Данные останутся в форме, и их можно будет отправить повторно.</div>' +
-          '</div>' +
+          '<div class="form-help">После отправки заявка уходит на регистрацию карты клиента. До одобрения менеджером в каталоге останутся розничные цены.</div>' +
+          '<div class="form-note">Если сайт или CRM временно недоступны, приложение покажет понятный статус. Данные останутся в форме, и регистрацию можно будет отправить повторно без потери информации.</div>' +
+          '<div class="form-actions">' +
+          '<button class="inline-btn primary full" data-action="submit-card-registration">✅ Отправить регистрацию</button>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="submit-card-registration">✅ Отправить регистрацию</button>' +
           '<button class="inline-btn" data-action="show-card">💳 Назад к карте</button>' +
           '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="sync">🔄 Статус CRM</button>' +
+          '</div>' +
+          '</div>' +
           '</div>' +
           '</div>' +
           '</article>';
