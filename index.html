@@ -2090,7 +2090,7 @@
         channel: "https://t.me/schetchiki_yug",
         bot: "https://t.me/schetchiki_yug_bot",
         catalog: "https://t.me/schetchiki_yug_bot/catalog",
-        manager: "tg://resolve?phone=79081878008",
+        manager: "+7 908 187 80 08",
       };
 
       function telegramIdentity() {
@@ -2420,6 +2420,16 @@
 
       function notifyTelegram(text) {
         if (!text) return;
+        try {
+          if (telegramWebApp && typeof telegramWebApp.showAlert === "function") {
+            telegramWebApp.showAlert(text);
+            return;
+          }
+        } catch (_error) {}
+        try {
+          window.alert(text);
+          return;
+        } catch (_error) {}
         console.info(text);
       }
 
@@ -3542,7 +3552,7 @@
           '</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="open-whatsapp"><div class="route-kicker">Написать</div><div class="route-title">WhatsApp</div><div class="route-copy">Открыть WhatsApp и написать менеджеру по заказу или доставке.</div></button>' +
-          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Написать</div><div class="route-title">Telegram</div><div class="route-copy">Открыть Telegram менеджера для быстрого вопроса.</div></button>' +
+          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Написать</div><div class="route-title">Telegram</div><div class="route-copy">Скопировать номер менеджера и открыть Telegram для быстрого вопроса.</div></button>' +
           '<button class="route-btn" data-action="open-max"><div class="route-kicker">Написать</div><div class="route-title">MAX</div><div class="route-copy">Открыть MAX, если вы используете его для связи.</div></button>' +
           '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Контакт</div><div class="route-title">Отдел продаж</div><div class="route-copy">Перейти на экран связи и выбрать удобный способ обращения.</div></button>' +
           '</div>' +
@@ -3578,7 +3588,7 @@
           '<div class="post-date">💬 Каналы связи</div>' +
           '<div class="post-copy">Выберите удобный способ связи: Telegram, WhatsApp, MAX или прямой переход к менеджеру. Все основные контакты собраны в одном месте.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Telegram</div><div class="route-title">Менеджер</div><div class="route-copy">Открыть Telegram менеджера для вопроса по заказу, прайсу или наличию.</div></button>' +
+          '<button class="route-btn" data-action="open-telegram-link" data-telegram-link="manager"><div class="route-kicker">Telegram</div><div class="route-title">Менеджер</div><div class="route-copy">Скопировать номер менеджера для Telegram и быстро выйти на связь.</div></button>' +
           '<button class="route-btn" data-action="open-whatsapp"><div class="route-kicker">Статус</div><div class="route-title">WhatsApp</div><div class="route-copy">Открыть быстрый канал связи в WhatsApp.</div></button>' +
           '<button class="route-btn" data-action="open-max"><div class="route-kicker">Статус</div><div class="route-title">MAX</div><div class="route-copy">Открыть канал связи в MAX.</div></button>' +
           '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Статус</div><div class="route-title">Менеджер</div><div class="route-copy">Перейти к сценарию обращения и быстрой связи.</div></button>' +
@@ -3683,6 +3693,25 @@
         document.execCommand("copy");
         document.body.removeChild(area);
         notifyTelegram("Адрес скопирован");
+      }
+
+      function copyManagerTelegramPhone() {
+        const text = TELEGRAM_LINKS.manager;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+          notifyTelegram("Номер менеджера скопирован. Откройте Telegram и начните чат по номеру " + text);
+          return;
+        }
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "absolute";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+        notifyTelegram("Номер менеджера скопирован. Откройте Telegram и начните чат по номеру " + text);
       }
 
       function pushHistory(screen) {
@@ -3855,7 +3884,7 @@
           const key = actionBtn.getAttribute("data-telegram-link");
           if (key === "channel") openExternal(TELEGRAM_LINKS.channel);
           else if (key === "catalog") openExternal(TELEGRAM_LINKS.catalog);
-          else if (key === "manager") openExternal(TELEGRAM_LINKS.manager);
+          else if (key === "manager") copyManagerTelegramPhone();
           else openExternal(TELEGRAM_LINKS.bot);
           return;
         }
