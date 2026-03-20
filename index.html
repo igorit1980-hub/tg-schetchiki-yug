@@ -2112,12 +2112,12 @@
 
       function homeStatusText(fallbackActive) {
         if (!state.backend.connected) {
-          return "Каталог доступен. Если обновление витрины приходит с задержкой, используйте разделы ниже или откройте статус синхронизации.";
+          return "Каталог открыт. Основные разделы уже доступны. При необходимости откройте статус витрины.";
         }
         if (fallbackActive) {
-          return "Каталог открыт. Хиты и акции доступны, часть витрины сейчас показана из опубликованной версии. Нажмите, чтобы посмотреть статус обновления.";
+          return "Каталог открыт. Хиты и акции доступны. Нажмите, чтобы посмотреть статус обновления.";
         }
-        return "Каталог обновлен. Хиты, акции и клиентские сценарии доступны в рабочем режиме. Нажмите, чтобы посмотреть статус витрины.";
+        return "Каталог обновлен. Хиты, акции и карта клиента доступны. Нажмите, чтобы посмотреть статус витрины.";
       }
 
       async function apiJson(path, options = {}) {
@@ -2434,7 +2434,7 @@
 
       function initTelegramMiniApp() {
         if (!telegramWebApp) {
-          setTelegramStatus("Откройте экран внутри Telegram, чтобы использовать Mini App.");
+          setTelegramStatus("Откройте каталог внутри Telegram, чтобы использовать все функции витрины.");
           updateViewportHeight();
           return;
         }
@@ -2601,7 +2601,7 @@
           '<div class="channel-menu-meta">' +
           '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
           '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></div>' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">режим backend</div></div>' +
+          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(backendLabel()) + '</div><div class="channel-meta-label">статус витрины</div></div>' +
           '</div>' +
           '</section>' +
           infoCardHtml() +
@@ -2660,8 +2660,8 @@
           '<div class="mini-card">' +
           '<div class="mini-title">Навигация по каталогу</div>' +
           '<div class="mini-list">' +
-          "<div>В этом экране показываются реальные папки и подпапки каталога, которые Mini App получает через backend.</div>" +
-          "<div>Когда раздел содержит товары, открывается список позиций с ценами и остатками из текущего каталожного снимка.</div>" +
+          "<div>В этом экране показаны реальные папки и подпапки каталога.</div>" +
+          "<div>Когда раздел содержит товары, открывается список позиций с ценами и остатками из текущей витрины.</div>" +
           "</div>" +
           "</div>";
 
@@ -2756,7 +2756,7 @@
             ? "Карта подтверждена, поэтому публикации и товарные списки показывают только оптовые цены."
             : state.cardStatus === "pending"
               ? "Заявка на оптовый доступ уже в Bitrix24. До подтверждения менеджером в каталоге остаются только розничные цены."
-              : "Пока карта клиента не подтверждена, в каталоге остаются только розничные цены. После одобрения в Bitrix24 Mini App автоматически переключится на оптовый режим.") +
+              : "Пока карта клиента не подтверждена, в каталоге остаются только розничные цены. После одобрения в Bitrix24 приложение автоматически переключится на оптовый режим.") +
           "</div>" +
           '<div class="list-text">' +
           escapeHtml(priceList.rows) +
@@ -2770,7 +2770,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Пост каталога", "Формат длинной публикации в канале", "☰", "👁 104,2K изменено 09:43");
+        setHeader("Публикация каталога", "Формат витринной публикации", "☰", "👁 104,2K изменено 09:43");
       }
 
       function renderPopular() {
@@ -2789,8 +2789,8 @@
           '<div class="post-date">📦 Популярные товары</div>' +
           '<div class="post-copy">' +
           (liveItems.length
-            ? "Блок уже читает локальный storefront backend и показывает актуальные позиции из последней сборки."
-            : "Этот блок нужен для самых ходовых позиций канала. Пока backend не отдал свежую витрину, используется fallback-вариант экрана.") +
+            ? "Здесь собраны актуальные ходовые позиции из текущей витрины."
+            : "Здесь показываются самые востребованные позиции канала. Как только витрина обновится, блок подхватит свежую подборку.") +
           "</div>" +
           '<div class="list-text">' +
           (liveItems.length
@@ -2837,7 +2837,7 @@
           '<div class="post-date">🔥 Акции</div>' +
           '<div class="post-copy">' +
           (liveItems.length
-            ? "Этот блок уже берет акции из локально опубликованного storefront payload."
+            ? "Здесь собраны актуальные предложения из текущей витрины."
             : "Акции должны жить отдельно от общего прайса. Здесь собираются временные предложения, которые менеджеры включают в Битрикс24 и выводят в канал на срок акции.") +
           "</div>" +
           '<div class="list-text">' +
@@ -2938,10 +2938,10 @@
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
-          '<div class="post-date">🕰 История проекта</div>' +
-          '<div class="post-copy">Это краткая история того, как собиралась Telegram-витрина: от согласования концепции до рабочей схемы, где сайт, Telegram и Битрикс24 работают как одна система.</div>' +
+          '<div class="post-date">🕰 История витрины</div>' +
+          '<div class="post-copy">Это краткая история того, как собиралась витрина Счетчики Юг: от согласования структуры до связки сайта, Telegram и Битрикс24 в одной системе.</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Старт проекта</div>' +
+          '<div class="mini-title">Старт витрины</div>' +
           '<div class="mini-list">' +
           '<div>• зафиксировали бренд `Счетчики Юг` и формат канала-каталога</div>' +
           '<div>• определили связку: Telegram-канал + Telegram-бот + сайт + Битрикс24</div>' +
@@ -2959,13 +2959,13 @@
           '<div class="mini-card">' +
           '<div class="mini-title">Этап 2</div>' +
           '<div class="mini-list">' +
-          '<div>• разложили проект на сущности, связи и потоки данных</div>' +
+          '<div>• разложили витрину на сущности, связи и потоки данных</div>' +
           '<div>• сайт оставили мастер-источником каталога и карточек</div>' +
           '<div>• Битрикс24 закрепили как источник цен, остатков, статусов и заявок</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="show-project">🧩 Открыть проект</button>' +
+          '<button class="inline-btn primary" data-action="show-project">🧩 Открыть схему</button>' +
           '<button class="inline-btn" data-action="sync">🔄 Синхронизация</button>' +
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
           '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
@@ -2973,7 +2973,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("История проекта", "Как развивалась витрина Счетчики Юг", "🕰", "👁 история проекта");
+        setHeader("История витрины", "Как развивалась витрина Счетчики Юг", "🕰", "👁 история витрины");
       }
 
       function renderProject() {
@@ -2981,8 +2981,8 @@
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
-          '<div class="post-date">🧩 Проект</div>' +
-          '<div class="post-copy">Проект собирает витрину продаж и обслуживания в одной логике: сайт отдает каталог, Telegram показывает путь клиента, а Битрикс24 управляет коммерческой частью и статусами.</div>' +
+          '<div class="post-date">🧩 Схема системы</div>' +
+          '<div class="post-copy">Витрина продаж и обслуживания работает как единая система: сайт отдает каталог, Telegram показывает путь клиента, а Битрикс24 управляет коммерческой частью и статусами.</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn"><div class="route-kicker">Источник</div><div class="route-title">Сайт</div><div class="route-copy">Категории, бренды, карточки товаров, описания и изображения.</div></button>' +
           '<button class="route-btn"><div class="route-kicker">Витрина</div><div class="route-title">Telegram-канал</div><div class="route-copy">Навигация, публикации, акции, полезный контент и вход в каталог.</div></button>' +
@@ -3014,7 +3014,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Проект", "Сайт, Telegram и Битрикс24 в одной схеме", "🧩", "👁 схема проекта");
+        setHeader("Схема системы", "Сайт, Telegram и Битрикс24 в одной схеме", "🧩", "👁 схема системы");
       }
 
       function renderBrand() {
@@ -3096,15 +3096,15 @@
           topBlock =
             '<div class="card-stage retail">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в Mini App: имя, телефон, email и тип деятельности. После этого заявка уходит в backend, синхронизируется с сайтом и попадает в Bitrix24 на подтверждение.</div></div>' +
+            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в приложении: имя, телефон, email и тип деятельности. После этого заявка уходит на сайт и в Bitrix24 для подтверждения.</div></div>' +
             '<div class="card-stage-badge">Розница</div>' +
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в Mini App</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в приложении</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
             '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Регистрация на сайте</div><div class="route-copy">Интеграция регистрирует клиента на сайте как оптового покупателя и привязывает номер карты.</div></button>' +
             '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Синхронизация в Bitrix24</div><div class="route-copy">Заявка и статус карты попадают в CRM, где менеджер подтверждает оптовый доступ.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в приложении</div><div class="route-copy">После одобрения Mini App показывает номер карты, статус и только оптовые цены.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в каталоге</div><div class="route-copy">После одобрения приложение показывает номер карты, статус и только оптовые цены.</div></button>' +
             '</div>';
 
           actionBlock =
@@ -3157,7 +3157,7 @@
             '<div>' +
             '<div class="loyalty-kicker">Постоянный покупатель</div>' +
             '<div class="loyalty-name">' + escapeHtml(liveCard.full_name || "Клиент") + '</div>' +
-            '<div class="loyalty-meta">' + escapeHtml((liveCard.phone || "Телефон не указан") + " · " + (liveCard.contact_id ? "ID " + liveCard.contact_id : "preview")) + '</div>' +
+            '<div class="loyalty-meta">' + escapeHtml((liveCard.phone || "Телефон не указан") + " · " + (liveCard.contact_id ? "ID " + liveCard.contact_id : "карта оформляется")) + '</div>' +
             '</div>' +
             '<div class="discount-chip">Скидка ' + escapeHtml(String(liveCard.discount_percent || 0)) + '%</div>' +
             '</div>' +
@@ -3221,8 +3221,8 @@
             '<div class="mini-card">' +
             '<div class="mini-title">Как работает карта</div>' +
             '<div class="journey-grid">' +
-            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация карты в приложении</div><div class="journey-copy">Клиент вводит имя, телефон, email и тип деятельности прямо в Mini App.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки Mini App передает данные в сайт, а затем заявка синхронизируется в Bitrix24.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация карты в приложении</div><div class="journey-copy">Клиент вводит имя, телефон, email и тип деятельности прямо в приложении.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки данные уходят на сайт, а затем заявка синхронизируется в Bitrix24.</div></div></div>' +
             '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Карта и цены</div><div class="journey-copy">После подтверждения клиент получает номер карты и видит только оптовые цены.</div></div></div>' +
             '</div>' +
             '</div>';
@@ -3275,9 +3275,9 @@
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📝 Регистрация карты клиента</div>' +
           '<div class="registration-hero">' +
-          '<div class="registration-kicker">Telegram Mini App</div>' +
+          '<div class="registration-kicker">Карта клиента</div>' +
           '<div class="registration-title">Карта клиента и доступ к оптовым ценам</div>' +
-          '<div class="registration-copy">Регистрация начинается прямо в приложении. После проверки менеджером Mini App показывает номер карты, статус клиента и только оптовые цены.</div>' +
+          '<div class="registration-copy">Регистрация начинается прямо в приложении. После проверки менеджером каталог покажет номер карты, статус клиента и только оптовые цены.</div>' +
           '<div class="registration-meta">' +
           '<div class="registration-chip">Канал Счетчики Юг</div>' +
           '<div class="registration-chip">Сайт + CRM</div>' +
@@ -3285,7 +3285,7 @@
           '</div>' +
           '</div>' +
           '<div class="registration-steps">' +
-          '<div class="registration-step"><div class="registration-step-num">1</div><div><div class="registration-step-title">Заполните данные</div><div class="registration-step-copy">Имя, телефон, email, тип клиента и компания сохраняются прямо в Mini App.</div></div></div>' +
+          '<div class="registration-step"><div class="registration-step-num">1</div><div><div class="registration-step-title">Заполните данные</div><div class="registration-step-copy">Имя, телефон, email, город и тип клиента сохраняются прямо в приложении.</div></div></div>' +
           '<div class="registration-step"><div class="registration-step-num">2</div><div><div class="registration-step-title">Интеграция уходит в сайт и CRM</div><div class="registration-step-copy">Заявка получает источник Telegram-канала Счетчики Юг и уходит на регистрацию карты.</div></div></div>' +
           '<div class="registration-step"><div class="registration-step-num">3</div><div><div class="registration-step-title">Менеджер подтверждает доступ</div><div class="registration-step-copy">После проверки клиент получает номер карты и приложению открываются оптовые цены.</div></div></div>' +
           '</div>' +
@@ -3321,7 +3321,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Регистрация карты", "Форма оптового клиента внутри Mini App", "📝", "👁 оформление доступа");
+        setHeader("Регистрация карты", "Оформление доступа к оптовым ценам", "📝", "👁 оформление доступа");
       }
 
       function renderSync() {
@@ -3330,27 +3330,26 @@
           '<article class="post">' +
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
-          '<div class="post-date">Синхронизация с сайтом и Битрикс24</div>' +
+          '<div class="post-date">Статус каталога и интеграций</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Текущая схема</div>' +
+          '<div class="mini-title">Состояние витрины</div>' +
           '<div class="mini-list">' +
-          '<div>• backend режим: ' + escapeHtml(backendLabel()) + '</div>' +
-          '<div>• popular_products: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.popular_products : state.storefront.popular_products.length)) + '</div>' +
-          '<div>• promotions: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.promotions : state.storefront.promotions.length)) + '</div>' +
-          '<div>• storefront path: ' + escapeHtml(health && health.storefront_path ? health.storefront_path : "не подключен") + '</div>' +
-          '<div>• diagnostics path: ' + escapeHtml(health && health.diagnostics_path ? health.diagnostics_path : "—") + '</div>' +
-          '<div>• fallback: ' + escapeHtml(health && health.fallback_mode && health.fallback_mode.active ? "активен" : "выключен") + '</div>' +
+          '<div>• статус каталога: ' + escapeHtml(backendLabel()) + '</div>' +
+          '<div>• хитов в витрине: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.popular_products : state.storefront.popular_products.length)) + '</div>' +
+          '<div>• акций в витрине: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.promotions : state.storefront.promotions.length)) + '</div>' +
+          '<div>• файл витрины: ' + escapeHtml(health && health.storefront_path ? health.storefront_path : "не подключен") + '</div>' +
+          '<div>• служебный статус: ' + escapeHtml(health && health.fallback_mode && health.fallback_mode.active ? "резервный источник активен" : "основной источник активен") + '</div>' +
           '</div>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Smart-process статус</div>' +
+          '<div class="mini-title">Интеграции</div>' +
           '<div class="mini-list">' +
-          '<div>• webhook настроен: ' + (health && health.bitrix_webhook_configured ? "да" : "нет") + '</div>' +
-          '<div>• popular_products_tg: ET ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.entity_type_id : 1042)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.category_id : 23)) + '</div>' +
-          '<div>• telegram_promotions: ET ' + escapeHtml(String(health && health.entities ? health.entities.promotions.entity_type_id : 1044)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.promotions.category_id : 27)) + '</div>' +
-          '<div>• lookup URL: ' + escapeHtml(health && health.site_lookup_url ? health.site_lookup_url : "—") + '</div>' +
-          '<div>• fallback path: ' + escapeHtml(health && health.empty_fallback_path ? health.empty_fallback_path : "—") + '</div>' +
-          '<div>• клиентский статус: ' + escapeHtml(state.customerContext && state.customerContext.customer_state ? state.customerContext.customer_state : "guest") + '</div>' +
+          '<div>• Битрикс24 подключен: ' + (health && health.bitrix_webhook_configured ? "да" : "нет") + '</div>' +
+          '<div>• блок хитов: ET ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.entity_type_id : 1042)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.category_id : 23)) + '</div>' +
+          '<div>• блок акций: ET ' + escapeHtml(String(health && health.entities ? health.entities.promotions.entity_type_id : 1044)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.promotions.category_id : 27)) + '</div>' +
+          '<div>• адрес подбора: ' + escapeHtml(health && health.site_lookup_url ? health.site_lookup_url : "—") + '</div>' +
+          '<div>• резервный источник: ' + escapeHtml(health && health.empty_fallback_path ? health.empty_fallback_path : "—") + '</div>' +
+          '<div>• статус клиента: ' + escapeHtml(state.customerContext && state.customerContext.customer_state ? state.customerContext.customer_state : "guest") + '</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -3371,20 +3370,20 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📞 Связаться с менеджером</div>' +
-          '<div class="post-copy">Этот экран уже умеет отправлять обращение в локальный backend. Если рядом поднят `customer_api.py`, запрос уйдет в `Telegram -> backend -> CRM/preview` поток.</div>' +
+          '<div class="post-copy">Этот экран отправляет обращение менеджеру и фиксирует тему запроса в системе, чтобы клиент быстрее получил ответ.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а backend сохраняет обращение для менеджера.</div></button>' +
+          '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а обращение сразу уходит менеджеру.</div></button>' +
           '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карте клиента сразу уходит как отдельный тип заявки.</div></button>' +
           '<button class="route-btn" data-action="submit-request" data-request-type="product"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер получит сообщение с текущим разделом каталога или товарной логикой.</div></button>' +
           '<button class="route-btn"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Что уже подключено</div>' +
+          '<div class="mini-title">Что доступно</div>' +
           '<div class="mini-list">' +
-          '<div>• base URL: ' + escapeHtml(state.backend.baseUrl) + '</div>' +
-          '<div>• backend режим: ' + escapeHtml(backendLabel()) + '</div>' +
           '<div>• быстрый выбор темы обращения</div>' +
-          '<div>• отправка заявки через `/api/telegram/request`</div>' +
+          '<div>• отправка заявки менеджеру</div>' +
+          '<div>• отдельный сценарий по оптовому запросу</div>' +
+          '<div>• переход из обращения в каталог и карту клиента</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
