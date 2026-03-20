@@ -88,6 +88,26 @@ def run() -> int:
                 response["ok"] = True
                 return _respond(start_response, 200, response)
 
+            if method == "GET" and path == "/api/telegram/catalog":
+                catalog_path = config.local_catalog_path
+                if not catalog_path.exists():
+                    return _respond(
+                        start_response,
+                        404,
+                        {"ok": False, "error_code": "CATALOG_NOT_FOUND", "path": str(catalog_path)},
+                    )
+                catalog_payload = json.loads(catalog_path.read_text(encoding="utf-8"))
+                return _respond(
+                    start_response,
+                    200,
+                    {
+                        "ok": True,
+                        "source": "local_catalog_snapshot",
+                        "catalog_path": str(catalog_path),
+                        "items": catalog_payload,
+                    },
+                )
+
             if method == "GET" and path == "/api/health":
                 storefront_counts = {"popular_products": 0, "promotions": 0}
                 fallback_mode = {"active": False, "source": "", "reason": ""}
@@ -110,6 +130,7 @@ def run() -> int:
                         "bitrix_webhook_configured": bool(config.bitrix_webhook),
                         "site_lookup_url": config.site_lookup_url,
                         "storefront_path": str(config.output_path),
+                        "catalog_path": str(config.local_catalog_path),
                         "diagnostics_path": str(config.diagnostics_path),
                         "empty_fallback_path": str(config.empty_storefront_fallback_path),
                         "storefront_counts": storefront_counts,

@@ -1784,7 +1784,7 @@
 
     <script src="./catalog_real.js"></script>
     <script>
-      const CATALOG = Array.isArray(window.CATALOG_DATA) ? window.CATALOG_DATA : [];
+      let CATALOG = Array.isArray(window.CATALOG_DATA) ? window.CATALOG_DATA : [];
 
       const state = {
         tab: "home",
@@ -1928,6 +1928,15 @@
         };
       }
 
+      async function loadCatalogState() {
+        const data = await apiJson("/api/telegram/catalog");
+        if (Array.isArray(data.items) && data.items.length) {
+          CATALOG = data.items;
+          return true;
+        }
+        return false;
+      }
+
       async function bootstrapBackend() {
         try {
           const health = await apiJson("/api/health");
@@ -1937,6 +1946,9 @@
           state.backend.error = "";
 
           await loadStorefrontState();
+          try {
+            await loadCatalogState();
+          } catch (error) {}
           await refreshCustomerState();
 
           setTelegramStatus("Счетчики Юг в Telegram");
@@ -2333,14 +2345,14 @@
             .join("") +
           "</div>" +
           '<div class="mini-card">' +
-          '<div class="mini-title">Навигация по каталогу сайта</div>' +
+          '<div class="mini-title">Навигация по каталогу</div>' +
           '<div class="mini-list">' +
-          "<div>В этом экране показываются реальные папки и подпапки боевого каталога сайта.</div>" +
-          "<div>Когда раздел содержит товары, открывается список позиций без карточек и описаний.</div>" +
+          "<div>В этом экране показываются реальные папки и подпапки каталога, которые Mini App получает через backend.</div>" +
+          "<div>Когда раздел содержит товары, открывается список позиций с ценами и остатками из текущего каталожного снимка.</div>" +
           "</div>" +
           "</div>";
 
-        setHeader(title, node ? "Подкаталоги и товарные списки" : "Структура каталога сайта", "↗", "👁 каталог сайта");
+        setHeader(title, node ? "Подкаталоги и товарные списки" : "Структура каталога", "↗", "👁 каталог");
       }
 
       function renderProducts() {
@@ -2387,7 +2399,7 @@
             ? "Карта подтверждена. В списке показываются только оптовые цены."
             : state.cardStatus === "pending"
               ? "Карта отправлена на проверку. Пока менеджер не подтвердил клиента, в списке остаются розничные цены."
-              : "Вы просматриваете канал как обычный клиент. В списке показываются только розничные цены. Оптовые цены открываются после регистрации карты и подтверждения менеджером.") +
+              : "Вы просматриваете каталог как обычный клиент. В списке показываются розничные цены. Оптовые цены открываются после регистрации карты и подтверждения менеджером.") +
           "</div>" +
           '<div class="filter-bar">' +
           '<div class="filter-copy">' +
@@ -2405,7 +2417,7 @@
           '<div class="inline-grid">' +
           '<button class="inline-btn' + (hasWholesaleAccess() ? '' : ' primary') + '" data-action="' + (hasWholesaleAccess() ? 'show-price' : 'show-wholesale') + '">' + (hasWholesaleAccess() ? '💰 Оптовый прайс' : '🔐 Получить оптовый доступ') + '</button>' +
           '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
-          '<button class="inline-btn" data-action="sync">🌐 Сайт / CRM</button>' +
+          '<button class="inline-btn" data-action="sync">🌐 Каталог / CRM</button>' +
           '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
           "</div>" +
           "</div>" +
@@ -2413,7 +2425,7 @@
 
         setHeader(
           node ? node.title : "Список товаров",
-          "Товары показаны списком, без карточек",
+          "Цены и остатки через backend каталог",
           "↗",
           "👁 список товаров"
         );
