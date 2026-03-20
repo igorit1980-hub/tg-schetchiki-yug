@@ -2090,6 +2090,7 @@
         channel: "https://t.me/schetchiki_yug",
         bot: "https://t.me/schetchiki_yug_bot",
         catalog: "https://t.me/schetchiki_yug_bot/catalog",
+        manager: "https://t.me/schetchiki_yug",
       };
 
       function telegramIdentity() {
@@ -3393,7 +3394,13 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">📞 Связаться с менеджером</div>' +
-          '<div class="post-copy">Этот экран отправляет обращение менеджеру и фиксирует тему запроса в системе, чтобы клиент быстрее получил ответ.</div>' +
+          '<div class="post-copy">Выберите удобный канал связи или отправьте обращение прямо из приложения.</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="open-telegram-link" data-telegram-link="manager">✈️ Telegram менеджера</button>' +
+          '<button class="inline-btn" data-action="open-whatsapp">💬 WhatsApp</button>' +
+          '<button class="inline-btn" data-action="show-messengers">📲 Все каналы связи</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а обращение сразу уходит менеджеру.</div></button>' +
           '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карте клиента сразу уходит как отдельный тип заявки.</div></button>' +
@@ -3409,17 +3416,10 @@
           '<div>• переход из обращения в каталог и карту клиента</div>' +
           '</div>' +
           '</div>' +
-          '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="submit-request" data-request-type="quick">📝 Отправить запрос</button>' +
-          '<button class="inline-btn" data-action="submit-request" data-request-type="wholesale">💰 Оптовый запрос</button>' +
-          '<button class="inline-btn" data-action="show-card">💳 По карте клиента</button>' +
-          '<button class="inline-btn" data-action="open-root-catalog">📦 Открыть каталог</button>' +
-          '<button class="inline-btn" data-action="sync">🔄 Интеграции</button>' +
-          '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Менеджер", "Внутренняя логика обращения без боевой привязки", "📞", "👁 сценарии связи");
+        setHeader("Менеджер", "Telegram, WhatsApp и обращения из каталога", "📞", "👁 сценарии связи");
       }
 
       function renderService() {
@@ -3855,6 +3855,7 @@
           const key = actionBtn.getAttribute("data-telegram-link");
           if (key === "channel") openExternal(TELEGRAM_LINKS.channel);
           else if (key === "catalog") openExternal(TELEGRAM_LINKS.catalog);
+          else if (key === "manager") openExternal(TELEGRAM_LINKS.manager);
           else openExternal(TELEGRAM_LINKS.bot);
           return;
         }
