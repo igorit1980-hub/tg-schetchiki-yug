@@ -639,6 +639,78 @@
         border-radius: 16px;
       }
 
+      .form-grid {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .form-field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .form-field.full {
+        grid-column: 1 / -1;
+      }
+
+      .form-label {
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 12px 13px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(10, 12, 15, 0.92);
+        color: #f5f7f9;
+        font: inherit;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        border-color: rgba(52, 176, 218, 0.44);
+        box-shadow: 0 0 0 3px rgba(52, 176, 218, 0.12);
+      }
+
+      .form-textarea {
+        min-height: 88px;
+        resize: vertical;
+      }
+
+      .form-help {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 12px;
+        line-height: 1.34;
+      }
+
+      .form-note {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(52, 176, 218, 0.1);
+        border: 1px solid rgba(52, 176, 218, 0.18);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12.5px;
+        line-height: 1.38;
+      }
+
       .pin-stack,
       .feed-stack {
         display: grid;
@@ -1805,11 +1877,14 @@
         customerContext: null,
         customerCard: null,
         profileDraft: {
+          firstName: window.localStorage.getItem("tg_preview_first_name") || "",
+          lastName: window.localStorage.getItem("tg_preview_last_name") || "",
           phone: window.localStorage.getItem("tg_preview_phone") || "",
           email: window.localStorage.getItem("tg_preview_email") || "",
           city: window.localStorage.getItem("tg_preview_city") || "Ростов-на-Дону",
           customerType: window.localStorage.getItem("tg_preview_customer_type") || "installer",
           companyName: window.localStorage.getItem("tg_preview_company_name") || "",
+          inn: window.localStorage.getItem("tg_preview_inn") || "",
         },
       };
 
@@ -1921,6 +1996,20 @@
         }
       }
 
+      function setGuestCustomerState() {
+        state.customerContext = {
+          ok: true,
+          customer_state: "guest",
+          approval_status: "new",
+          card_status: "not_created",
+          allowed_price_type: "retail",
+          can_view_wholesale_prices: false,
+          can_use_loyalty_card: false,
+        };
+        state.customerCard = null;
+        state.cardStatus = "retail";
+      }
+
       async function refreshCustomerStateSilently(options = {}) {
         try {
           await refreshCustomerState();
@@ -1965,22 +2054,30 @@
           try {
             await loadCatalogState();
           } catch (error) {}
-          await refreshCustomerState();
+          try {
+            await refreshCustomerState();
+          } catch (error) {
+            setGuestCustomerState();
+          }
 
           setTelegramStatus("Счетчики Юг в Telegram");
         } catch (error) {
           state.backend.connected = false;
           state.backend.error = error.message || "backend unavailable";
+          setGuestCustomerState();
           setTelegramStatus("Счетчики Юг в Telegram");
         }
       }
 
       function persistProfileDraft() {
+        window.localStorage.setItem("tg_preview_first_name", state.profileDraft.firstName || "");
+        window.localStorage.setItem("tg_preview_last_name", state.profileDraft.lastName || "");
         window.localStorage.setItem("tg_preview_phone", state.profileDraft.phone || "");
         window.localStorage.setItem("tg_preview_email", state.profileDraft.email || "");
         window.localStorage.setItem("tg_preview_city", state.profileDraft.city || "");
         window.localStorage.setItem("tg_preview_customer_type", state.profileDraft.customerType || "");
         window.localStorage.setItem("tg_preview_company_name", state.profileDraft.companyName || "");
+        window.localStorage.setItem("tg_preview_inn", state.profileDraft.inn || "");
       }
 
       function siteLink(key, fallback = "") {
@@ -1993,42 +2090,54 @@
         return siteLink("customer_account_url", LOCATION_INFO.contactsPage);
       }
 
+      function syncProfileDraftFromForm() {
+        const root = screenRoot;
+        if (!root.querySelector("[data-register-form]")) return;
+        const read = (name) => {
+          const field = root.querySelector('[data-field="' + name + '"]');
+          return field ? field.value.trim() : "";
+        };
+        state.profileDraft.firstName = read("first_name");
+        state.profileDraft.lastName = read("last_name");
+        state.profileDraft.phone = read("phone");
+        state.profileDraft.email = read("email");
+        state.profileDraft.city = read("city");
+        state.profileDraft.customerType = read("customer_type") || "installer";
+        state.profileDraft.companyName = read("company_name");
+        state.profileDraft.inn = read("inn");
+        persistProfileDraft();
+      }
+
       async function submitCardRegistration() {
         const identity = telegramIdentity();
-        const phone = window.prompt("Телефон", state.profileDraft.phone || "+7 ");
-        if (phone === null) return;
-        const email = window.prompt("Email", state.profileDraft.email || "");
-        if (email === null) return;
-        const city = window.prompt("Город", state.profileDraft.city || LOCATION_INFO.city);
-        if (city === null) return;
-        const customerType = window.prompt("Тип клиента: installer / developer / wholesale", state.profileDraft.customerType || "installer");
-        if (customerType === null) return;
-        const companyName = window.prompt("Компания или ИП", state.profileDraft.companyName || "");
-        if (companyName === null) return;
+        syncProfileDraftFromForm();
 
-        state.profileDraft.phone = phone.trim();
-        state.profileDraft.email = email.trim();
-        state.profileDraft.city = city.trim();
-        state.profileDraft.customerType = customerType.trim() || "installer";
-        state.profileDraft.companyName = companyName.trim();
+        if (!state.profileDraft.firstName) state.profileDraft.firstName = identity.firstName || "";
+        if (!state.profileDraft.lastName) state.profileDraft.lastName = identity.lastName || "";
         persistProfileDraft();
+
+        if (!state.profileDraft.firstName || !state.profileDraft.phone || !state.profileDraft.email || !state.profileDraft.city) {
+          notifyTelegram("Заполните имя, телефон, email и город");
+          return;
+        }
 
         try {
           const response = await apiJson("/api/telegram/customer/register", {
             method: "POST",
             body: JSON.stringify({
-              first_name: identity.firstName,
-              last_name: identity.lastName,
+              first_name: state.profileDraft.firstName || identity.firstName,
+              last_name: state.profileDraft.lastName || identity.lastName,
               phone: state.profileDraft.phone,
               email: state.profileDraft.email,
               city: state.profileDraft.city,
               customer_type: state.profileDraft.customerType,
               company_name: state.profileDraft.companyName,
-              comment: "Регистрация карты клиента из Telegram Mini App",
+              inn: state.profileDraft.inn,
+              comment: "Регистрация карты клиента из Mini App канала Счетчики Юг",
               telegram_user_id: identity.userId,
               telegram_username: identity.username,
               telegram_chat_id: identity.chatId,
-              source: "telegram-mini-app",
+              source: "telegram-channel-schetchiki-yug",
             }),
           });
           await refreshCustomerState();
@@ -2848,8 +2957,8 @@
             '</div>' +
             '<div class="route-grid">' +
             '<button class="route-btn"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в Mini App</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Регистрация на сайте</div><div class="route-copy">Backend регистрирует клиента как оптового покупателя и привязывает карту.</div></button>' +
-            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Проверка в Bitrix24</div><div class="route-copy">Менеджер подтверждает клиента и разрешает оптовый режим.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 2</div><div class="route-title">Регистрация на сайте</div><div class="route-copy">Интеграция регистрирует клиента на сайте как оптового покупателя и привязывает номер карты.</div></button>' +
+            '<button class="route-btn"><div class="route-kicker">Шаг 3</div><div class="route-title">Синхронизация в Bitrix24</div><div class="route-copy">Заявка и статус карты попадают в CRM, где менеджер подтверждает оптовый доступ.</div></button>' +
             '<button class="route-btn"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в приложении</div><div class="route-copy">После одобрения Mini App показывает номер карты, статус и только оптовые цены.</div></button>' +
             '</div>';
 
@@ -2970,7 +3079,7 @@
             '<div class="mini-title">Как работает карта</div>' +
             '<div class="journey-grid">' +
             '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация карты в приложении</div><div class="journey-copy">Клиент вводит имя, телефон, email и тип деятельности прямо в Mini App.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">Backend синхронизирует регистрацию с сайтом и отправляет заявку в Bitrix24.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки Mini App передает данные в сайт, а затем заявка синхронизируется в Bitrix24.</div></div></div>' +
             '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Карта и цены</div><div class="journey-copy">После подтверждения клиент получает номер карты и видит только оптовые цены.</div></div></div>' +
             '</div>' +
             '</div>';
@@ -2998,6 +3107,62 @@
           '</article>';
 
         setHeader("Карта клиента", meta.headerSub, "★", "👁 62,8K просмотров");
+      }
+
+      function renderCardRegistration() {
+        const identity = telegramIdentity();
+        if (!state.profileDraft.firstName) state.profileDraft.firstName = identity.firstName || "";
+        if (!state.profileDraft.lastName) state.profileDraft.lastName = identity.lastName || "";
+
+        const customerType = state.profileDraft.customerType || "installer";
+        const selectOptions = [
+          { value: "installer", label: "Монтажник" },
+          { value: "developer", label: "Застройщик" },
+          { value: "wholesale", label: "Оптовый покупатель" },
+          { value: "uk", label: "УК / сервис" },
+        ].map((option) =>
+          '<option value="' + option.value + '"' + (customerType === option.value ? " selected" : "") + ">" +
+          option.label +
+          "</option>"
+        ).join("");
+
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📝 Регистрация карты клиента</div>' +
+          '<div class="post-copy">Клиент заполняет данные прямо в Mini App. После отправки заявка уходит в интеграцию сайта и CRM, а после проверки менеджером приложение открывает номер карты и оптовые цены.</div>' +
+          '<div class="mini-card">' +
+          '<div class="mini-title">Данные для регистрации</div>' +
+          '<div class="form-grid" data-register-form="true">' +
+          '<div class="form-row">' +
+          '<label class="form-field"><span class="form-label">Имя</span><input class="form-input" data-field="first_name" type="text" placeholder="Игорь" value="' + escapeHtml(state.profileDraft.firstName || "") + '"></label>' +
+          '<label class="form-field"><span class="form-label">Фамилия</span><input class="form-input" data-field="last_name" type="text" placeholder="Иванов" value="' + escapeHtml(state.profileDraft.lastName || "") + '"></label>' +
+          '</div>' +
+          '<div class="form-row">' +
+          '<label class="form-field"><span class="form-label">Телефон</span><input class="form-input" data-field="phone" type="tel" placeholder="+7 900 123-45-67" value="' + escapeHtml(state.profileDraft.phone || "") + '"></label>' +
+          '<label class="form-field"><span class="form-label">Email</span><input class="form-input" data-field="email" type="email" placeholder="client@example.ru" value="' + escapeHtml(state.profileDraft.email || "") + '"></label>' +
+          '</div>' +
+          '<div class="form-row">' +
+          '<label class="form-field"><span class="form-label">Город</span><input class="form-input" data-field="city" type="text" placeholder="Ростов-на-Дону" value="' + escapeHtml(state.profileDraft.city || LOCATION_INFO.city) + '"></label>' +
+          '<label class="form-field"><span class="form-label">Тип клиента</span><select class="form-select" data-field="customer_type">' + selectOptions + "</select></label>" +
+          '</div>' +
+          '<label class="form-field full"><span class="form-label">Компания или ИП</span><input class="form-input" data-field="company_name" type="text" placeholder="ООО Счетчики Юг" value="' + escapeHtml(state.profileDraft.companyName || "") + '"></label>' +
+          '<label class="form-field full"><span class="form-label">ИНН</span><input class="form-input" data-field="inn" type="text" inputmode="numeric" placeholder="6165000000" value="' + escapeHtml(state.profileDraft.inn || "") + '"></label>' +
+          '</div>' +
+          '<div class="form-help">После отправки заявка регистрируется в системе клиента, менеджер проверяет тип доступа и после подтверждения Mini App автоматически показывает номер карты и оптовые цены.</div>' +
+          '<div class="form-note">Если CRM временно недоступна, приложение покажет понятный статус ошибки. Данные останутся в форме, и их можно будет отправить повторно.</div>' +
+          '</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="submit-card-registration">✅ Отправить регистрацию</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Назад к карте</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader("Регистрация карты", "Форма оптового клиента внутри Mini App", "📝", "👁 оформление доступа");
       }
 
       function renderSync() {
@@ -3351,6 +3516,7 @@
         if (screen === "catalog") state.tab = "catalog";
         if (screen === "post") state.tab = "post";
         if (screen === "card") state.tab = "card";
+        if (screen === "card-register") state.tab = "card";
 
         if (push) pushHistory(screen);
         updateDock();
@@ -3361,6 +3527,7 @@
         if (screen === "post") renderPost();
         if (screen === "wholesale") renderWholesale();
         if (screen === "card") renderCard();
+        if (screen === "card-register") renderCardRegistration();
         if (screen === "popular") renderPopular();
         if (screen === "promotions") renderPromotions();
         if (screen === "content") renderContent();
@@ -3502,6 +3669,10 @@
           return;
         }
         if (action === "register-card") {
+          openScreen("card-register");
+          return;
+        }
+        if (action === "submit-card-registration") {
           submitCardRegistration();
           return;
         }

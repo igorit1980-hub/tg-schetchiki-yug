@@ -3,9 +3,14 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from ..config import AppConfig, EntityConfig
+
+
+class Bitrix24UnavailableError(RuntimeError):
+    pass
 
 
 class Bitrix24Client:
@@ -119,8 +124,26 @@ class Bitrix24Client:
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
             },
         )
-        with urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as exc:
+            if exc.code in {429, 500, 502, 503, 504}:
+                raise Bitrix24UnavailableError(
+                    f"Bitrix24 временно недоступен ({exc.code}) во время {method}"
+                ) from exc
+            error_body = ""
+            try:
+                error_body = exc.read().decode("utf-8")
+            except Exception:
+                error_body = ""
+            raise RuntimeError(
+                f"Bitrix24 request failed ({exc.code}) during {method}: {error_body or exc.reason}"
+            ) from exc
+        except URLError as exc:
+            raise Bitrix24UnavailableError(
+                f"Bitrix24 недоступен во время {method}: {exc.reason}"
+            ) from exc
 
 
 def _flatten_fields(fields: Dict[str, Any]) -> Dict[str, Any]:

@@ -9,7 +9,7 @@ from wsgiref.simple_server import make_server
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from sync_backend.clients.bitrix24 import Bitrix24Client
+from sync_backend.clients.bitrix24 import Bitrix24Client, Bitrix24UnavailableError
 from sync_backend.config import load_config
 from sync_backend.logging_utils import configure_logging
 from sync_backend.models import CustomerRegistrationPayload, TelegramRequestPayload
@@ -158,6 +158,17 @@ def run() -> int:
                 )
 
             return _respond(start_response, 404, {"ok": False, "error_code": "NOT_FOUND"})
+        except Bitrix24UnavailableError as exc:
+            logger.warning("customer_api_bitrix_unavailable path=%s error=%s", path, exc)
+            return _respond(
+                start_response,
+                503,
+                {
+                    "ok": False,
+                    "error_code": "CRM_UNAVAILABLE",
+                    "message": "Bitrix24 временно недоступен. Регистрация карты будет доступна после восстановления CRM.",
+                },
+            )
         except Exception as exc:
             logger.exception("customer_api_error path=%s error=%s", path, exc)
             return _respond(start_response, 500, {"ok": False, "error_code": "INTERNAL_ERROR"})
@@ -224,6 +235,7 @@ def _respond(start_response, status_code: int, payload: dict):
         400: "400 Bad Request",
         404: "404 Not Found",
         500: "500 Internal Server Error",
+        503: "503 Service Unavailable",
     }.get(status_code, f"{status_code} OK")
     start_response(
         status_text,

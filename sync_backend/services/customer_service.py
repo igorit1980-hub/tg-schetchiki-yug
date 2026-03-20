@@ -221,12 +221,12 @@ class CustomerService:
             "NAME": payload.first_name.strip(),
             "LAST_NAME": payload.last_name.strip(),
             "PHONE": [{"VALUE": payload.phone.strip(), "VALUE_TYPE": "WORK"}],
-            "COMMENTS": payload.comment.strip(),
+            "COMMENTS": build_registration_comment(payload),
             "COMPANY_ID": company_id or "",
             self.f["phone_normalized"]: normalized_phone,
             self.f["telegram_user_id"]: payload.telegram_user_id.strip(),
             self.f["telegram_username"]: payload.telegram_username.strip(),
-            self.f["telegram_source"]: payload.source.strip() or "telegram",
+            self.f["telegram_source"]: (payload.source.strip() or "telegram-channel-schetchiki-yug"),
             self.f["customer_type"]: payload.customer_type.strip(),
             self.f["approval_status"]: "pending_review",
             self.f["allowed_price_type"]: "retail",
@@ -234,6 +234,8 @@ class CustomerService:
             self.f["last_sync_at"]: now,
             self.f["company_name_snapshot"]: payload.company_name.strip(),
         }
+        if self.f.get("card_comment"):
+            fields[self.f["card_comment"]] = "Заявка на карту и оптовый доступ из Telegram-канала Счетчики Юг"
         if payload.email.strip():
             fields["EMAIL"] = [{"VALUE": payload.email.strip(), "VALUE_TYPE": "WORK"}]
         if payload.city.strip():
@@ -350,6 +352,21 @@ def generate_card_id(contact_id: int) -> str:
 
 def generate_qr_payload(card_id: str) -> str:
     return f"LOYALTY:{card_id}"
+
+
+def build_registration_comment(payload: CustomerRegistrationPayload) -> str:
+    lines = [
+        "Регистрация карты клиента из Telegram Mini App.",
+        "Источник: Telegram-канал Счетчики Юг.",
+        "Сценарий: заявка на оптовый доступ.",
+    ]
+    if payload.customer_type.strip():
+        lines.append(f"Тип клиента: {payload.customer_type.strip()}.")
+    if payload.company_name.strip():
+        lines.append(f"Компания: {payload.company_name.strip()}.")
+    if payload.comment.strip():
+        lines.append(payload.comment.strip())
+    return "\n".join(lines)
 
 
 def calculate_customer_state(context: CustomerContext) -> str:
