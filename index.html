@@ -2586,9 +2586,9 @@
         return (
           sectionLabel("Статус клиента") +
           '<div class="status-switch">' +
-          '<div class="status-pill ' + (state.cardStatus === "retail" ? "active" : "") + '">Гость</div>' +
-          '<div class="status-pill ' + (state.cardStatus === "pending" ? "active" : "") + '">На проверке</div>' +
-          '<div class="status-pill ' + (state.cardStatus === "approved" ? "active" : "") + '">Карта активна</div>' +
+          '<button class="status-pill ' + (state.cardStatus === "retail" ? "active" : "") + '" data-action="card-status-route" data-card-status="retail">Гость</button>' +
+          '<button class="status-pill ' + (state.cardStatus === "pending" ? "active" : "") + '" data-action="card-status-route" data-card-status="pending">На проверке</button>' +
+          '<button class="status-pill ' + (state.cardStatus === "approved" ? "active" : "") + '" data-action="card-status-route" data-card-status="approved">Карта активна</button>' +
           "</div>"
         );
       }
@@ -2625,6 +2625,7 @@
             .map((item) => '<button class="channel-grid-btn" data-root-code="' + item.code + '">' + item.title + "</button>")
             .join("") +
           '</div>' +
+          statusSwitchHtml() +
           infoCardHtml() +
           '<button class="channel-bottom-cta" data-action="show-manager">⚙️ Заказать у менеджера</button>' +
           "</div>";
@@ -3838,6 +3839,31 @@
         if (action === "register-card") {
           openScreen("card-register");
           return;
+        }
+        if (action === "card-status-route") {
+          const targetStatus = actionBtn.getAttribute("data-card-status");
+          if (targetStatus === "retail") {
+            if (state.cardStatus === "retail") openScreen("card-register");
+            else {
+              openScreen("card");
+              notifyTelegram("Карта уже оформляется или активна. Здесь показан текущий статус клиента.");
+            }
+            return;
+          }
+          if (targetStatus === "pending") {
+            openScreen("card");
+            if (state.cardStatus !== "pending") {
+              notifyTelegram("Здесь отображается этап проверки карты после отправки заявки.");
+            }
+            return;
+          }
+          if (targetStatus === "approved") {
+            openScreen("card");
+            if (state.cardStatus !== "approved") {
+              notifyTelegram("Оптовый режим откроется после подтверждения карты менеджером.");
+            }
+            return;
+          }
         }
         if (action === "submit-card-registration") {
           submitCardRegistration();
