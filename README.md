@@ -71,6 +71,20 @@ Current live state:
 - card registration already creates a contact in Bitrix24
 - the card gets an id like `SY-XXXXXX`
 - Mini App can already show `pending_review` via backend fallback state even if `UF_CRM_*` fields are not created yet
+
+## Local Telegram run
+
+If Telegram Mini App on this Mac shows `Load failed`, first make sure the local customer API is running:
+
+```bash
+./scripts/run_customer_api.command
+```
+
+Quick health check:
+
+```bash
+./scripts/check_customer_api.command
+```
 - full site sync still depends on the production endpoint `/local/api/telegram-miniapp-wholesale-register.php` returning `200 OK` instead of `404`
 
 ## Restored API syncs
