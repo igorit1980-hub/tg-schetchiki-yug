@@ -2153,6 +2153,12 @@
           city: window.localStorage.getItem("tg_preview_city") || "Ростов-на-Дону",
           customerType: window.localStorage.getItem("tg_preview_customer_type") || "installer",
         },
+        requestDraft: {
+          type: "quick",
+          title: "Обращение менеджеру",
+          description: "Опишите вопрос, и менеджер получит обращение напрямую из приложения.",
+          message: "",
+        },
       };
 
       const screenRoot = document.getElementById("screenRoot");
@@ -2450,7 +2456,7 @@
         };
       }
 
-      async function submitManagerRequest(requestType) {
+      async function submitManagerRequest(requestType, explicitMessage) {
         const identity = telegramIdentity();
         const productName = state.selectedNode ? state.selectedNode.title : "";
         const defaultMessage =
@@ -2463,10 +2469,13 @@
                 : requestType === "order"
                   ? "Нужно уточнить статус заказа и комплектность."
                   : requestType === "delivery"
-                    ? "Нужно уточнить доставку и сроки отгрузки."
+                  ? "Нужно уточнить доставку и сроки отгрузки."
               : "Нужна связь с менеджером.";
-        const message = window.prompt("Сообщение менеджеру", defaultMessage);
-        if (message === null) return;
+        const message = explicitMessage || defaultMessage;
+        if (!message || !message.trim()) {
+          notifyTelegram("Опишите запрос для менеджера");
+          return;
+        }
 
         try {
           const response = await apiJson("/api/telegram/request", {
@@ -2490,6 +2499,58 @@
         } catch (error) {
           notifyTelegram("Не удалось отправить обращение: " + error.message);
         }
+      }
+
+      function requestMeta(requestType) {
+        if (requestType === "wholesale") {
+          return {
+            title: "Оптовый запрос",
+            description: "Передайте менеджеру расчет, комплектацию объекта или запрос по поставке.",
+            message: "Нужны оптовые условия и подтверждение карты клиента.",
+          };
+        }
+        if (requestType === "product") {
+          return {
+            title: "Подбор товара",
+            description: "Опишите, что нужно подобрать. Менеджер увидит текущий раздел и поможет с выбором.",
+            message: "Нужна помощь с подбором товара.",
+          };
+        }
+        if (requestType === "service") {
+          return {
+            title: "Сервис и гарантия",
+            description: "Опишите вопрос по гарантии, диагностике или уже купленному оборудованию.",
+            message: "Нужна помощь по сервису или гарантии.",
+          };
+        }
+        if (requestType === "order") {
+          return {
+            title: "Проверка заказа",
+            description: "Уточните комплектность, документы, отгрузку или текущий статус заказа.",
+            message: "Нужно уточнить статус заказа и комплектность.",
+          };
+        }
+        if (requestType === "delivery") {
+          return {
+            title: "Доставка и отгрузка",
+            description: "Сообщите, что нужно уточнить по доставке, самовывозу или срокам получения.",
+            message: "Нужно уточнить доставку и сроки отгрузки.",
+          };
+        }
+        return {
+          title: "Обращение менеджеру",
+          description: "Опишите вопрос, и менеджер получит обращение напрямую из приложения.",
+          message: "Нужна связь с менеджером.",
+        };
+      }
+
+      function openRequestForm(requestType) {
+        const meta = requestMeta(requestType);
+        state.requestDraft.type = requestType;
+        state.requestDraft.title = meta.title;
+        state.requestDraft.description = meta.description;
+        state.requestDraft.message = meta.message;
+        openScreen("request-form");
       }
 
       function applyTelegramTheme() {
@@ -2648,7 +2709,6 @@
       }
 
       function updateSoundUi() {
-        pillRight.textContent = state.soundEnabled ? "🔊" : "🔇";
         soundToggle.textContent = state.soundEnabled ? "Выкл. звук" : "Вкл. звук";
       }
 
@@ -2657,11 +2717,12 @@
         updateSoundUi();
       }
 
-      function setHeader(title, sub, right = "🔇", views = "👁 137K изменено 09:42") {
+      function setHeader(title, sub, right = "⋯", views = "") {
         pillTitle.textContent = title;
         pillSub.textContent = sub || "";
         pillSub.classList.toggle("hidden", !sub);
-        viewsLine.textContent = views;
+        pillRight.textContent = right || "⋯";
+        viewsLine.textContent = views || "";
       }
 
       function hasWholesaleAccess() {
@@ -2792,8 +2853,8 @@
           '<section class="channel-menu-head">' +
           '<div class="channel-menu-title">Каталог и акции в одном окне</div>' +
           '<div class="channel-menu-meta">' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(visiblePopularItems.length || storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></div>' +
-          '<div class="channel-meta-tile"><div class="channel-meta-value">' + escapeHtml(String(visiblePromotionItems.length || storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></div>' +
+          '<button class="channel-meta-tile" data-action="show-popular"><div class="channel-meta-value">' + escapeHtml(String(visiblePopularItems.length || storefrontCounts.popular_products || 0)) + '</div><div class="channel-meta-label">хитов в витрине</div></button>' +
+          '<button class="channel-meta-tile" data-action="show-promotions"><div class="channel-meta-value">' + escapeHtml(String(visiblePromotionItems.length || storefrontCounts.promotions || 0)) + '</div><div class="channel-meta-label">акций доступно</div></button>' +
           '<button class="channel-meta-tile" data-action="open-root-catalog"><div class="channel-meta-value">Каталог</div><div class="channel-meta-label">открыть разделы</div></button>' +
           '</div>' +
           '</section>' +
@@ -2806,16 +2867,17 @@
           '<button class="channel-service-btn info" data-action="show-service">⚙️ Сервис и гарантия</button>' +
           '<button class="channel-service-btn warn" data-action="show-wholesale">💸 Оптовый заказ</button>' +
           '<button class="channel-service-btn accent" data-action="show-manager">💬 Менеджер</button>' +
+          '<button class="channel-service-btn" data-action="show-site">🌐 Сайт</button>' +
           '</div>' +
           infoCardHtml() +
           '<button class="channel-bottom-cta" data-action="show-manager">⚙️ Заказать у менеджера</button>' +
           "</div>";
 
         setHeader(
-          "Счетчики Юг | Каталог приборов учета",
-          "Оптовый поставщик приборов учета и комплектующих",
-          "🔇",
-          "👁 137K изменено 09:42"
+          "Счетчики Юг",
+          "",
+          "⋯",
+          ""
         );
       }
 
@@ -3287,14 +3349,14 @@
             '</div>' +
             '<div class="route-grid">' +
             '<button class="route-btn" data-action="show-price"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает публикации и списки товаров уже в оптовом режиме.</div></button>' +
-            '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Оформить заявку</div><div class="route-copy">Клиент сможет отправить запрос на отгрузку после связки с CRM.</div></button>' +
+            '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Отправить оптовый запрос</div><div class="route-copy">Передать менеджеру расчет, комплектацию объекта или запрос по поставке.</div></button>' +
             '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Опт</div><div class="route-title">Запросить остатки</div><div class="route-copy">Отдельный путь для оперативной проверки доступности товара.</div></button>' +
             '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Опт</div><div class="route-title">Связаться с менеджером</div><div class="route-copy">Быстрый маршрут к оптовому менеджеру без выхода из логики канала.</div></button>' +
             '</div>';
 
           actionBlock =
             '<button class="inline-btn primary" data-action="show-price">💰 Открыть оптовый прайс</button>' +
-            '<button class="inline-btn" data-action="show-stock">📦 Остатки</button>' +
+            '<button class="inline-btn" data-action="open-request-form" data-request-type="wholesale">📩 Оптовый запрос</button>' +
             '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
             '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>';
         } else if (state.cardStatus === "pending") {
@@ -3347,14 +3409,14 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">💰 Оптовый заказ</div>' +
-          '<div class="post-copy">Это отдельный сценарий внутри канала: не просто прайс, а путь клиента к оптовому режиму, карте и дальнейшим действиям внутри витрины.</div>' +
+          '<div class="post-copy">Здесь можно зарегистрировать карту клиента, отправить оптовый запрос и перейти к оптовым ценам после подтверждения менеджером.</div>' +
           topBlock +
           '<div class="mini-card">' +
-          '<div class="mini-title">Логика экрана</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• обычный клиент видит путь к регистрации</div>' +
-          '<div>• клиент на проверке видит ожидание подтверждения</div>' +
-          '<div>• подтвержденный клиент попадает в отдельный оптовый режим</div>' +
+          '<div>• зарегистрировать карту клиента</div>' +
+          '<div>• отправить запрос по объекту или поставке</div>' +
+          '<div>• проверить остатки и статус карты</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -3363,7 +3425,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Оптовый заказ", "Отдельный сценарий доступа к оптовому режиму", "💰", "👁 оптовый путь");
+        setHeader("Оптовый заказ", "Карта клиента, расчет и оптовые цены", "⋯", "");
       }
 
       function renderCard() {
@@ -3477,7 +3539,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Карта клиента", meta.headerSub, "★", "👁 62,8K просмотров");
+        setHeader("Карта клиента", meta.headerSub, "⋯", "");
       }
 
       function renderCardRegistration() {
@@ -3549,7 +3611,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Регистрация карты", "Оформление доступа к оптовым ценам", "📝", "👁 оформление доступа");
+        setHeader("Регистрация карты", "Оформление доступа к оптовым ценам", "⋯", "");
       }
 
       function renderSync() {
@@ -3589,7 +3651,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Синхронизация", "Сайт / Telegram / Битрикс24", "⚙", "👁 интеграции");
+        setHeader("Синхронизация", "Сайт / Telegram / Битрикс24", "⋯", "");
       }
 
       function renderManager() {
@@ -3606,10 +3668,10 @@
           '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
           '</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="quick"><div class="route-kicker">Сценарий</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Клиент вводит вопрос, а обращение сразу уходит менеджеру.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="wholesale"><div class="route-kicker">Сценарий</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Обращение по оптовым ценам и карте клиента сразу уходит как отдельный тип заявки.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="product"><div class="route-kicker">Сценарий</div><div class="route-title">Подбор товара</div><div class="route-copy">Менеджер получит сообщение с текущим разделом каталога или товарной логикой.</div></button>' +
-          '<button class="route-btn" data-action="show-service"><div class="route-kicker">Сценарий</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Отдельная точка для гарантийных вопросов и сопровождения заказа.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="quick"><div class="route-kicker">Обращение</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Оставьте короткое сообщение, и менеджер получит запрос напрямую из приложения.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Отправьте запрос по оптовым ценам, объекту или подтверждению карты клиента.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="product"><div class="route-kicker">Подбор</div><div class="route-title">Подобрать товар</div><div class="route-copy">Передайте менеджеру задачу по товару или разделу каталога без выхода из приложения.</div></button>' +
+          '<button class="route-btn" data-action="show-service"><div class="route-kicker">Сервис</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Если вопрос связан с гарантией, диагностикой или заказом, откройте отдельный раздел.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что доступно</div>' +
@@ -3623,7 +3685,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Менеджер", "Telegram, WhatsApp и обращения из каталога", "📞", "👁 сценарии связи");
+        setHeader("Менеджер", "Telegram, WhatsApp и обращения из каталога", "⋯", "");
       }
 
       function renderService() {
@@ -3634,9 +3696,9 @@
           '<div class="post-date">⚙️ Гарантийный сервис</div>' +
           '<div class="post-copy">Здесь можно быстро выбрать тип сервисного обращения: гарантия, сверка по заказу или вопрос по уже купленному оборудованию. Заявка сразу уходит менеджеру.</div>' +
           '<div class="route-grid">' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Сообщите о проблеме по прибору, чтобы менеджер помог с гарантией и дальнейшими шагами.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="order"><div class="route-kicker">Сервис</div><div class="route-title">Проверка заказа</div><div class="route-copy">Уточните отгрузку, комплектность, документы или текущий статус заказа.</div></button>' +
-          '<button class="route-btn" data-action="submit-request" data-request-type="service"><div class="route-kicker">Сервис</div><div class="route-title">Диагностика</div><div class="route-copy">Опишите модель и вопрос, чтобы менеджер подсказал решение.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="service"><div class="route-kicker">Гарантия</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Опишите проблему по прибору, чтобы менеджер помог с гарантией и следующими шагами.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="order"><div class="route-kicker">Заказ</div><div class="route-title">Проверка заказа</div><div class="route-copy">Уточните комплектность, документы, отгрузку или текущий статус заказа.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="service"><div class="route-kicker">Диагностика</div><div class="route-title">Технический вопрос</div><div class="route-copy">Опишите модель и проблему, чтобы менеджер помог с диагностикой и решением.</div></button>' +
           '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Связь</div><div class="route-title">Менеджер</div><div class="route-copy">Открыть все каналы связи и отправить обращение напрямую.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
@@ -3657,7 +3719,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Гарантийный сервис", "Заявки по гарантии и сопровождению заказа", "⚙️", "👁 сервис и гарантия");
+        setHeader("Гарантийный сервис", "Заявки по гарантии и сопровождению заказа", "⋯", "");
       }
 
       function renderDelivery() {
@@ -3691,7 +3753,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Доставка", "Получение заказа и связь по отгрузке", "🚚", "👁 доставка по России");
+        setHeader("Доставка", "Получение заказа и связь по отгрузке", "⋯", "");
       }
 
       function renderSite() {
@@ -3724,7 +3786,36 @@
           '</div>' +
           '</article>';
 
-        setHeader("Сайт", "Полный каталог и расширенные карточки товаров", "🌐", "👁 сайт и каталог");
+        setHeader("Сайт", "Полный каталог и расширенные карточки товаров", "⋯", "");
+      }
+
+      function renderRequestForm() {
+        const draft = state.requestDraft || requestMeta("quick");
+        screenRoot.innerHTML =
+          '<article class="post">' +
+          '<div class="post-body">' +
+          '<div class="post-name">Счетчики Юг</div>' +
+          '<div class="post-date">📝 ' + escapeHtml(draft.title || "Обращение менеджеру") + '</div>' +
+          '<div class="post-copy">' + escapeHtml(draft.description || "Опишите вопрос, и менеджер получит обращение напрямую из приложения.") + '</div>' +
+          '<div class="mini-card form-shell">' +
+          '<div class="form-section-title">Сообщение менеджеру</div>' +
+          '<div class="form-section-copy">Заявка уйдет в CRM как обращение из Telegram Mini App. При необходимости менеджер свяжется с вами по указанным контактам.</div>' +
+          '<div class="form-grid" data-request-form="true">' +
+          '<label class="form-field full"><span class="form-label">Тема обращения</span><input class="form-input" data-request-title type="text" value="' + escapeHtml(draft.title || "Обращение") + '" readonly></label>' +
+          '<label class="form-field full"><span class="form-label">Комментарий</span><textarea class="form-textarea" data-request-message placeholder="Опишите, что нужно менеджеру">' + escapeHtml(draft.message || "") + '</textarea></label>' +
+          '</div>' +
+          '<div class="form-help">Если вопрос связан с товаром, разделом каталога или картой клиента, менеджер увидит это вместе с обращением.</div>' +
+          '<div class="inline-grid">' +
+          '<button class="inline-btn primary" data-action="submit-request-form">✅ Отправить</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+          '<button class="inline-btn" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+
+        setHeader(draft.title || "Обращение менеджеру", "Отправка запроса менеджеру", "⋯", "");
       }
 
       function renderFindUs() {
@@ -3929,6 +4020,7 @@
         if (screen === "service") renderService();
         if (screen === "delivery") renderDelivery();
         if (screen === "site") renderSite();
+        if (screen === "request-form") renderRequestForm();
         if (screen === "sync") renderSync();
         if (screen === "find") renderFindUs();
         if (screen === "messengers") renderMessengers();
@@ -4050,6 +4142,10 @@
         if (action === "show-messengers") openScreen("messengers");
         if (action === "sync") openScreen("sync");
         if (action === "show-stock") openScreen("stock");
+        if (action === "open-request-form") {
+          openRequestForm(actionBtn.getAttribute("data-request-type") || "quick");
+          return;
+        }
         if (action === "open-site-account") {
           openExternal(customerAccountUrl());
           return;
@@ -4118,6 +4214,12 @@
           submitCardRegistration();
           return;
         }
+        if (action === "submit-request-form") {
+          const messageField = screenRoot.querySelector("[data-request-message]");
+          const message = messageField ? messageField.value.trim() : "";
+          submitManagerRequest(state.requestDraft.type || "quick", message);
+          return;
+        }
         if (action === "submit-request") {
           submitManagerRequest(actionBtn.getAttribute("data-request-type") || "quick");
           return;
@@ -4142,7 +4244,7 @@
 
       backButton.addEventListener("click", goBack);
       shareButton.addEventListener("click", shareCurrentScreen);
-      pillRight.addEventListener("click", toggleSound);
+      pillRight.addEventListener("click", shareCurrentScreen);
       soundToggle.addEventListener("click", toggleSound);
       document.getElementById("giftButton").addEventListener("click", () => openScreen("home"));
       document.getElementById("upButton").addEventListener("click", () => contentRoot.scrollTo({ top: 0, behavior: "smooth" }));
