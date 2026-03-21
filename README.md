@@ -49,6 +49,23 @@ If `BITRIX24_WEBHOOK` is missing, `customer_api.py` now starts in `local_preview
 
 If smart-process items are empty, `sync_backend/main.py` can publish fallback storefront data from `output/storefront.test.json` so Mini App preview stays populated while Bitrix24 content is being prepared.
 
+## Mini App wholesale card flow
+
+The production path for wholesale card registration is now:
+
+- `Mini App -> customer_api.py -> site endpoint -> Bitrix24 -> card status in Mini App`
+
+Mini App backend supports these env vars:
+
+```text
+SITE_WHOLESALE_SYNC_API_URL=https://xn----7sbhjpnneqb.xn--p1ai/local/api/telegram-miniapp-wholesale-register.php
+SITE_WHOLESALE_SYNC_API_TOKEN=CHANGE_ME_STRONG_SECRET
+```
+
+The deployment checklist for this flow is stored in:
+
+- [MINIAPP_WHOLESALE_CARD_DEPLOY_CHECKLIST.md](/Users/igor_itmail.ru/Documents/ТГ счетчики юг/knowledge-base/launch/MINIAPP_WHOLESALE_CARD_DEPLOY_CHECKLIST.md)
+
 ## Restored API syncs
 
 The backend now covers these directions:

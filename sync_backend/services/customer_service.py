@@ -62,6 +62,10 @@ class CustomerService:
 
         site_sync = self._sync_registration_to_site(payload, contact_id=contact_id, company_id=company_id, card_id=card_id)
         context = self.get_customer_context(contact_id=contact_id)
+        if site_sync.get("ok"):
+            message = "Карта зарегистрирована. Заявка отправлена на проверку менеджеру"
+        else:
+            message = "Карта создана в CRM. Сайтовая регистрация ожидает синхронизацию, менеджер видит заявку"
         return {
             "ok": True,
             "action": action,
@@ -73,7 +77,7 @@ class CustomerService:
             "approval_status": context["approval_status"],
             "card_status": context["card_status"],
             "allowed_price_type": context["allowed_price_type"],
-            "message": "Карта зарегистрирована. Заявка отправлена на проверку менеджеру",
+            "message": message,
         }
 
     def get_customer_context(

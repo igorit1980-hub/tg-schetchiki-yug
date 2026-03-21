@@ -2497,6 +2497,10 @@
           }
           await refreshCustomerState();
           openScreen("card", false);
+          if (response.site_sync && response.site_sync.ok === false) {
+            notifyTelegram((response.message || "Заявка отправлена") + ". Сайт будет подключен после выкладки endpoint.");
+            return;
+          }
           notifyTelegram(response.message || "Заявка отправлена");
         } catch (error) {
           notifyTelegram("Не удалось зарегистрировать карту: " + error.message);
