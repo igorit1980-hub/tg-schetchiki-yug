@@ -402,7 +402,7 @@ Then:
 - refine weak points
 
 Then:
-- GitHub migration for Mini App
+- move Mini App into the main repository workflow
 - Telegram bot
 - Mini App integration
 
@@ -418,7 +418,7 @@ Correct future flow:
 
 ## Recommended next project steps after the channel
 
-1. Transfer Mini App project to GitHub
+1. Move Mini App project into the main repository
 2. Replace `prompt()` flows with proper forms in the Mini App
 3. Improve catalog UI
 4. Improve customer card UI

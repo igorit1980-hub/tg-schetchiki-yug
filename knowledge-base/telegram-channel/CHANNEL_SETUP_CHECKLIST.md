@@ -126,7 +126,7 @@
 
 ## Project next steps after channel
 
-- Move Mini App project into GitHub workflow if needed
+- Move Mini App project into the main repository workflow if needed
 - Continue Mini App development
 - Replace `prompt()` flows with forms
 - Improve catalog UI

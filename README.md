@@ -87,7 +87,7 @@ The backend now covers these directions:
 - `knowledge-base/bitrix24-first-items-checklist.md` - checklist for the first test records in Bitrix24
 - `knowledge-base/launch/BOT_LAUNCH_CHECKLIST.md` - BotFather and local bot startup checklist
 
-## Notes for GitHub
+## Notes for the repository
 
 - The repository does not store production secrets.
 - Generated output file `output/storefront.json` is ignored.

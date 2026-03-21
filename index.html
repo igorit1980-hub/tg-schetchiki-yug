@@ -1205,6 +1205,88 @@
         border-color: rgba(52, 176, 218, 0.2);
       }
 
+      .promo-stack {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .promo-item {
+        padding: 14px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at top right, rgba(225, 111, 84, 0.12), transparent 26%),
+          rgba(16, 16, 16, 0.96);
+        border: 1px solid rgba(225, 111, 84, 0.2);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+      }
+
+      .promo-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .promo-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(225, 111, 84, 0.12);
+        color: #ffb29f;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .promo-stock {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 11px;
+      }
+
+      .promo-item-title {
+        margin-top: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.24;
+      }
+
+      .promo-prices {
+        margin-top: 8px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .promo-old-price {
+        color: rgba(255, 255, 255, 0.42);
+        font-size: 13px;
+        text-decoration: line-through;
+      }
+
+      .promo-price {
+        color: #ffb29f;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .promo-copy {
+        margin-top: 7px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12.5px;
+        line-height: 1.34;
+      }
+
+      .promo-actions {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
       .feed-top {
         display: flex;
         align-items: center;
@@ -2936,13 +3018,41 @@
         const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
         const useDemoStorefront = fallbackActive || !state.backend.connected;
         const liveItems = (useDemoStorefront ? fallbackPromotionItems() : state.storefront.promotions).slice(0, 10);
-        const liveList = liveItems
+        const promoCards = liveItems
           .map((item) => {
-            const retailPrice = item.old_price ? formatPrice(item.old_price, "RUB") : "—";
+            const title = item.promo_title || item.product_name || "Акция";
+            const category = (item.category || "Акция").split("/")[0].trim();
+            const retailPrice = item.old_price ? formatPrice(item.old_price, "RUB") : null;
             const promoPrice = formatPrice(item.price, "RUB");
-            return escapeHtml((item.promo_title || item.product_name || "Акция") + " — старая цена " + retailPrice + " / акция " + promoPrice);
+            const promoCopy = item.promo_text
+              ? escapeHtml(item.promo_text)
+              : "Выгодная цена из витрины. Можно открыть каталог и продолжить выбор.";
+            const productUrl = item.url ? escapeHtml(item.url) : "";
+            const stockLabel = Number.isFinite(Number(item.stock))
+              ? "Остаток: " + escapeHtml(String(item.stock))
+              : "Позиция в витрине";
+            return (
+              '<div class="promo-item">' +
+              '<div class="promo-item-top">' +
+              '<div class="promo-badge">' + escapeHtml(category) + '</div>' +
+              '<div class="promo-stock">' + stockLabel + '</div>' +
+              '</div>' +
+              '<div class="promo-item-title">' + escapeHtml(title) + '</div>' +
+              '<div class="promo-prices">' +
+              (retailPrice ? '<div class="promo-old-price">' + escapeHtml(retailPrice) + "</div>" : "") +
+              '<div class="promo-price">' + escapeHtml(promoPrice) + "</div>" +
+              '</div>' +
+              '<div class="promo-copy">' + promoCopy + '</div>' +
+              '<div class="promo-actions">' +
+              (productUrl
+                ? '<button class="inline-btn primary" data-action="open-url" data-url="' + productUrl + '">🌐 Открыть товар</button>'
+                : '<button class="inline-btn primary" data-action="open-root-catalog">📦 Выбрать по акции</button>') +
+              '<button class="inline-btn" data-action="show-manager">📞 Уточнить резерв</button>' +
+              '</div>' +
+              '</div>'
+            );
           })
-          .join("\\n");
+          .join("");
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
@@ -2950,36 +3060,40 @@
           '<div class="post-date">🔥 Акции</div>' +
           '<div class="post-copy">' +
           (liveItems.length
-            ? "Здесь собраны актуальные предложения витрины. Можно быстро сравнить старую и текущую цену, а потом перейти в каталог или уточнить резерв."
-            : "Здесь собираются временные предложения по товарам, которые выделены как акции в витрине.") +
+            ? "Здесь собраны актуальные предложения витрины. Выберите нужную позицию, откройте товар или сразу уточните резерв."
+            : "Здесь будут собираться временные предложения по товарам, которые выделены как акции в витрине.") +
           "</div>" +
-          '<div class="list-text">' +
-          (liveItems.length
-            ? 'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' + liveList
-            : 'АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ\\n' +
-              'ЭКО НОМ СВ 15-110 — старая цена 1 850 ₽ / акция 1 690 ₽\\n' +
-              'БЕТАР СГВ-15 — старая цена 1 690 ₽ / акция 1 540 ₽\\n' +
-              'Vector G4 — старая цена 2 950 ₽ / акция 2 790 ₽') +
+          '<div class="promo-stack">' +
+          (promoCards ||
+            '<div class="promo-item">' +
+            '<div class="promo-item-top"><div class="promo-badge">Акции</div><div class="promo-stock">Ожидаем публикацию</div></div>' +
+            '<div class="promo-item-title">Витрина акций пока пуста</div>' +
+            '<div class="promo-copy">Как только менеджер отметит товары как акционные, они появятся здесь отдельными карточками.</div>' +
+            '<div class="promo-actions">' +
+            '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть каталог</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+            '</div>' +
+            '</div>') +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• посмотреть текущую акционную цену</div>' +
-          '<div>• перейти в каталог и продолжить выбор</div>' +
-          '<div>• уточнить резерв или наличие по акции</div>' +
-          '<div>• сравнить акции с хитами продаж</div>' +
+          '<div>• открыть товар по акции</div>' +
+          '<div>• сравнить цену с обычным каталогом</div>' +
+          '<div>• уточнить резерв или наличие</div>' +
+          '<div>• перейти в хиты продаж и сравнить позиции</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Смотреть каталог</button>' +
-          '<button class="inline-btn" data-action="show-manager">📞 Уточнить цену</button>' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Каталог</button>' +
           '<button class="inline-btn" data-action="show-popular">⭐ Хиты продаж</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
           '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
           '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Акции", "Текущие предложения и быстрый переход в каталог", "🔥", "👁 акции");
+        setHeader("Акции", "Выгодные позиции витрины", "🔥", "");
       }
 
       function renderContent() {
@@ -3944,6 +4058,11 @@
           const key = actionBtn.getAttribute("data-site-url");
           if (key === "catalog") openExternal(catalogSiteUrl());
           else openExternal(LOCATION_INFO.contactsPage);
+          return;
+        }
+        if (action === "open-url") {
+          const url = actionBtn.getAttribute("data-url");
+          if (url) openExternal(url);
           return;
         }
         if (action === "open-telegram-link") {
