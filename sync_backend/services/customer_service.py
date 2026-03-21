@@ -268,16 +268,25 @@ class CustomerService:
             "company_id": company_id,
             "client_card_id": card_id,
             "source": payload.source.strip() or "telegram",
+            "comment": payload.comment.strip(),
         }
         try:
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "Accept": "application/json",
+            }
+            if self.config.site_wholesale_sync_api_token:
+                headers["X-Api-Key"] = self.config.site_wholesale_sync_api_token
             request = Request(
                 self.config.site_wholesale_sync_api_url,
                 data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
-                headers={"Content-Type": "application/json; charset=utf-8", "Accept": "application/json"},
+                headers=headers,
                 method="POST",
             )
             with urlopen(request, timeout=20) as response:
                 data = json.loads(response.read().decode("utf-8"))
+            if isinstance(data, dict) and data.get("ok") is False:
+                return {"ok": False, "mode": "api", "response": data, "reason": data.get("message") or data.get("error")}
             return {"ok": True, "mode": "api", "response": data}
         except Exception as exc:
             return {"ok": False, "mode": "api", "reason": str(exc)}

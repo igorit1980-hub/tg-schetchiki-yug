@@ -2334,7 +2334,10 @@
 
       async function refreshCustomerState() {
         const identity = telegramIdentity();
-        const query = new URLSearchParams({ telegram_user_id: identity.userId });
+        const query = new URLSearchParams();
+        if (identity.userId) query.set("telegram_user_id", identity.userId);
+        const phone = (state.profileDraft.phone || "").trim();
+        if (phone) query.set("phone", phone);
         const context = await apiJson("/api/telegram/customer/status?" + query.toString());
         state.customerContext = context;
         state.cardStatus = deriveCardStatus(context);
@@ -2489,6 +2492,9 @@
               source: "telegram-channel-schetchiki-yug",
             }),
           });
+          if (response.customer_state === "pending_review") {
+            state.cardStatus = "pending";
+          }
           await refreshCustomerState();
           openScreen("card", false);
           notifyTelegram(response.message || "Заявка отправлена");
