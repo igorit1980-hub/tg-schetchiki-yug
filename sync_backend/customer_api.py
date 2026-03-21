@@ -36,20 +36,43 @@ def run() -> int:
         method = environ["REQUEST_METHOD"].upper()
         parsed = urlparse(environ.get("PATH_INFO", ""))
         path = parsed.path
+        origin = environ.get("HTTP_ORIGIN", "").strip()
+        request_private_network = environ.get("HTTP_ACCESS_CONTROL_REQUEST_PRIVATE_NETWORK", "").strip().lower() == "true"
         try:
+            if method == "OPTIONS":
+                return _respond(
+                    start_response,
+                    200,
+                    {"ok": True, "preflight": True},
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
+
             if method == "POST" and path == "/api/telegram/customer/register":
                 body_size = int(environ.get("CONTENT_LENGTH") or 0)
                 raw = environ["wsgi.input"].read(body_size) if body_size > 0 else b"{}"
                 payload = json.loads(raw.decode("utf-8"))
                 response = service.register_customer(_registration_payload_from_json(payload))
-                return _respond(start_response, 200 if response.get("ok") else 400, response)
+                return _respond(
+                    start_response,
+                    200 if response.get("ok") else 400,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "POST" and path == "/api/telegram/request":
                 body_size = int(environ.get("CONTENT_LENGTH") or 0)
                 raw = environ["wsgi.input"].read(body_size) if body_size > 0 else b"{}"
                 payload = json.loads(raw.decode("utf-8"))
                 response = request_service.submit_request(_request_payload_from_json(payload))
-                return _respond(start_response, 200 if response.get("ok") else 400, response)
+                return _respond(
+                    start_response,
+                    200 if response.get("ok") else 400,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "GET" and path == "/api/telegram/customer/status":
                 params = parse_qs(environ.get("QUERY_STRING", ""))
@@ -58,7 +81,13 @@ def run() -> int:
                     telegram_user_id=_single(params, "telegram_user_id"),
                     contact_id=_int_or_none(_single(params, "contact_id")),
                 )
-                return _respond(start_response, 200 if response.get("ok") else 404, response)
+                return _respond(
+                    start_response,
+                    200 if response.get("ok") else 404,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "GET" and path == "/api/telegram/customer/card":
                 params = parse_qs(environ.get("QUERY_STRING", ""))
@@ -67,7 +96,13 @@ def run() -> int:
                     telegram_user_id=_single(params, "telegram_user_id"),
                     contact_id=_int_or_none(_single(params, "contact_id")),
                 )
-                return _respond(start_response, 200 if response.get("ok") else 404, response)
+                return _respond(
+                    start_response,
+                    200 if response.get("ok") else 404,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "GET" and path == "/api/telegram/customer/resolve":
                 params = parse_qs(environ.get("QUERY_STRING", ""))
@@ -75,7 +110,13 @@ def run() -> int:
                     card_id=_single(params, "card_id"),
                     qr_payload=_single(params, "qr_payload"),
                 )
-                return _respond(start_response, 200 if response.get("ok") else 404, response)
+                return _respond(
+                    start_response,
+                    200 if response.get("ok") else 404,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "GET" and path == "/api/telegram/storefront":
                 if not config.output_path.exists():
@@ -83,10 +124,18 @@ def run() -> int:
                         start_response,
                         404,
                         {"ok": False, "error_code": "STOREFRONT_NOT_FOUND", "path": str(config.output_path)},
+                        origin=origin,
+                        request_private_network=request_private_network,
                     )
                 response = json.loads(config.output_path.read_text(encoding="utf-8"))
                 response["ok"] = True
-                return _respond(start_response, 200, response)
+                return _respond(
+                    start_response,
+                    200,
+                    response,
+                    origin=origin,
+                    request_private_network=request_private_network,
+                )
 
             if method == "GET" and path == "/api/telegram/catalog":
                 catalog_path = config.local_catalog_path
@@ -95,6 +144,8 @@ def run() -> int:
                         start_response,
                         404,
                         {"ok": False, "error_code": "CATALOG_NOT_FOUND", "path": str(catalog_path)},
+                        origin=origin,
+                        request_private_network=request_private_network,
                     )
                 catalog_payload = json.loads(catalog_path.read_text(encoding="utf-8"))
                 return _respond(
@@ -106,6 +157,8 @@ def run() -> int:
                         "catalog_path": str(catalog_path),
                         "items": catalog_payload,
                     },
+                    origin=origin,
+                    request_private_network=request_private_network,
                 )
 
             if method == "GET" and path == "/api/health":
@@ -155,9 +208,17 @@ def run() -> int:
                             },
                         },
                     },
+                    origin=origin,
+                    request_private_network=request_private_network,
                 )
 
-            return _respond(start_response, 404, {"ok": False, "error_code": "NOT_FOUND"})
+            return _respond(
+                start_response,
+                404,
+                {"ok": False, "error_code": "NOT_FOUND"},
+                origin=origin,
+                request_private_network=request_private_network,
+            )
         except Bitrix24UnavailableError as exc:
             logger.warning("customer_api_bitrix_unavailable path=%s error=%s", path, exc)
             return _respond(
@@ -168,10 +229,18 @@ def run() -> int:
                     "error_code": "CRM_UNAVAILABLE",
                     "message": "Bitrix24 временно недоступен. Регистрация карты будет доступна после восстановления CRM.",
                 },
+                origin=origin,
+                request_private_network=request_private_network,
             )
         except Exception as exc:
             logger.exception("customer_api_error path=%s error=%s", path, exc)
-            return _respond(start_response, 500, {"ok": False, "error_code": "INTERNAL_ERROR"})
+            return _respond(
+                start_response,
+                500,
+                {"ok": False, "error_code": "INTERNAL_ERROR"},
+                origin=origin,
+                request_private_network=request_private_network,
+            )
 
     logger.info("customer_api_started host=%s port=%s", config.customer_api_host, config.customer_api_port)
     with make_server(config.customer_api_host, config.customer_api_port, app) as server:
@@ -228,7 +297,7 @@ def _int_or_none(value: str):
     return int(value)
 
 
-def _respond(start_response, status_code: int, payload: dict):
+def _respond(start_response, status_code: int, payload: dict, *, origin: str = "", request_private_network: bool = False):
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     status_text = {
         200: "200 OK",
@@ -237,13 +306,21 @@ def _respond(start_response, status_code: int, payload: dict):
         500: "500 Internal Server Error",
         503: "503 Service Unavailable",
     }.get(status_code, f"{status_code} OK")
-    start_response(
-        status_text,
-        [
-            ("Content-Type", "application/json; charset=utf-8"),
-            ("Content-Length", str(len(body))),
-        ],
-    )
+    response_origin = origin or "*"
+    headers = [
+        ("Content-Type", "application/json; charset=utf-8"),
+        ("Content-Length", str(len(body))),
+        ("Access-Control-Allow-Origin", response_origin),
+        ("Access-Control-Allow-Methods", "GET, POST, OPTIONS"),
+        ("Access-Control-Allow-Headers", "Content-Type, X-Api-Key"),
+        ("Access-Control-Max-Age", "86400"),
+        ("Vary", "Origin"),
+    ]
+    if response_origin != "*":
+        headers.append(("Access-Control-Allow-Credentials", "true"))
+    if request_private_network:
+        headers.append(("Access-Control-Allow-Private-Network", "true"))
+    start_response(status_text, headers)
     return [body]
 
 
