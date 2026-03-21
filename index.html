@@ -1287,6 +1287,75 @@
         gap: 8px;
       }
 
+      .popular-stack {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .popular-item {
+        padding: 14px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at top right, rgba(73, 201, 137, 0.1), transparent 26%),
+          rgba(16, 16, 16, 0.96);
+        border: 1px solid rgba(73, 201, 137, 0.18);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+      }
+
+      .popular-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .popular-rank {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(73, 201, 137, 0.12);
+        color: #9ce2b9;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .popular-stock {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 11px;
+      }
+
+      .popular-item-title {
+        margin-top: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.24;
+      }
+
+      .popular-price {
+        margin-top: 8px;
+        color: #9ce2b9;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .popular-copy {
+        margin-top: 7px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12.5px;
+        line-height: 1.34;
+      }
+
+      .popular-actions {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
       .feed-top {
         display: flex;
         align-items: center;
@@ -3030,13 +3099,28 @@
         const fallbackActive = Boolean(state.backend.health && state.backend.health.fallback_mode && state.backend.health.fallback_mode.active);
         const useDemoStorefront = fallbackActive || !state.backend.connected;
         const liveItems = (useDemoStorefront ? fallbackPopularItems() : state.storefront.popular_products).slice(0, 10);
-        const liveList = liveItems
+        const popularCards = liveItems
           .map((item) => {
             const price = formatPrice(item.price, "RUB");
-            const suffix = item.stock > 0 ? " · в наличии" : " · под заказ";
-            return escapeHtml((item.product_name || item.title || "Товар") + " — " + price + suffix);
+            const stockText = Number(item.stock) > 0 ? "В наличии: " + escapeHtml(String(item.stock)) : "Под заказ";
+            const title = item.product_name || item.title || "Товар";
+            return (
+              '<div class="popular-item">' +
+              '<div class="popular-item-top">' +
+              '<div class="popular-rank">Хит витрины</div>' +
+              '<div class="popular-stock">' + stockText + '</div>' +
+              '</div>' +
+              '<div class="popular-item-title">' + escapeHtml(title) + '</div>' +
+              '<div class="popular-price">' + escapeHtml(price) + '</div>' +
+              '<div class="popular-copy">Ходовая позиция из текущей витрины. Можно перейти в каталог или сразу связаться с менеджером.</div>' +
+              '<div class="popular-actions">' +
+              '<button class="inline-btn primary" data-action="open-root-catalog">📦 Выбрать в каталоге</button>' +
+              '<button class="inline-btn" data-action="show-manager">📞 Уточнить наличие</button>' +
+              '</div>' +
+              '</div>'
+            );
           })
-          .join("\\n");
+          .join("");
         screenRoot.innerHTML =
           '<article class="post">' +
           '<div class="post-body">' +
@@ -3044,36 +3128,40 @@
           '<div class="post-date">📦 Популярные товары</div>' +
           '<div class="post-copy">' +
           (liveItems.length
-            ? "Здесь собраны актуальные ходовые позиции из текущей витрины."
-            : "Здесь показываются самые востребованные позиции канала. Как только витрина обновится, блок подхватит свежую подборку.") +
+            ? "Здесь собраны ходовые позиции витрины. Откройте каталог, сравните цены и уточните наличие у менеджера."
+            : "Здесь будут появляться самые востребованные позиции витрины, которые менеджер выделяет как хиты.") +
           "</div>" +
-          '<div class="list-text">' +
-          (liveItems.length
-            ? 'ТОП ПО СПРОСУ\\n' + liveList
-            : 'ТОП ПО СПРОСУ\\n' +
-              'ЭКО НОМ СВ 15-110 — ' + (hasWholesaleAccess() ? '1 690 ₽' : '1 850 ₽') + '\\n' +
-              'БЕТАР СГВ-15 — ' + (hasWholesaleAccess() ? '1 540 ₽' : '1 690 ₽') + '\\n' +
-              'Газовый счетчик Вектор G4 — ' + (hasWholesaleAccess() ? '2 700 ₽' : '2 950 ₽') + '\\n' +
-              'Манометр МП50 0–6 бар — ' + (hasWholesaleAccess() ? '320 ₽' : '350 ₽')) +
+          '<div class="popular-stack">' +
+          (popularCards ||
+            '<div class="popular-item">' +
+            '<div class="popular-item-top"><div class="popular-rank">Хиты</div><div class="popular-stock">Ожидаем публикацию</div></div>' +
+            '<div class="popular-item-title">Хиты витрины пока не опубликованы</div>' +
+            '<div class="popular-copy">Как только менеджер выделит ходовые позиции, они появятся здесь отдельными карточками.</div>' +
+            '<div class="popular-actions">' +
+            '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть каталог</button>' +
+            '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
+            '</div>' +
+            '</div>') +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Логика блока</div>' +
+          '<div class="mini-title">Что можно сделать здесь</div>' +
           '<div class="mini-list">' +
-          '<div>• товары попадают сюда из Битрикс24 как отдельная витрина</div>' +
-          '<div>• клиент переходит из популярных товаров сразу в каталог или к менеджеру</div>' +
-          '<div>• блок должен обновляться без ручной правки Telegram-поста</div>' +
+          '<div>• посмотреть самые востребованные позиции</div>' +
+          '<div>• перейти в каталог и продолжить выбор</div>' +
+          '<div>• уточнить наличие и резерв</div>' +
+          '<div>• сравнить хиты с текущими акциями</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
-          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Открыть каталог</button>' +
-          '<button class="inline-btn" data-action="show-manager">📞 Связаться с менеджером</button>' +
+          '<button class="inline-btn primary" data-action="open-root-catalog">📦 Каталог</button>' +
+          '<button class="inline-btn" data-action="show-promotions">🔥 Акции</button>' +
+          '<button class="inline-btn" data-action="show-manager">📞 Менеджер</button>' +
           '<button class="inline-btn" data-action="show-card">💳 Карта клиента</button>' +
-          '<button class="inline-btn" data-action="sync">🔄 Битрикс24</button>' +
           '</div>' +
           '</div>' +
           '</article>';
 
-        setHeader("Популярные товары", "Блок автоподборки ходовых позиций", "📦", "👁 популярные");
+        setHeader("Популярные товары", "Ходовые позиции витрины", "⋯", "");
       }
 
       function renderPromotions() {
