@@ -58,13 +58,20 @@ The production path for wholesale card registration is now:
 Mini App backend supports these env vars:
 
 ```text
-SITE_WHOLESALE_SYNC_API_URL=https://xn----7sbhjpnneqb.xn--p1ai/local/api/telegram-miniapp-wholesale-register.php
+SITE_WHOLESALE_SYNC_API_URL=https://xn----ftbemal0cj7bc5f.xn--p1ai/local/api/telegram-miniapp-wholesale-register.php
 SITE_WHOLESALE_SYNC_API_TOKEN=CHANGE_ME_STRONG_SECRET
 ```
 
 The deployment checklist for this flow is stored in:
 
 - [MINIAPP_WHOLESALE_CARD_DEPLOY_CHECKLIST.md](/Users/igor_itmail.ru/Documents/ТГ счетчики юг/knowledge-base/launch/MINIAPP_WHOLESALE_CARD_DEPLOY_CHECKLIST.md)
+
+Current live state:
+
+- card registration already creates a contact in Bitrix24
+- the card gets an id like `SY-XXXXXX`
+- Mini App can already show `pending_review` via backend fallback state even if `UF_CRM_*` fields are not created yet
+- full site sync still depends on the production endpoint `/local/api/telegram-miniapp-wholesale-register.php` returning `200 OK` instead of `404`
 
 ## Restored API syncs
 

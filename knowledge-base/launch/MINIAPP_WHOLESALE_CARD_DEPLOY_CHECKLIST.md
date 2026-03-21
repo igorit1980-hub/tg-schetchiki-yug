@@ -8,6 +8,11 @@
 - backend умеет отправлять регистрацию на сайт через:
   - `SITE_WHOLESALE_SYNC_API_URL`
   - `SITE_WHOLESALE_SYNC_API_TOKEN`
+- если в Bitrix24 еще нет кастомных полей `UF_CRM_*`, backend использует fallback:
+  - ищет клиента по обычному телефону
+  - создает контакт в CRM стандартными полями
+  - хранит статус карты в `output/customer_cards_state.json`
+  - это убирает ложные `DUPLICATE_CONTACT` и дает Mini App показать `На проверке`
 - на сайте подготовлен endpoint:
   - `/local/api/telegram-miniapp-wholesale-register.php`
 - endpoint создает результат формы `OPTOVIKI` (`WEB_FORM_ID = 11`)
@@ -45,7 +50,7 @@ return [
 В [`.env`](/Users/igor_itmail.ru/Documents/ТГ счетчики юг/.env) указать:
 
 ```text
-SITE_WHOLESALE_SYNC_API_URL=https://xn----7sbhjpnneqb.xn--p1ai/local/api/telegram-miniapp-wholesale-register.php
+SITE_WHOLESALE_SYNC_API_URL=https://xn----ftbemal0cj7bc5f.xn--p1ai/local/api/telegram-miniapp-wholesale-register.php
 SITE_WHOLESALE_SYNC_API_TOKEN=CHANGE_ME_STRONG_SECRET
 ```
 
@@ -127,3 +132,10 @@ python3 sync_backend/customer_api.py
 - `BITRIX_RUNTIME_NOT_FOUND`
 
 Это ожидаемо для текущей локальной copy и не означает, что endpoint написан неправильно. Полноценная проверка возможна только после выкладки на боевой сайт.
+
+## 9. Что уже подтверждено живым тестом
+
+- регистрация карты создает контакт в Bitrix24
+- карта получает номер вида `SY-XXXXXX`
+- статус в Mini App переходит в `На проверке`
+- текущий блокер полного пути `Mini App -> сайт`: боевой endpoint сайта сейчас отвечает `HTTP 404 Not Found`

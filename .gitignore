@@ -8,3 +8,4 @@ venv/
 output/storefront.json
 output/storefront.diagnostics.json
 output/preview_state.json
+output/customer_cards_state.json

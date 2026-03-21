@@ -1,6 +1,6 @@
 {
   "domain_human": "https://счетчики-юг.рф/",
-  "domain_technical": "https://xn----7sbhjpnneqb.xn--p1ai/",
+  "domain_technical": "https://xn----ftbemal0cj7bc5f.xn--p1ai/",
   "preferred_lookup_endpoint": "/api/catalog/by-xml-id?xml_id={xmlId}",
   "fallback_local_sources": [
     "/Users/igor_itmail.ru/Documents/ТГ счетчики юг/catalog_real.json",

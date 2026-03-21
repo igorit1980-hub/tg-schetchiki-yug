@@ -61,6 +61,7 @@ class AppConfig:
     popular_products: EntityConfig
     promotions: EntityConfig
     local_catalog_path: Path
+    customer_state_path: Path
     customer_fields: Dict[str, str]
 
 
@@ -162,5 +163,11 @@ def load_config() -> AppConfig:
             active_stage_id=bitrix["entities"]["promotions"]["active_stage_id"],
         ),
         local_catalog_path=BASE_DIR / "catalog_priced.json",
+        customer_state_path=Path(
+            os.environ.get(
+                "CUSTOMER_STATE_PATH",
+                str(BASE_DIR / "output" / "customer_cards_state.json"),
+            )
+        ),
         customer_fields=_default_customer_fields(),
     )

@@ -1,5 +1,5 @@
 {
-  "endpoint": "https://xn----7sbhjpnneqb.xn--p1ai/api/telegram/storefront.json",
+  "endpoint": "https://xn----ftbemal0cj7bc5f.xn--p1ai/api/telegram/storefront.json",
   "timezone": "Europe/Moscow",
   "format": {
     "generated_at": "ISO8601",

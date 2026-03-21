@@ -5,7 +5,7 @@
   "systems": {
     "site": {
       "role": "catalog_master",
-      "domain": "https://xn----7sbhjpnneqb.xn--p1ai/",
+      "domain": "https://xn----ftbemal0cj7bc5f.xn--p1ai/",
       "local_catalog_sources": [
         "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_real.json",
         "/Users/igor_itmail.ru/Documents/сайт насосы-юг/ТГ счетчики юг/catalog_priced.json"
@@ -43,7 +43,7 @@
     },
     "telegram": {
       "role": "consumer",
-      "entrypoint": "https://xn----7sbhjpnneqb.xn--p1ai/api/telegram/storefront.json",
+      "entrypoint": "https://xn----ftbemal0cj7bc5f.xn--p1ai/api/telegram/storefront.json",
       "required_blocks": [
         "popular_products",
         "promotions"
