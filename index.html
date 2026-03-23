@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
     <style>
       :root {
-        color-scheme: dark;
+        color-scheme: dark light;
         --bg: #000;
         --bg-soft: #0a0a0a;
         --card: rgba(18, 18, 18, 0.98);
@@ -2632,20 +2632,55 @@
         openScreen("request-form");
       }
 
+      function parseThemeColor(value) {
+        if (!value || typeof value !== "string") return null;
+        const color = value.trim();
+        const hex = color.startsWith("#") ? color.slice(1) : color;
+        if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+          const int = parseInt(hex, 16);
+          return {
+            r: (int >> 16) & 255,
+            g: (int >> 8) & 255,
+            b: int & 255,
+          };
+        }
+        const rgbMatch = color.match(/^rgba?\(([^)]+)\)$/i);
+        if (!rgbMatch) return null;
+        const parts = rgbMatch[1].split(",").map((part) => Number(part.trim()));
+        if (parts.length < 3 || parts.some((part, index) => index < 3 && Number.isNaN(part))) return null;
+        return { r: parts[0], g: parts[1], b: parts[2] };
+      }
+
+      function isLightThemeColor(value) {
+        const parsed = parseThemeColor(value);
+        if (!parsed) return false;
+        const luminance = (0.299 * parsed.r + 0.587 * parsed.g + 0.114 * parsed.b) / 255;
+        return luminance > 0.72;
+      }
+
       function applyTelegramTheme() {
         if (!telegramWebApp || !telegramWebApp.themeParams) return;
 
         const theme = telegramWebApp.themeParams;
         const root = document.documentElement;
+        const isLight = isLightThemeColor(theme.bg_color || theme.secondary_bg_color || "");
 
-        if (theme.bg_color) root.style.setProperty("--bg", theme.bg_color);
-        if (theme.secondary_bg_color) root.style.setProperty("--bg-soft", theme.secondary_bg_color);
-        if (theme.section_bg_color) root.style.setProperty("--card", theme.section_bg_color);
-        if (theme.bottom_bar_bg_color) root.style.setProperty("--card-2", theme.bottom_bar_bg_color);
-        if (theme.text_color) root.style.setProperty("--text", theme.text_color);
-        if (theme.hint_color) root.style.setProperty("--muted", theme.hint_color);
+        document.body.classList.toggle("tg-theme-light", isLight);
+        document.body.classList.toggle("tg-theme-dark", !isLight);
+
+        root.style.setProperty("--bg", "#000000");
+        root.style.setProperty("--bg-soft", "#0a0a0a");
+        root.style.setProperty("--card", "rgba(18, 18, 18, 0.98)");
+        root.style.setProperty("--card-2", "rgba(24, 24, 24, 0.98)");
+        root.style.setProperty("--text", "#f7f7f7");
+        root.style.setProperty("--muted", "rgba(255, 255, 255, 0.58)");
+        root.style.setProperty("--muted-2", "rgba(255, 255, 255, 0.38)");
+
         if (theme.link_color) root.style.setProperty("--link", theme.link_color);
-        if (theme.button_color) root.style.setProperty("--accent", theme.button_color);
+        else root.style.setProperty("--link", "#35a8ff");
+
+        if (theme.button_color && !isLightThemeColor(theme.button_color)) root.style.setProperty("--accent", theme.button_color);
+        else root.style.setProperty("--accent", "#49c989");
       }
 
       function updateViewportHeight() {
@@ -2727,9 +2762,9 @@
         telegramWebApp.expand();
 
         try {
-          if (typeof telegramWebApp.setHeaderColor === "function") telegramWebApp.setHeaderColor("bg_color");
-          if (typeof telegramWebApp.setBackgroundColor === "function" && telegramWebApp.themeParams.bg_color) {
-            telegramWebApp.setBackgroundColor(telegramWebApp.themeParams.bg_color);
+          if (typeof telegramWebApp.setHeaderColor === "function") telegramWebApp.setHeaderColor("#050505");
+          if (typeof telegramWebApp.setBackgroundColor === "function") {
+            telegramWebApp.setBackgroundColor("#050505");
           }
         } catch (error) {}
 
