@@ -1690,14 +1690,26 @@
 
       .card-summary.approved {
         border-color: rgba(73, 201, 137, 0.26);
+        background:
+          radial-gradient(circle at 92% 12%, rgba(73, 201, 137, 0.2), transparent 22%),
+          radial-gradient(circle at 6% 0%, rgba(52, 176, 218, 0.12), transparent 26%),
+          linear-gradient(180deg, rgba(17, 28, 21, 0.98), rgba(8, 12, 9, 0.98));
       }
 
       .card-summary.pending {
         border-color: rgba(255, 187, 86, 0.26);
+        background:
+          radial-gradient(circle at 92% 12%, rgba(255, 187, 86, 0.2), transparent 22%),
+          radial-gradient(circle at 6% 0%, rgba(255, 255, 255, 0.08), transparent 26%),
+          linear-gradient(180deg, rgba(30, 24, 13, 0.98), rgba(12, 10, 8, 0.98));
       }
 
       .card-summary.retail {
         border-color: rgba(52, 176, 218, 0.16);
+        background:
+          radial-gradient(circle at 92% 12%, rgba(52, 176, 218, 0.16), transparent 22%),
+          radial-gradient(circle at 6% 0%, rgba(255, 255, 255, 0.08), transparent 26%),
+          linear-gradient(180deg, rgba(13, 20, 27, 0.98), rgba(8, 11, 15, 0.98));
       }
 
       .card-summary-top {
@@ -1738,6 +1750,16 @@
         font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
+      }
+
+      .card-summary.pending .card-summary-badge {
+        background: rgba(255, 187, 86, 0.16);
+        color: #fff2cf;
+      }
+
+      .card-summary.retail .card-summary-badge {
+        background: rgba(52, 176, 218, 0.16);
+        color: #def6ff;
       }
 
       .card-summary-grid {
@@ -3674,7 +3696,7 @@
             '<div>' +
             '<div class="card-summary-kicker">Активная карта клиента</div>' +
             '<div class="card-summary-number">' + escapeHtml(currentCardNo) + '</div>' +
-            '<div class="card-summary-copy">Оптовые цены открыты, QR-код готов для магазина и ручного ввода.</div>' +
+            '<div class="card-summary-copy">Карта уже работает. QR, номер и оптовые цены готовы к использованию.</div>' +
             '</div>' +
             '<div class="card-summary-badge">Опт активен</div>' +
             '</div>' +
@@ -3683,6 +3705,10 @@
             '<div class="card-summary-cell"><div class="card-summary-label">Цены</div><div class="card-summary-value">Только оптовые</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Режим</div><div class="card-summary-value">Каталог + QR</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Синхронизация</div><div class="card-summary-value">' + escapeHtml(backendLabel()) + '</div></div>' +
+            '</div>' +
+            '<div class="journey-grid">' +
+            '<div class="journey-step"><div class="journey-icon">✅</div><div><div class="journey-title">Активный клиент</div><div class="journey-copy">Откройте каталог и используйте оптовый прайс без дополнительных действий.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🧾</div><div><div class="journey-title">Номер для магазина</div><div class="journey-copy">Покажите QR или назовите номер карты для ручного поиска.</div></div></div>' +
             '</div>' +
             '</div>' +
             '<div class="card-stage approved">' +
@@ -3729,7 +3755,7 @@
             '<div>' +
             '<div class="card-summary-kicker">Статус карты</div>' +
             '<div class="card-summary-number">На проверке</div>' +
-            '<div class="card-summary-copy">Заявка уже в системе. После синхронизации появятся номер карты, QR и оптовые цены.</div>' +
+            '<div class="card-summary-copy">Заявка уже в системе. Идет синхронизация с CRM и сайтом, после чего откроются номер карты и оптовые цены.</div>' +
             '</div>' +
             '<div class="card-summary-badge">Синхронизация</div>' +
             '</div>' +
@@ -3738,6 +3764,10 @@
             '<div class="card-summary-cell"><div class="card-summary-label">Телефон</div><div class="card-summary-value">' + escapeHtml(pendingPhone) + '</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Тип</div><div class="card-summary-value">' + escapeHtml(pendingCustomerType) + '</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Карточка</div><div class="card-summary-value">Готовится к активации</div></div>' +
+            '</div>' +
+            '<div class="journey-grid">' +
+            '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Данные ушли в систему</div><div class="journey-copy">Контакт и карта зарегистрированы и ожидают сверки с CRM.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">2</div><div><div class="journey-title">Ожидание активации</div><div class="journey-copy">После обновления статуса карточка переключится на оптовый режим.</div></div></div>' +
             '</div>' +
             '</div>' +
             '<div class="card-stage pending">' +
@@ -3774,7 +3804,7 @@
             '<div>' +
             '<div class="card-summary-kicker">Старт карты</div>' +
             '<div class="card-summary-number">Гость</div>' +
-            '<div class="card-summary-copy">После регистрации карта получит номер, QR и откроет оптовые цены.</div>' +
+            '<div class="card-summary-copy">Пока клиент в рознице. После регистрации карта получит номер, QR и оптовые цены.</div>' +
             '</div>' +
             '<div class="card-summary-badge">Розница</div>' +
             '</div>' +
@@ -3783,6 +3813,10 @@
             '<div class="card-summary-cell"><div class="card-summary-label">Шаг 2</div><div class="card-summary-value">Отправить в сайт и CRM</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Шаг 3</div><div class="card-summary-value">Получить номер карты</div></div>' +
             '<div class="card-summary-cell"><div class="card-summary-label">Шаг 4</div><div class="card-summary-value">Открыть оптовые цены</div></div>' +
+            '</div>' +
+            '<div class="journey-grid">' +
+            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Запуск регистрации</div><div class="journey-copy">Форма открывает путь к карте клиента без лишних действий.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки данные уходят в систему и готовят карту к активации.</div></div></div>' +
             '</div>' +
             '</div>' +
             '<div class="card-stage retail">' +
