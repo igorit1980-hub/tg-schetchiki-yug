@@ -485,19 +485,21 @@
         margin-top: 8px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px;
+        gap: 8px;
       }
 
       .status-pill {
-        padding: 10px 12px;
-        border-radius: 12px;
-        background: rgba(18, 18, 18, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 11px 12px;
+        border-radius: 14px;
+        background:
+          linear-gradient(180deg, rgba(24, 27, 30, 0.96), rgba(9, 10, 12, 0.96));
+        border: 1px solid rgba(255, 255, 255, 0.06);
         color: rgba(255, 255, 255, 0.82);
         font-size: 12px;
         font-weight: 600;
         text-align: center;
         cursor: pointer;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
       }
 
       .status-pill.active {
@@ -1622,10 +1624,13 @@
 
       .card-stage {
         margin-top: 12px;
-        padding: 11px 12px;
-        border-radius: 14px;
+        padding: 13px 13px 12px;
+        border-radius: 18px;
         border: 1px solid rgba(255, 255, 255, 0.06);
-        background: rgba(255, 255, 255, 0.03);
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 26%),
+          linear-gradient(180deg, rgba(13, 15, 18, 0.98), rgba(7, 8, 10, 0.98));
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.22);
       }
 
       .card-stage.retail {
@@ -1669,6 +1674,98 @@
         color: rgba(255, 255, 255, 0.76);
         font-size: 13px;
         line-height: 1.32;
+      }
+
+      .card-summary {
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at 92% 12%, rgba(73, 201, 137, 0.16), transparent 22%),
+          radial-gradient(circle at 6% 0%, rgba(52, 176, 218, 0.14), transparent 26%),
+          linear-gradient(180deg, rgba(18, 21, 25, 0.98), rgba(8, 9, 11, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+      }
+
+      .card-summary.approved {
+        border-color: rgba(73, 201, 137, 0.26);
+      }
+
+      .card-summary.pending {
+        border-color: rgba(255, 187, 86, 0.26);
+      }
+
+      .card-summary.retail {
+        border-color: rgba(52, 176, 218, 0.16);
+      }
+
+      .card-summary-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .card-summary-kicker {
+        color: rgba(217, 255, 233, 0.72);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+      }
+
+      .card-summary-number {
+        margin-top: 6px;
+        font-size: 22px;
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+
+      .card-summary-copy {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12.5px;
+        line-height: 1.32;
+      }
+
+      .card-summary-badge {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .card-summary-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .card-summary-cell {
+        padding: 10px 11px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .card-summary-label {
+        color: rgba(223, 255, 236, 0.62);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .card-summary-value {
+        margin-top: 4px;
+        color: #f4fff7;
+        font-size: 12.5px;
+        font-weight: 700;
+        line-height: 1.24;
       }
 
       .journey-grid {
@@ -1797,14 +1894,15 @@
 
       .qr {
         position: relative;
-        width: 148px;
-        height: 148px;
+        width: 156px;
+        height: 156px;
         margin: 14px auto 0;
-        border-radius: 18px;
+        border-radius: 20px;
         padding: 10px;
         box-sizing: border-box;
         background-color: #fff;
         overflow: hidden;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
       }
 
       .qr::before,
@@ -3566,9 +3664,27 @@
         const liveCard = state.customerCard;
         let cardBody = "";
         let actionButtons = "";
+        const currentCardNo = liveCard && liveCard.client_card_id ? liveCard.client_card_id : "—";
+        const currentQrPayload = liveCard && liveCard.client_qr_payload ? liveCard.client_qr_payload : "";
 
         if (state.cardStatus === "approved" && liveCard) {
           cardBody =
+            '<div class="card-summary approved">' +
+            '<div class="card-summary-top">' +
+            '<div>' +
+            '<div class="card-summary-kicker">Активная карта клиента</div>' +
+            '<div class="card-summary-number">' + escapeHtml(currentCardNo) + '</div>' +
+            '<div class="card-summary-copy">Оптовые цены открыты, QR-код готов для магазина и ручного ввода.</div>' +
+            '</div>' +
+            '<div class="card-summary-badge">Опт активен</div>' +
+            '</div>' +
+            '<div class="card-summary-grid">' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Статус</div><div class="card-summary-value">Карта активна</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Цены</div><div class="card-summary-value">Только оптовые</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Режим</div><div class="card-summary-value">Каталог + QR</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Синхронизация</div><div class="card-summary-value">' + escapeHtml(backendLabel()) + '</div></div>' +
+            '</div>' +
+            '</div>' +
             '<div class="card-stage approved">' +
             '<div class="card-stage-top">' +
             '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
@@ -3593,7 +3709,7 @@
             '<div class="customer-cell"><div class="customer-label">Синхронизация</div><div class="customer-value">' + escapeHtml(backendLabel()) + '</div></div>' +
             '</div>' +
             '<div class="qr">' +
-            '<img src="' + escapeHtml(qrImageUrl(liveCard.client_qr_payload || liveCard.manual_entry_code || liveCard.client_card_id || "")) + '" alt="QR-код карты">' +
+            '<img src="' + escapeHtml(qrImageUrl(currentQrPayload || liveCard.manual_entry_code || liveCard.client_card_id || "")) + '" alt="QR-код карты">' +
             '</div>' +
             '<div class="card-note">Покажите QR-код в магазине. Если сканер не работает, используйте номер карты ' + escapeHtml(liveCard.manual_entry_code || "—") + ' для ручного ввода.</div>' +
             '</div>';
@@ -3608,6 +3724,22 @@
           const pendingPhone = liveCard && liveCard.phone ? liveCard.phone : "+7 900 123-45-67";
           const pendingCustomerType = liveCard && liveCard.customer_type ? liveCard.customer_type : "монтажник / застройщик / оптовик";
           cardBody =
+            '<div class="card-summary pending">' +
+            '<div class="card-summary-top">' +
+            '<div>' +
+            '<div class="card-summary-kicker">Статус карты</div>' +
+            '<div class="card-summary-number">На проверке</div>' +
+            '<div class="card-summary-copy">Заявка уже в системе. После синхронизации появятся номер карты, QR и оптовые цены.</div>' +
+            '</div>' +
+            '<div class="card-summary-badge">Синхронизация</div>' +
+            '</div>' +
+            '<div class="card-summary-grid">' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Клиент</div><div class="card-summary-value">' + escapeHtml(pendingName) + '</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Телефон</div><div class="card-summary-value">' + escapeHtml(pendingPhone) + '</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Тип</div><div class="card-summary-value">' + escapeHtml(pendingCustomerType) + '</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Карточка</div><div class="card-summary-value">Готовится к активации</div></div>' +
+            '</div>' +
+            '</div>' +
             '<div class="card-stage pending">' +
             '<div class="card-stage-top">' +
             '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
@@ -3637,6 +3769,22 @@
             '<button class="inline-btn" data-action="register-card">✏️ Исправить данные</button>';
         } else {
           cardBody =
+            '<div class="card-summary retail">' +
+            '<div class="card-summary-top">' +
+            '<div>' +
+            '<div class="card-summary-kicker">Старт карты</div>' +
+            '<div class="card-summary-number">Гость</div>' +
+            '<div class="card-summary-copy">После регистрации карта получит номер, QR и откроет оптовые цены.</div>' +
+            '</div>' +
+            '<div class="card-summary-badge">Розница</div>' +
+            '</div>' +
+            '<div class="card-summary-grid">' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Шаг 1</div><div class="card-summary-value">Заполнить данные</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Шаг 2</div><div class="card-summary-value">Отправить в сайт и CRM</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Шаг 3</div><div class="card-summary-value">Получить номер карты</div></div>' +
+            '<div class="card-summary-cell"><div class="card-summary-label">Шаг 4</div><div class="card-summary-value">Открыть оптовые цены</div></div>' +
+            '</div>' +
+            '</div>' +
             '<div class="card-stage retail">' +
             '<div class="card-stage-top">' +
             '<div><div class="card-stage-title">' + meta.title + '</div><div class="card-stage-copy">' + meta.copy + '</div></div>' +
