@@ -2272,7 +2272,7 @@
               </div>
               <button class="share-chip" id="shareButton" aria-label="Поделиться"></button>
             </div>
-            <div class="views-line" id="viewsLine">👁 137K изменено 09:42</div>
+            <div class="views-line" id="viewsLine">Каталог открыт</div>
           </div>
 
           <div id="screenRoot"></div>
@@ -2424,12 +2424,12 @@
 
       function homeStatusText(fallbackActive) {
         if (!state.backend.connected) {
-          return "Каталог открыт. Основные разделы уже доступны. При необходимости откройте статус витрины.";
+          return "Каталог открыт. Основные разделы уже доступны.";
         }
         if (fallbackActive) {
-          return "Каталог открыт. Хиты и акции доступны. Нажмите, чтобы посмотреть статус обновления.";
+          return "Каталог открыт. Хиты и акции доступны.";
         }
-        return "Каталог обновлен. Хиты, акции и карта клиента доступны. Нажмите, чтобы посмотреть статус витрины.";
+        return "Каталог открыт. Хиты, акции и карта клиента доступны.";
       }
 
       async function apiJson(path, options = {}) {
@@ -3152,7 +3152,7 @@
           "</div>" +
           "</div>";
 
-        setHeader(title, node ? "Подкаталоги и товарные списки" : "Структура каталога", "↗", "👁 каталог");
+        setHeader(title, node ? "Подкаталоги и товарные списки" : "Структура каталога", "↗", "Каталог");
       }
 
       function renderProducts() {
@@ -3238,11 +3238,11 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">' + escapeHtml(priceList.title) + " / " + (hasWholesaleAccess() ? "оптовый прайс" : "розничный прайс") + '</div>' +
-          '<div class="post-copy"><strong>Сайт + Telegram + Битрикс24</strong><br>' +
+          '<div class="post-copy"><strong>Сайт + Telegram + CRM</strong><br>' +
           (hasWholesaleAccess()
             ? "Карта активна, поэтому публикации и товарные списки показывают только оптовые цены."
             : state.cardStatus === "pending"
-              ? "Заявка на оптовый доступ уже в Bitrix24. Пока идет синхронизация, в каталоге остаются только розничные цены."
+              ? "Заявка на оптовый доступ уже в CRM. Пока идет синхронизация, в каталоге остаются только розничные цены."
               : "Пока карта клиента не активна, в каталоге остаются только розничные цены. После активации приложение автоматически переключится на оптовый режим.") +
           "</div>" +
           '<div class="list-text">' +
@@ -3257,7 +3257,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Публикация каталога", "Формат витринной публикации", "☰", "👁 104,2K изменено 09:43");
+        setHeader("Публикация каталога", "Формат витринной публикации", "☰", "Каталог");
       }
 
       function renderPopular() {
@@ -3441,7 +3441,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Контент канала", "Инструкции, объяснения и полезные посты", "📰", "👁 полезный контент");
+        setHeader("Контент канала", "Инструкции, объяснения и полезные посты", "📰", "Полезные посты");
       }
 
       function renderContentChannel() {
@@ -3473,7 +3473,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Информационный канал", "Отдельный контентный Telegram-канал", "🔗", "👁 полезные публикации");
+        setHeader("Информационный канал", "Отдельный контентный Telegram-канал", "🔗", "Публикации");
       }
 
       function renderHistory() {
@@ -3482,12 +3482,12 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">🕰 История витрины</div>' +
-          '<div class="post-copy">Это краткая история того, как собиралась витрина Счетчики Юг: от согласования структуры до связки сайта, Telegram и Битрикс24 в одной системе.</div>' +
+          '<div class="post-copy">Это краткая история того, как собиралась витрина Счетчики Юг: от согласования структуры до связки сайта, Telegram и CRM в одной системе.</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Старт витрины</div>' +
           '<div class="mini-list">' +
           '<div>• зафиксировали бренд `Счетчики Юг` и формат канала-каталога</div>' +
-          '<div>• определили связку: Telegram-канал + Telegram-бот + сайт + Битрикс24</div>' +
+          '<div>• определили связку: Telegram-канал + Telegram-бот + сайт + CRM</div>' +
           '<div>• задали цель: витрина, заявки, цены, остатки и карта клиента</div>' +
           '</div>' +
           '</div>' +
@@ -3504,7 +3504,7 @@
           '<div class="mini-list">' +
           '<div>• разложили витрину на сущности, связи и потоки данных</div>' +
           '<div>• сайт оставили мастер-источником каталога и карточек</div>' +
-          '<div>• Битрикс24 закрепили как источник цен, остатков, статусов и заявок</div>' +
+          '<div>• CRM закрепили как источник цен, остатков, статусов и заявок</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -3516,7 +3516,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("История витрины", "Как развивалась витрина Счетчики Юг", "🕰", "👁 история витрины");
+        setHeader("История витрины", "Как развивалась витрина Счетчики Юг", "🕰", "История витрины");
       }
 
       function renderProject() {
@@ -3525,18 +3525,18 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">🧩 Схема системы</div>' +
-          '<div class="post-copy">Витрина продаж и обслуживания работает как единая система: сайт отдает каталог, Telegram показывает путь клиента, а Битрикс24 управляет коммерческой частью и статусами.</div>' +
+          '<div class="post-copy">Витрина продаж и обслуживания работает как единая система: сайт отдает каталог, Telegram показывает путь клиента, а CRM управляет коммерческой частью и статусами.</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="show-site"><div class="route-kicker">Источник</div><div class="route-title">Сайт</div><div class="route-copy">Категории, бренды, карточки товаров, описания и изображения.</div></button>' +
           '<button class="route-btn" data-action="show-content-channel"><div class="route-kicker">Витрина</div><div class="route-title">Telegram-канал</div><div class="route-copy">Навигация, публикации, акции, полезный контент и вход в каталог.</div></button>' +
           '<button class="route-btn" data-action="show-card"><div class="route-kicker">Сценарии</div><div class="route-title">Telegram-бот</div><div class="route-copy">Регистрация клиента, карта, оптовый доступ и отправка заявок.</div></button>' +
-          '<button class="route-btn" data-action="sync"><div class="route-kicker">Коммерция</div><div class="route-title">Битрикс24</div><div class="route-copy">Цены, остатки, клиенты, статусы, сделки и менеджерская логика.</div></button>' +
+          '<button class="route-btn" data-action="sync"><div class="route-kicker">Коммерция</div><div class="route-title">CRM</div><div class="route-copy">Цены, остатки, клиенты, статусы, сделки и менеджерская логика.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
           '<div class="mini-title">Главные правила</div>' +
           '<div class="mini-list">' +
           '<div>• сайт — мастер-источник каталога и товарных карточек</div>' +
-          '<div>• Битрикс24 — мастер-источник цен, остатков и клиентского статуса</div>' +
+          '<div>• CRM — мастер-источник цен, остатков и клиентского статуса</div>' +
           '<div>• Telegram показывает уже собранную витринную модель без ручной путаницы</div>' +
           '</div>' +
           '</div>' +
@@ -3545,7 +3545,7 @@
           '<div class="mini-list">' +
           '<div>• подтягивать категории и товарные списки с сайта</div>' +
           '<div>• показывать цены и сценарии по статусу клиента</div>' +
-          '<div>• передавать заявки и обращения в Битрикс24</div>' +
+          '<div>• передавать заявки и обращения в CRM</div>' +
           '</div>' +
           '</div>' +
           '<div class="inline-grid">' +
@@ -3557,7 +3557,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Схема системы", "Сайт, Telegram и Битрикс24 в одной схеме", "🧩", "👁 схема системы");
+        setHeader("Схема системы", "Сайт, Telegram и CRM в одной схеме", "🧩", "Сайт, Telegram и CRM");
       }
 
       function renderBrand() {
@@ -3585,7 +3585,7 @@
           '</div>' +
           '</article>';
 
-        setHeader(brand, "Брендовая точка входа в каталог", "🏷", "👁 бренд");
+        setHeader(brand, "Брендовая точка входа в каталог", "🏷", "Бренд каталога");
       }
 
       function renderWholesale() {
@@ -3944,18 +3944,15 @@
           '<div>• статус каталога: ' + escapeHtml(backendLabel()) + '</div>' +
           '<div>• хитов в витрине: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.popular_products : state.storefront.popular_products.length)) + '</div>' +
           '<div>• акций в витрине: ' + escapeHtml(String(health && health.storefront_counts ? health.storefront_counts.promotions : state.storefront.promotions.length)) + '</div>' +
-          '<div>• файл витрины: ' + escapeHtml(health && health.storefront_path ? health.storefront_path : "не подключен") + '</div>' +
-          '<div>• служебный статус: ' + escapeHtml(health && health.fallback_mode && health.fallback_mode.active ? "резервный источник активен" : "основной источник активен") + '</div>' +
+          '<div>• режим каталога: ' + escapeHtml(health && health.fallback_mode && health.fallback_mode.active ? "резервный" : "основной") + '</div>' +
           '</div>' +
           '</div>' +
           '<div class="mini-card">' +
-          '<div class="mini-title">Интеграции</div>' +
+          '<div class="mini-title">Подключения</div>' +
           '<div class="mini-list">' +
-          '<div>• Битрикс24 подключен: ' + (health && health.bitrix_webhook_configured ? "да" : "нет") + '</div>' +
-          '<div>• блок хитов: ET ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.entity_type_id : 1042)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.popular_products.category_id : 23)) + '</div>' +
-          '<div>• блок акций: ET ' + escapeHtml(String(health && health.entities ? health.entities.promotions.entity_type_id : 1044)) + ' / cat ' + escapeHtml(String(health && health.entities ? health.entities.promotions.category_id : 27)) + '</div>' +
-          '<div>• адрес подбора: ' + escapeHtml(health && health.site_lookup_url ? health.site_lookup_url : "—") + '</div>' +
-          '<div>• резервный источник: ' + escapeHtml(health && health.empty_fallback_path ? health.empty_fallback_path : "—") + '</div>' +
+          '<div>• CRM подключена: ' + (health && health.bitrix_webhook_configured ? "да" : "нет") + '</div>' +
+          '<div>• сайт каталога: ' + escapeHtml(health && health.site_lookup_url ? health.site_lookup_url : "—") + '</div>' +
+          '<div>• резервная витрина: ' + (health && health.fallback_mode && health.fallback_mode.active ? "активна" : "не используется") + '</div>' +
           '<div>• статус клиента: ' + escapeHtml(state.customerContext && state.customerContext.customer_state ? state.customerContext.customer_state : "guest") + '</div>' +
           '</div>' +
           '</div>' +
@@ -3968,7 +3965,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Синхронизация", "Сайт / Telegram / Битрикс24", "⋯", "");
+        setHeader("Синхронизация", "Сайт / Telegram / CRM", "⋯", "");
       }
 
       function renderManager() {
@@ -4015,7 +4012,7 @@
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="open-request-form" data-request-type="service"><div class="route-kicker">Гарантия</div><div class="route-title">Гарантийный случай</div><div class="route-copy">Опишите проблему по прибору, чтобы менеджер помог с гарантией и следующими шагами.</div></button>' +
           '<button class="route-btn" data-action="open-request-form" data-request-type="order"><div class="route-kicker">Заказ</div><div class="route-title">Проверка заказа</div><div class="route-copy">Уточните комплектность, документы, отгрузку или текущий статус заказа.</div></button>' +
-          '<button class="route-btn" data-action="open-request-form" data-request-type="service"><div class="route-kicker">Диагностика</div><div class="route-title">Технический вопрос</div><div class="route-copy">Опишите модель и проблему, чтобы менеджер помог с диагностикой и решением.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="service"><div class="route-kicker">Диагностика</div><div class="route-title">Вопрос по прибору</div><div class="route-copy">Опишите модель и проблему, чтобы менеджер помог разобраться и предложил решение.</div></button>' +
           '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Связь</div><div class="route-title">Менеджер</div><div class="route-copy">Открыть все каналы связи и отправить обращение напрямую.</div></button>' +
           '</div>' +
           '<div class="mini-card">' +
@@ -4235,7 +4232,7 @@
           '</div>' +
           '</article>';
 
-        setHeader("Остатки", "Склад Ростов-на-Дону", "↻", "👁 76,1K изменено 09:44");
+        setHeader("Остатки", "Склад Ростов-на-Дону", "↻", "Склад");
       }
 
       function buildNodePath(node) {

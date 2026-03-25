@@ -77,8 +77,6 @@ def _welcome_text(config) -> str:
                 f"Сейчас в витрине: {popular_count} хитов и {promotions_count} акций.",
             ]
         )
-        if fallback_mode:
-            lines.append("Сейчас включен временный fallback-режим витрины.")
     lines.extend(
         [
             "",
