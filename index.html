@@ -1801,37 +1801,24 @@
         height: 148px;
         margin: 14px auto 0;
         border-radius: 18px;
-        background:
-          linear-gradient(90deg, rgba(255, 255, 255, 0.96) 11px, transparent 11px),
-          linear-gradient(rgba(255, 255, 255, 0.96) 11px, transparent 11px);
-        background-size: 22px 22px;
+        padding: 10px;
+        box-sizing: border-box;
         background-color: #fff;
+        overflow: hidden;
       }
 
       .qr::before,
       .qr::after,
       .qr-corner {
-        content: "";
-        position: absolute;
-        width: 42px;
-        height: 42px;
-        border: 9px solid #fff;
-        background: #0a0a0a;
+        display: none;
       }
 
-      .qr::before {
-        top: 12px;
-        left: 12px;
-      }
-
-      .qr::after {
-        top: 12px;
-        right: 12px;
-      }
-
-      .qr-corner {
-        left: 12px;
-        bottom: 12px;
+      .qr img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        object-fit: cover;
       }
 
       .float-ui {
@@ -2195,6 +2182,10 @@
     <script>
       let CATALOG = Array.isArray(window.CATALOG_DATA) ? window.CATALOG_DATA : [];
 
+      const defaultBackendBaseUrl =
+        window.__TG_API_BASE__ ||
+        (window.location && /^https?:$/i.test(window.location.protocol) ? window.location.origin : "http://127.0.0.1:8787");
+
       const state = {
         tab: "home",
         history: [{ screen: "home" }],
@@ -2205,7 +2196,7 @@
         showDeliveryItems: false,
         storefront: { popular_products: [], promotions: [] },
         backend: {
-          baseUrl: window.__TG_API_BASE__ || "http://127.0.0.1:8787",
+          baseUrl: defaultBackendBaseUrl,
           connected: false,
           mode: "offline",
           health: null,
@@ -2298,8 +2289,9 @@
 
       function deriveCardStatus(context) {
         if (!context || context.customer_state === "guest") return "retail";
-        if (context.can_view_wholesale_prices) return "approved";
+        if (context.can_view_wholesale_prices || context.customer_state === "approved_wholesale") return "approved";
         if (context.approval_status === "pending_review" || context.customer_state === "pending_review") return "pending";
+        if (context.card_status === "active" && context.allowed_price_type === "wholesale") return "approved";
         return "retail";
       }
 
@@ -2436,6 +2428,12 @@
         return fallback;
       }
 
+      function qrImageUrl(payload) {
+        const value = String(payload || "").trim();
+        if (!value) return "";
+        return "https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&data=" + encodeURIComponent(value);
+      }
+
       function customerAccountUrl() {
         return siteLink("customer_account_url", LOCATION_INFO.contactsPage);
       }
@@ -2492,7 +2490,9 @@
               source: "telegram-channel-schetchiki-yug",
             }),
           });
-          if (response.customer_state === "pending_review") {
+          if (response.can_view_wholesale_prices || response.customer_state === "approved_wholesale" || response.card_status === "active") {
+            state.cardStatus = "approved";
+          } else if (response.customer_state === "pending_review") {
             state.cardStatus = "pending";
           }
           await refreshCustomerState();
@@ -2540,7 +2540,7 @@
         const productName = state.selectedNode ? state.selectedNode.title : "";
         const defaultMessage =
           requestType === "wholesale"
-            ? "Нужны оптовые условия и подтверждение карты клиента."
+            ? "Нужны оптовые условия и доступ к оптовым ценам."
             : requestType === "product"
               ? "Нужна помощь с подбором товара."
               : requestType === "service"
@@ -2585,7 +2585,7 @@
           return {
             title: "Оптовый запрос",
             description: "Передайте менеджеру расчет, комплектацию объекта или запрос по поставке.",
-            message: "Нужны оптовые условия и подтверждение карты клиента.",
+            message: "Нужны оптовые условия и доступ к оптовым ценам.",
           };
         }
         if (requestType === "product") {
@@ -2840,33 +2840,33 @@
       }
 
       function hasWholesaleAccess() {
-        return state.cardStatus === "approved";
+        return Boolean(state.customerContext && state.customerContext.can_view_wholesale_prices) || state.cardStatus === "approved";
       }
 
       function cardStatusMeta() {
         if (state.cardStatus === "approved") {
           return {
-            label: "Карта подтверждена",
+            label: "Карта активна",
             shortLabel: "Опт активен",
-            title: "Оптовый доступ открыт",
-            copy: "Менеджер подтвердил профиль клиента. В каталоге и публикациях показываются только оптовые цены.",
-            headerSub: "Личный кабинет подтвержденного клиента",
+            title: "Карта активна",
+            copy: "Карта активна, номер отображается в приложении, а каталог показывает оптовые цены.",
+            headerSub: "Личный кабинет активного клиента",
           };
         }
         if (state.cardStatus === "pending") {
           return {
             label: "Заявка на проверке",
             shortLabel: "Проверка",
-            title: "Карта ожидает подтверждения",
-            copy: "Заявка отправлена менеджеру. До подтверждения в канале и каталоге остаются только розничные цены.",
-            headerSub: "Заявка отправлена менеджеру на проверку",
+            title: "Карта ожидает активации",
+            copy: "Заявка отправлена в систему. После синхронизации клиент получает номер карты и оптовый доступ.",
+            headerSub: "Статус заявки на карту",
           };
         }
         return {
           label: "Карта не оформлена",
           shortLabel: "Розница",
           title: "Получите доступ к оптовым ценам",
-          copy: "После регистрации карты менеджер подтверждает тип клиента: застройщик, монтажник или оптовый покупатель.",
+          copy: "После регистрации карта отправляется в систему, а в приложении появляется путь к оптовым ценам.",
           headerSub: "Регистрация и доступ к оптовым ценам",
         };
       }
@@ -3076,10 +3076,10 @@
           '<div class="post-date">' + (node ? node.title : "Список товаров") + "</div>" +
           '<div class="post-copy">' +
           (hasWholesaleAccess()
-            ? "Карта подтверждена. В списке показываются только оптовые цены."
+            ? "Карта активна. В списке показываются только оптовые цены."
             : state.cardStatus === "pending"
-              ? "Карта отправлена на проверку. Пока менеджер не подтвердил клиента, в списке остаются розничные цены."
-              : "Вы просматриваете каталог как обычный клиент. В списке показываются розничные цены. Оптовые цены открываются после регистрации карты и подтверждения менеджером.") +
+              ? "Карта отправлена в систему. Пока идет синхронизация, в списке остаются розничные цены."
+              : "Вы просматриваете каталог как обычный клиент. В списке показываются розничные цены. Оптовые цены открываются после регистрации карты.") +
           "</div>" +
           '<div class="filter-bar">' +
           '<div class="filter-copy">' +
@@ -3120,10 +3120,10 @@
           '<div class="post-date">' + escapeHtml(priceList.title) + " / " + (hasWholesaleAccess() ? "оптовый прайс" : "розничный прайс") + '</div>' +
           '<div class="post-copy"><strong>Сайт + Telegram + Битрикс24</strong><br>' +
           (hasWholesaleAccess()
-            ? "Карта подтверждена, поэтому публикации и товарные списки показывают только оптовые цены."
+            ? "Карта активна, поэтому публикации и товарные списки показывают только оптовые цены."
             : state.cardStatus === "pending"
-              ? "Заявка на оптовый доступ уже в Bitrix24. До подтверждения менеджером в каталоге остаются только розничные цены."
-              : "Пока карта клиента не подтверждена, в каталоге остаются только розничные цены. После одобрения в Bitrix24 приложение автоматически переключится на оптовый режим.") +
+              ? "Заявка на оптовый доступ уже в Bitrix24. Пока идет синхронизация, в каталоге остаются только розничные цены."
+              : "Пока карта клиента не активна, в каталоге остаются только розничные цены. После активации приложение автоматически переключится на оптовый режим.") +
           "</div>" +
           '<div class="list-text">' +
           escapeHtml(priceList.rows) +
@@ -3476,13 +3476,13 @@
           topBlock =
             '<div class="card-stage approved">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый режим активен</div><div class="card-stage-copy">Карта подтверждена, поэтому клиенту открывается отдельный оптовый сценарий внутри канала и показ только оптовых цен.</div></div>' +
+            '<div><div class="card-stage-title">Оптовый режим активен</div><div class="card-stage-copy">Карта активна, и в каталоге уже показываются только оптовые цены.</div></div>' +
             '<div class="card-stage-badge">Опт активен</div>' +
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
-            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает публикации и списки товаров уже в оптовом режиме.</div></button>' +
-            '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Отправить оптовый запрос</div><div class="route-copy">Передать менеджеру расчет, комплектацию объекта или запрос по поставке.</div></button>' +
+            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Опт</div><div class="route-title">Смотреть оптовый прайс</div><div class="route-copy">Открывает товары и цены для активной карты клиента.</div></button>' +
+            '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Отправить оптовый запрос</div><div class="route-copy">Передать менеджеру расчет, комплектацию или запрос по поставке.</div></button>' +
             '<button class="route-btn" data-action="show-stock"><div class="route-kicker">Опт</div><div class="route-title">Запросить остатки</div><div class="route-copy">Отдельный путь для оперативной проверки доступности товара.</div></button>' +
             '<button class="route-btn" data-action="show-manager"><div class="route-kicker">Опт</div><div class="route-title">Связаться с менеджером</div><div class="route-copy">Быстрый маршрут к оптовому менеджеру без выхода из логики канала.</div></button>' +
             '</div>';
@@ -3496,7 +3496,7 @@
           topBlock =
             '<div class="card-stage pending">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый доступ на проверке</div><div class="card-stage-copy">Заявка уже отправлена. Пока менеджер не подтвердил клиента, канал продолжает показывать только розничные цены.</div></div>' +
+            '<div><div class="card-stage-title">Карта на проверке</div><div class="card-stage-copy">Заявка уже отправлена. После синхронизации клиент получит номер карты и оптовый доступ.</div></div>' +
             '<div class="card-stage-badge">Проверка</div>' +
             '</div>' +
             '</div>' +
@@ -3504,8 +3504,8 @@
             '<div class="mini-title">Что происходит сейчас</div>' +
             '<div class="mini-list">' +
             '<div>• заявка на карту уже создана</div>' +
-            '<div>• менеджер проверяет тип клиента и право на оптовый доступ</div>' +
-            '<div>• после подтверждения включается отдельный оптовый сценарий</div>' +
+            '<div>• данные ушли в CRM и сайт для синхронизации</div>' +
+            '<div>• после обновления карточка откроет оптовые цены</div>' +
             '</div>' +
             '</div>';
 
@@ -3519,15 +3519,15 @@
           topBlock =
             '<div class="card-stage retail">' +
             '<div class="card-stage-top">' +
-            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в приложении: имя, телефон, email и тип клиента. После отправки заявка уходит в сайт и Bitrix24, а менеджер подтверждает оптовый доступ.</div></div>' +
+            '<div><div class="card-stage-title">Оптовый заказ начинается с регистрации карты</div><div class="card-stage-copy">Клиент заполняет данные прямо в приложении. После отправки заявка уходит в сайт и Bitrix24, а карта получает номер и статус.</div></div>' +
             '<div class="card-stage-badge">Розница</div>' +
             '</div>' +
             '</div>' +
             '<div class="route-grid">' +
             '<button class="route-btn" data-action="register-card"><div class="route-kicker">Шаг 1</div><div class="route-title">Заполнить данные в приложении</div><div class="route-copy">Имя, телефон, email и тип клиента вводятся прямо в приложении.</div></button>' +
-            '<button class="route-btn" data-action="sync"><div class="route-kicker">Шаг 2</div><div class="route-title">Заявка уходит в систему</div><div class="route-copy">После отправки данные попадают на сайт и в Bitrix24 для проверки клиента.</div></button>' +
-            '<button class="route-btn" data-action="show-card"><div class="route-kicker">Шаг 3</div><div class="route-title">Статус карты</div><div class="route-copy">В приложении видно, когда карта еще на проверке и когда доступ уже подтвержден.</div></button>' +
-            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в каталоге</div><div class="route-copy">После одобрения приложение показывает номер карты, статус и только оптовые цены.</div></button>' +
+            '<button class="route-btn" data-action="sync"><div class="route-kicker">Шаг 2</div><div class="route-title">Заявка уходит в систему</div><div class="route-copy">После отправки данные попадают на сайт и в Bitrix24.</div></button>' +
+            '<button class="route-btn" data-action="show-card"><div class="route-kicker">Шаг 3</div><div class="route-title">Статус карты</div><div class="route-copy">В приложении видно номер карты, QR и текущий статус клиента.</div></button>' +
+            '<button class="route-btn" data-action="show-price"><div class="route-kicker">Шаг 4</div><div class="route-title">Оптовые цены в каталоге</div><div class="route-copy">После активации карта открывает оптовые цены.</div></button>' +
             '</div>';
 
           actionBlock =
@@ -3542,7 +3542,7 @@
           '<div class="post-body">' +
           '<div class="post-name">Счетчики Юг</div>' +
           '<div class="post-date">💰 Оптовый заказ</div>' +
-          '<div class="post-copy">Здесь можно зарегистрировать карту клиента, отправить оптовый запрос и перейти к оптовым ценам после подтверждения менеджером.</div>' +
+          '<div class="post-copy">Здесь можно зарегистрировать карту клиента, отправить оптовый запрос и перейти к оптовым ценам после активации карты.</div>' +
           topBlock +
           '<div class="mini-card">' +
           '<div class="mini-title">Что можно сделать здесь</div>' +
@@ -3592,7 +3592,9 @@
             '<div class="customer-cell"><div class="customer-label">Цены в канале</div><div class="customer-value">Только оптовые</div></div>' +
             '<div class="customer-cell"><div class="customer-label">Синхронизация</div><div class="customer-value">' + escapeHtml(backendLabel()) + '</div></div>' +
             '</div>' +
-            '<div class="qr"><span class="qr-corner"></span></div>' +
+            '<div class="qr">' +
+            '<img src="' + escapeHtml(qrImageUrl(liveCard.client_qr_payload || liveCard.manual_entry_code || liveCard.client_card_id || "")) + '" alt="QR-код карты">' +
+            '</div>' +
             '<div class="card-note">Покажите QR-код в магазине. Если сканер не работает, используйте номер карты ' + escapeHtml(liveCard.manual_entry_code || "—") + ' для ручного ввода.</div>' +
             '</div>';
 
@@ -3622,9 +3624,9 @@
             '<div>Тип клиента: ' + escapeHtml(pendingCustomerType) + '</div>' +
             '</div>' +
             '<div class="journey-grid">' +
-            '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Заявка создана</div><div class="journey-copy">Контакт и карточка клиента уже отправлены менеджеру для проверки.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">2</div><div><div class="journey-title">Проверка профиля</div><div class="journey-copy">Менеджер определяет тип клиента и подтверждает доступ к оптовому прайсу.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">3</div><div><div class="journey-title">Активация карты</div><div class="journey-copy">После подтверждения в Telegram автоматически открываются только оптовые цены.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">1</div><div><div class="journey-title">Заявка создана</div><div class="journey-copy">Контакт и карта уже переданы в CRM и сайт.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">2</div><div><div class="journey-title">Синхронизация данных</div><div class="journey-copy">Система сверяет статус и готовит номер карты к показу.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">3</div><div><div class="journey-title">Оптовый доступ</div><div class="journey-copy">После активации карточка открывает оптовые цены автоматически.</div></div></div>' +
             '</div>' +
             '</div>';
 
@@ -3644,9 +3646,9 @@
             '<div class="mini-card">' +
             '<div class="mini-title">Как работает карта</div>' +
             '<div class="journey-grid">' +
-            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация карты в приложении</div><div class="journey-copy">Клиент вводит имя, телефон, email и тип деятельности прямо в приложении.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки данные уходят на сайт, а затем заявка синхронизируется в Bitrix24.</div></div></div>' +
-            '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Карта и цены</div><div class="journey-copy">После подтверждения клиент получает номер карты и видит только оптовые цены.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">📝</div><div><div class="journey-title">Регистрация карты в приложении</div><div class="journey-copy">Клиент вводит данные прямо в приложении.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">🌐</div><div><div class="journey-title">Сайт и CRM</div><div class="journey-copy">После отправки данные уходят в сайт и Bitrix24.</div></div></div>' +
+            '<div class="journey-step"><div class="journey-icon">💳</div><div><div class="journey-title">Карта и цены</div><div class="journey-copy">Клиент получает номер карты и оптовые цены после активации.</div></div></div>' +
             '</div>' +
             '</div>';
 
@@ -3700,7 +3702,7 @@
           '<div class="registration-hero">' +
           '<div class="registration-kicker">Карта клиента</div>' +
           '<div class="registration-title">Карта клиента и доступ к оптовым ценам</div>' +
-          '<div class="registration-copy">Регистрация начинается прямо в приложении. После проверки менеджером каталог покажет номер карты, статус клиента и только оптовые цены.</div>' +
+          '<div class="registration-copy">Регистрация начинается прямо в приложении. После отправки карта получает номер, статус и доступ к оптовым ценам.</div>' +
           '<div class="registration-meta">' +
           '<div class="registration-chip">Канал Счетчики Юг</div>' +
           '<div class="registration-chip">Сайт + CRM</div>' +
@@ -3710,7 +3712,7 @@
           '<div class="registration-steps">' +
           '<div class="registration-step"><div class="registration-step-num">1</div><div><div class="registration-step-title">Заполните данные</div><div class="registration-step-copy">Имя, телефон, email, город и тип клиента сохраняются прямо в приложении.</div></div></div>' +
           '<div class="registration-step"><div class="registration-step-num">2</div><div><div class="registration-step-title">Интеграция уходит в сайт и CRM</div><div class="registration-step-copy">Заявка получает источник Telegram-канала Счетчики Юг и уходит на регистрацию карты.</div></div></div>' +
-          '<div class="registration-step"><div class="registration-step-num">3</div><div><div class="registration-step-title">Менеджер подтверждает доступ</div><div class="registration-step-copy">После проверки клиент получает номер карты и приложению открываются оптовые цены.</div></div></div>' +
+          '<div class="registration-step"><div class="registration-step-num">3</div><div><div class="registration-step-title">Карта активируется</div><div class="registration-step-copy">После синхронизации клиент видит номер карты, QR и оптовые цены.</div></div></div>' +
           '</div>' +
           '<div class="mini-card form-shell">' +
           '<div class="form-section-title">Данные для регистрации</div>' +
@@ -3729,7 +3731,7 @@
           '<label class="form-field"><span class="form-label">Тип клиента</span><select class="form-select" data-field="customer_type">' + selectOptions + "</select></label>" +
           '</div>' +
           '</div>' +
-          '<div class="form-help">После отправки заявка уходит на регистрацию карты клиента. До одобрения менеджером в каталоге останутся розничные цены.</div>' +
+          '<div class="form-help">После отправки заявка уходит в сайт и CRM. Карта получает номер, QR и статус клиента.</div>' +
           '<div class="form-note">Если сайт или CRM временно недоступны, приложение покажет понятный статус. Данные останутся в форме, и регистрацию можно будет отправить повторно без потери информации.</div>' +
           '<div class="form-actions">' +
           '<button class="inline-btn primary full" data-action="submit-card-registration">✅ Отправить регистрацию</button>' +
@@ -3802,7 +3804,7 @@
           '</div>' +
           '<div class="route-grid">' +
           '<button class="route-btn" data-action="open-request-form" data-request-type="quick"><div class="route-kicker">Обращение</div><div class="route-title">Быстрый запрос</div><div class="route-copy">Оставьте короткое сообщение, и менеджер получит запрос напрямую из приложения.</div></button>' +
-          '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Отправьте запрос по оптовым ценам, объекту или подтверждению карты клиента.</div></button>' +
+          '<button class="route-btn" data-action="open-request-form" data-request-type="wholesale"><div class="route-kicker">Опт</div><div class="route-title">Оптовый запрос</div><div class="route-copy">Отправьте запрос по оптовым ценам, объекту или активации карты клиента.</div></button>' +
           '<button class="route-btn" data-action="open-request-form" data-request-type="product"><div class="route-kicker">Подбор</div><div class="route-title">Подобрать товар</div><div class="route-copy">Передайте менеджеру задачу по товару или разделу каталога без выхода из приложения.</div></button>' +
           '<button class="route-btn" data-action="show-service"><div class="route-kicker">Сервис</div><div class="route-title">Сервис и гарантия</div><div class="route-copy">Если вопрос связан с гарантией, диагностикой или заказом, откройте отдельный раздел.</div></button>' +
           '</div>' +
@@ -4331,14 +4333,14 @@
           if (targetStatus === "pending") {
             openScreen("card");
             if (state.cardStatus !== "pending") {
-              notifyTelegram("Здесь отображается этап проверки карты после отправки заявки.");
+              notifyTelegram("Здесь отображается этап синхронизации карты после отправки заявки.");
             }
             return;
           }
           if (targetStatus === "approved") {
             openScreen("card");
             if (state.cardStatus !== "approved") {
-              notifyTelegram("Оптовый режим откроется после подтверждения карты менеджером.");
+              notifyTelegram("Оптовый режим откроется после синхронизации карты.");
             }
             return;
           }

@@ -39,9 +39,9 @@ class PreviewService:
         if not contact:
             contact = {
                 "id": state["next_contact_id"],
-                "approval_status": "pending_review",
-                "card_status": "not_created",
-                "allowed_price_type": "retail",
+                "approval_status": "approved",
+                "card_status": "active",
+                "allowed_price_type": "wholesale",
                 "discount_percent": 0,
                 "client_card_id": "",
                 "client_qr_payload": "",
@@ -73,7 +73,9 @@ class PreviewService:
             contact["client_card_id"] = generate_card_id(int(contact["id"]))
         if not contact.get("client_qr_payload"):
             contact["client_qr_payload"] = generate_qr_payload(contact["client_card_id"])
-        contact["card_status"] = "issued"
+        contact["approval_status"] = "approved"
+        contact["card_status"] = "active"
+        contact["allowed_price_type"] = "wholesale"
 
         self._save_state(state)
         context = self.get_customer_context(contact_id=contact["id"])
@@ -87,7 +89,7 @@ class PreviewService:
             "approval_status": context["approval_status"],
             "card_status": context["card_status"],
             "allowed_price_type": context["allowed_price_type"],
-            "message": "Карта зарегистрирована в локальном preview и ожидает подтверждения менеджером",
+            "message": "Карта зарегистрирована в локальном preview и активирована",
         }
 
     def get_customer_context(
@@ -222,8 +224,7 @@ class PreviewService:
             "card_status": contact.get("card_status") or "not_created",
             "allowed_price_type": contact.get("allowed_price_type") or "retail",
             "discount_percent": float(contact.get("discount_percent") or 0),
-            "can_view_wholesale_prices": (contact.get("approval_status") == "approved")
-            and (contact.get("card_status") == "active")
+            "can_view_wholesale_prices": (contact.get("card_status") == "active")
             and (contact.get("allowed_price_type") == "wholesale"),
             "can_use_loyalty_card": contact.get("card_status") == "active",
             "last_sync_at": contact.get("last_sync_at") or None,

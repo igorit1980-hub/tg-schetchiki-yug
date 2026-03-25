@@ -17,7 +17,59 @@ class CustomerService:
         self.config = config
         self.bitrix = bitrix_client
         self.f = config.customer_fields
+        self.field_aliases: Dict[str, List[str]] = {
+            "telegram_user_id": ["UF_CRM_TG_USER_ID"],
+            "telegram_username": ["UF_CRM_TG_USERNAME"],
+            "telegram_source": ["UF_CRM_TG_SOURCE", "UF_CRM_CLIENT_SOURCE"],
+            "phone_normalized": ["UF_CRM_PHONE_NORMALIZED"],
+            "customer_type": ["UF_CRM_CUSTOMER_TYPE"],
+            "client_card_id": ["UF_CRM_CLIENT_CARD_ID", "UF_CRM_CLIENT_CARD_NO"],
+            "client_qr_payload": ["UF_CRM_CLIENT_QR_PAYLOAD", "UF_CRM_CLIENT_CARD_QR"],
+            "card_status": ["UF_CRM_CARD_STATUS", "UF_CRM_CLIENT_CARD_STATUS"],
+            "approval_status": ["UF_CRM_APPROVAL_STATUS"],
+            "allowed_price_type": ["UF_CRM_ALLOWED_PRICE_TYPE"],
+            "discount_percent": ["UF_CRM_DISCOUNT_PERCENT", "UF_CRM_CLIENT_DISCOUNT"],
+            "approved_at": ["UF_CRM_APPROVED_AT"],
+            "rejected_at": ["UF_CRM_REJECTED_AT"],
+            "last_sync_at": ["UF_CRM_LAST_SYNC_AT", "UF_CRM_CLIENT_CARD_REGISTERED_AT"],
+            "company_name_snapshot": ["UF_CRM_COMPANY_NAME_SNAPSHOT"],
+            "card_comment": ["UF_CRM_CARD_COMMENT"],
+        }
+        self.field_name_to_logical: Dict[str, str] = {}
+        for logical_key, targets in self.field_aliases.items():
+            for field_name in [logical_key, *targets]:
+                self.field_name_to_logical[field_name] = logical_key
         self._supported_contact_fields: Optional[set[str]] = None
+
+    def _field_targets(self, key: str) -> List[str]:
+        targets = [key]
+        for alias in self.field_aliases.get(key, []):
+            if alias not in targets:
+                targets.append(alias)
+        return targets
+
+    def _contact_field_value(self, contact: Dict[str, Any], key: str, default: Any = "") -> Any:
+        for field in self._field_targets(key):
+            value = contact.get(field)
+            if value not in (None, "", [], {}):
+                return value
+        return default
+
+    def _shadow_field_value(self, shadow: Optional[Dict[str, Any]], key: str, default: Any = "") -> Any:
+        if not shadow:
+            return default
+        for field in self._field_targets(key):
+            value = shadow.get(field)
+            if value not in (None, "", [], {}):
+                return value
+        return default
+
+    def _best_supported_field(self, key: str) -> Optional[str]:
+        supported = self._contact_fields()
+        for field_name in self._field_targets(key):
+            if field_name in supported:
+                return field_name
+        return None
 
     def register_customer(self, payload: CustomerRegistrationPayload) -> Dict[str, Any]:
         if not payload.first_name or not payload.phone or not payload.city or not payload.customer_type or not payload.telegram_user_id:
@@ -56,7 +108,11 @@ class CustomerService:
             {
                 self.f["client_card_id"]: card_id,
                 self.f["client_qr_payload"]: qr_payload,
-                self.f["card_status"]: "issued",
+                self.f["card_status"]: "active",
+                self.f["approval_status"]: "approved",
+                self.f["allowed_price_type"]: "wholesale",
+                self.f["discount_percent"]: 0,
+                self.f["approved_at"]: current_iso(),
                 self.f["last_sync_at"]: current_iso(),
             }
         )
@@ -78,9 +134,9 @@ class CustomerService:
                 "customer_type": payload.customer_type.strip() or "retail",
                 "client_card_id": card_id,
                 "client_qr_payload": qr_payload,
-                "approval_status": "pending_review",
-                "card_status": "issued",
-                "allowed_price_type": "retail",
+                "approval_status": "approved",
+                "card_status": "active",
+                "allowed_price_type": "wholesale",
                 "discount_percent": 0,
                 "company_name": None,
                 "last_sync_at": current_iso(),
@@ -94,9 +150,9 @@ class CustomerService:
         self._save_shadow_state(shadow_record)
         context = self.get_customer_context(contact_id=contact_id)
         if site_sync.get("ok"):
-            message = "Карта зарегистрирована. Заявка отправлена на проверку менеджеру"
+            message = "Карта создана и активирована. Оптовые цены открыты"
         else:
-            message = "Карта создана в CRM. Сайтовая регистрация ожидает синхронизацию, менеджер видит заявку"
+            message = "Карта создана и активирована в CRM. Сайт будет синхронизирован после выкладки endpoint"
         return {
             "ok": True,
             "action": action,
@@ -132,8 +188,8 @@ class CustomerService:
                     "allowed_price_type": context.allowed_price_type,
                     "discount_percent": context.discount_percent,
                     "can_view_wholesale_prices": context.allowed_price_type == "wholesale"
-                    and context.approval_status == "approved"
-                    and context.card_status == "active",
+                    and context.card_status == "active"
+                    and context.approval_status != "rejected",
                     "can_use_loyalty_card": context.card_status == "active",
                     "last_sync_at": context.last_sync_at,
                 }
@@ -155,8 +211,8 @@ class CustomerService:
             "allowed_price_type": context.allowed_price_type,
             "discount_percent": context.discount_percent,
             "can_view_wholesale_prices": context.allowed_price_type == "wholesale"
-            and context.approval_status == "approved"
-            and context.card_status == "active",
+            and context.card_status == "active"
+            and context.approval_status != "rejected",
             "can_use_loyalty_card": context.card_status == "active",
             "last_sync_at": context.last_sync_at,
         }
@@ -196,14 +252,16 @@ class CustomerService:
 
     def resolve_customer(self, card_id: str = "", qr_payload: str = "") -> Dict[str, Any]:
         filters: Dict[str, Any] = {}
-        if card_id:
-            filters[self.f["client_card_id"]] = card_id
-        elif qr_payload:
-            filters[self.f["client_qr_payload"]] = qr_payload
+        card_field = self._best_supported_field("client_card_id")
+        qr_field = self._best_supported_field("client_qr_payload")
+        if card_id and card_field:
+            filters[card_field] = card_id
+        elif qr_payload and qr_field:
+            filters[qr_field] = qr_payload
         else:
             return {"ok": False, "error_code": "INVALID_CARD_ID", "message": "Не указан номер карты или QR"}
 
-        if not self._supports_all([self.f["client_card_id"], self.f["client_qr_payload"]]):
+        if (card_id and not card_field) or (qr_payload and not qr_field):
             shadow = self._get_shadow_state(card_id=card_id, qr_payload=qr_payload)
             if shadow is None:
                 return {"ok": False, "error_code": "CONTACT_NOT_FOUND", "message": "Клиент не найден"}
@@ -243,9 +301,10 @@ class CustomerService:
     def _find_contacts(self, normalized_phone: str, telegram_user_id: str, raw_phone: str = "") -> List[Dict[str, Any]]:
         contacts: List[Dict[str, Any]] = []
         if normalized_phone:
-            if self._supports_all([self.f["phone_normalized"]]):
+            phone_field = self._best_supported_field("phone_normalized")
+            if phone_field:
                 contacts = self.bitrix.list_contacts(
-                    {self.f["phone_normalized"]: normalized_phone},
+                    {phone_field: normalized_phone},
                     select=self._contact_select_fields(),
                 )
             elif raw_phone.strip():
@@ -256,10 +315,11 @@ class CustomerService:
                 contacts = [item for item in contacts if normalize_phone(extract_primary_phone(item.get("PHONE", []))) == normalized_phone]
         if contacts or not telegram_user_id:
             return self._dedupe_contacts(contacts)
-        if self._supports_all([self.f["telegram_user_id"]]):
+        telegram_field = self._best_supported_field("telegram_user_id")
+        if telegram_field:
             return self._dedupe_contacts(
                 self.bitrix.list_contacts(
-                    {self.f["telegram_user_id"]: telegram_user_id},
+                    {telegram_field: telegram_user_id},
                     select=self._contact_select_fields(),
                 )
             )
@@ -305,9 +365,11 @@ class CustomerService:
                     self.f["telegram_username"]: payload.telegram_username.strip(),
                     self.f["telegram_source"]: (payload.source.strip() or "telegram-channel-schetchiki-yug"),
                     self.f["customer_type"]: payload.customer_type.strip(),
-                    self.f["approval_status"]: "pending_review",
-                    self.f["allowed_price_type"]: "retail",
-                    self.f["card_status"]: "issued",
+                    self.f["approval_status"]: "approved",
+                    self.f["allowed_price_type"]: "wholesale",
+                    self.f["card_status"]: "active",
+                    self.f["discount_percent"]: 0,
+                    self.f["approved_at"]: now,
                     self.f["last_sync_at"]: now,
                 }
             )
@@ -325,27 +387,37 @@ class CustomerService:
         return fields
 
     def _contact_select_fields(self) -> List[str]:
-        return [
+        fields = [
             "ID",
             "NAME",
             "LAST_NAME",
             "PHONE",
             "COMPANY_ID",
             "CITY",
-            self.f["telegram_user_id"],
-            self.f["telegram_username"],
-            self.f["phone_normalized"],
-            self.f["customer_type"],
-            self.f["client_card_id"],
-            self.f["client_qr_payload"],
-            self.f["card_status"],
-            self.f["approval_status"],
-            self.f["allowed_price_type"],
-            self.f["discount_percent"],
-            self.f["last_sync_at"],
-            self.f["company_name_snapshot"],
             "EMAIL",
         ]
+        logical_fields = [
+            "telegram_user_id",
+            "telegram_username",
+            "phone_normalized",
+            "customer_type",
+            "client_card_id",
+            "client_qr_payload",
+            "card_status",
+            "approval_status",
+            "allowed_price_type",
+            "discount_percent",
+            "approved_at",
+            "rejected_at",
+            "last_sync_at",
+            "company_name_snapshot",
+            "card_comment",
+        ]
+        for logical_key in logical_fields:
+            for field in self._field_targets(logical_key):
+                if field not in fields:
+                    fields.append(field)
+        return fields
 
     def _sync_registration_to_site(
         self,
@@ -370,6 +442,10 @@ class CustomerService:
             "contact_id": contact_id,
             "company_id": company_id,
             "client_card_id": card_id,
+            "client_qr_payload": generate_qr_payload(card_id),
+            "approval_status": "approved",
+            "card_status": "active",
+            "allowed_price_type": "wholesale",
             "source": payload.source.strip() or "telegram",
             "comment": payload.comment.strip(),
         }
@@ -397,10 +473,10 @@ class CustomerService:
     def _contact_to_context(self, contact: Dict[str, Any]) -> CustomerContext:
         phone = extract_primary_phone(contact.get("PHONE", []))
         company_id = contact.get("COMPANY_ID")
-        company_name = contact.get(self.f["company_name_snapshot"]) or None
+        company_name = self._contact_field_value(contact, "company_name_snapshot") or None
         shadow = self._get_shadow_state(
             phone=phone,
-            telegram_user_id=(contact.get(self.f["telegram_user_id"]) or "").strip(),
+            telegram_user_id=str(self._contact_field_value(contact, "telegram_user_id") or "").strip(),
             contact_id=int(contact["ID"]),
         )
         return CustomerContext(
@@ -408,17 +484,17 @@ class CustomerService:
             company_id=int(company_id) if company_id not in (None, "", 0, "0") else None,
             full_name=" ".join(part for part in [contact.get("NAME", ""), contact.get("LAST_NAME", "")] if part).strip(),
             phone=phone or ((shadow or {}).get("phone") or ""),
-            customer_type=((contact.get(self.f["customer_type"]) or "").strip() or (shadow or {}).get("customer_type") or "retail"),
-            approval_status=((contact.get(self.f["approval_status"]) or "").strip() or (shadow or {}).get("approval_status") or "new"),
-            card_status=((contact.get(self.f["card_status"]) or "").strip() or (shadow or {}).get("card_status") or "not_created"),
-            allowed_price_type=((contact.get(self.f["allowed_price_type"]) or "").strip() or (shadow or {}).get("allowed_price_type") or "retail"),
-            discount_percent=float(contact.get(self.f["discount_percent"]) or (shadow or {}).get("discount_percent") or 0),
-            client_card_id=(contact.get(self.f["client_card_id"]) or "").strip() or (shadow or {}).get("client_card_id") or None,
-            client_qr_payload=(contact.get(self.f["client_qr_payload"]) or "").strip() or (shadow or {}).get("client_qr_payload") or None,
-            telegram_user_id=(contact.get(self.f["telegram_user_id"]) or "").strip() or (shadow or {}).get("telegram_user_id") or None,
-            telegram_username=(contact.get(self.f["telegram_username"]) or "").strip() or (shadow or {}).get("telegram_username") or None,
+            customer_type=str(self._contact_field_value(contact, "customer_type") or self._shadow_field_value(shadow, "customer_type") or "retail").strip() or "retail",
+            approval_status=str(self._contact_field_value(contact, "approval_status") or self._shadow_field_value(shadow, "approval_status") or "new").strip() or "new",
+            card_status=str(self._contact_field_value(contact, "card_status") or self._shadow_field_value(shadow, "card_status") or "not_created").strip() or "not_created",
+            allowed_price_type=str(self._contact_field_value(contact, "allowed_price_type") or self._shadow_field_value(shadow, "allowed_price_type") or "retail").strip() or "retail",
+            discount_percent=float(self._contact_field_value(contact, "discount_percent", self._shadow_field_value(shadow, "discount_percent", 0)) or 0),
+            client_card_id=str(self._contact_field_value(contact, "client_card_id") or self._shadow_field_value(shadow, "client_card_id") or "").strip() or None,
+            client_qr_payload=str(self._contact_field_value(contact, "client_qr_payload") or self._shadow_field_value(shadow, "client_qr_payload") or "").strip() or None,
+            telegram_user_id=str(self._contact_field_value(contact, "telegram_user_id") or self._shadow_field_value(shadow, "telegram_user_id") or "").strip() or None,
+            telegram_username=str(self._contact_field_value(contact, "telegram_username") or self._shadow_field_value(shadow, "telegram_username") or "").strip() or None,
             company_name=company_name or (shadow or {}).get("company_name"),
-            last_sync_at=(contact.get(self.f["last_sync_at"]) or "").strip() or (shadow or {}).get("last_sync_at") or None,
+            last_sync_at=str(self._contact_field_value(contact, "last_sync_at") or self._shadow_field_value(shadow, "last_sync_at") or "").strip() or None,
             raw=contact,
         )
 
@@ -494,17 +570,17 @@ class CustomerService:
                 part for part in [shadow.get("first_name", ""), shadow.get("last_name", "")] if part
             ).strip(),
             phone=shadow.get("phone") or "",
-            customer_type=shadow.get("customer_type") or "retail",
-            approval_status=shadow.get("approval_status") or "new",
-            card_status=shadow.get("card_status") or "not_created",
-            allowed_price_type=shadow.get("allowed_price_type") or "retail",
-            discount_percent=float(shadow.get("discount_percent") or 0),
-            client_card_id=shadow.get("client_card_id") or None,
-            client_qr_payload=shadow.get("client_qr_payload") or None,
-            telegram_user_id=shadow.get("telegram_user_id") or None,
-            telegram_username=shadow.get("telegram_username") or None,
-            company_name=shadow.get("company_name") or None,
-            last_sync_at=shadow.get("last_sync_at") or None,
+            customer_type=self._shadow_field_value(shadow, "customer_type") or "retail",
+            approval_status=self._shadow_field_value(shadow, "approval_status") or "new",
+            card_status=self._shadow_field_value(shadow, "card_status") or "not_created",
+            allowed_price_type=self._shadow_field_value(shadow, "allowed_price_type") or "retail",
+            discount_percent=float(self._shadow_field_value(shadow, "discount_percent") or 0),
+            client_card_id=self._shadow_field_value(shadow, "client_card_id") or None,
+            client_qr_payload=self._shadow_field_value(shadow, "client_qr_payload") or None,
+            telegram_user_id=self._shadow_field_value(shadow, "telegram_user_id") or None,
+            telegram_username=self._shadow_field_value(shadow, "telegram_username") or None,
+            company_name=self._shadow_field_value(shadow, "company_name_snapshot") or self._shadow_field_value(shadow, "company_name") or None,
+            last_sync_at=self._shadow_field_value(shadow, "last_sync_at") or None,
             raw=shadow,
         )
 
@@ -522,7 +598,17 @@ class CustomerService:
 
     def _supported_custom_fields(self, fields: Dict[str, Any]) -> Dict[str, Any]:
         supported = self._contact_fields()
-        return {key: value for key, value in fields.items() if key in supported}
+        result: Dict[str, Any] = {}
+        for key, value in fields.items():
+            if key in supported:
+                result[key] = value
+            logical_key = self.field_name_to_logical.get(key)
+            if not logical_key:
+                continue
+            for alias_key in self._field_targets(logical_key):
+                if alias_key in supported:
+                    result[alias_key] = value
+        return result
 
     @staticmethod
     def _dedupe_contacts(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -580,11 +666,7 @@ def calculate_customer_state(context: CustomerContext) -> str:
         return "rejected"
     if context.card_status in {"archived", "blocked"}:
         return "archived"
-    if (
-        context.approval_status == "approved"
-        and context.card_status == "active"
-        and context.allowed_price_type == "wholesale"
-    ):
+    if context.card_status == "active" and context.allowed_price_type == "wholesale":
         return "approved_wholesale"
     if context.approval_status in {"pending_review", "new"}:
         return "pending_review"

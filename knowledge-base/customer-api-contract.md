@@ -71,13 +71,13 @@
 5. если не найден:
    - создать контакт
 6. установить или обновить поля:
-   - `approval_status = pending_review`
-   - `allowed_price_type = retail`
-   - `card_status = not_created` или `issued`
+   - `approval_status = approved`
+   - `allowed_price_type = wholesale`
+   - `card_status = active`
 7. если компания указана:
    - привязать к существующей компании
-   - либо сохранить в pending/manual matching
-8. вернуть клиенту статус заявки
+   - либо сохранить в ручном сопоставлении без потери заявки
+8. вернуть клиенту статус карты и доступ к оптовым ценам
 
 ### Response
 
@@ -87,11 +87,11 @@
   "action": "created",
   "contact_id": 1542,
   "company_id": 218,
-  "customer_state": "pending_review",
-  "approval_status": "pending_review",
-  "card_status": "not_created",
-  "allowed_price_type": "retail",
-  "message": "Заявка принята и ожидает подтверждения менеджером"
+  "customer_state": "approved_wholesale",
+  "approval_status": "approved",
+  "card_status": "active",
+  "allowed_price_type": "wholesale",
+  "message": "Карта создана и активирована, оптовые цены открыты"
 }
 ```
 
@@ -146,7 +146,7 @@
 ### Правило расчета `customer_state`
 
 - `guest` если клиент не найден
-- `pending_review` если контакт есть, но `approval_status != approved`
+- `pending_review` если контакт есть, но карта еще не активирована или синхронизация не завершена
 - `approved_wholesale` если:
   - `approval_status = approved`
   - `card_status = active`
@@ -195,7 +195,7 @@
 
 - `на проверке`
 - `не активна`
-- `ожидает подтверждения`
+- `ожидает синхронизации`
 
 ## 7. GET /api/telegram/customer/resolve
 
